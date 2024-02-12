@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aeropuerto>
+<nombre>JFK</nombre>
+<vuelos>
+    <vuelo codigo_vuelo="V22" Estado="R">
+        <vuelo_diario/>
+    </vuelo>
+    <vuelo>
+
+    </vuelo>
+</vuelos>
+<fecha>
+
+</fecha>
+
+</aeropuerto>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!-- Elemento ROOT-->
+  <xs:element name="estudiantes" type="TipoEstudiantes" />
+
+  <!--Tipos complejos reutilizables-->
+  <!--Separamos
+  los complex types y los hacemos reutilizables-->
+  <xs:complexType name="TipoEstudiante">
+    <xs:sequence>
+      <xs:element name="nombre" type="xs:string" />
+      <xs:element name="apellidos" type="xs:string" />
+    </xs:sequence>
+    <xs:attribute name="NIA" type="xs:string" use="required" /><!--Usamos
+    string en vez de integer-->
+    <xs:attribute name="ciclo" use="required" /><!--uso opcional o requerido-->
+  </xs:complexType>
+
+  <xs:complexType name="TipoEstudiantes">
+    <xs:sequence>
+      <xs:element name="estudiante" type="TipoEstudiante" />
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

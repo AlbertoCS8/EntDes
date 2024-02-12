@@ -1,0 +1,10 @@
+<!ELEMENT mensajes (mensaje+)>
+<!ELEMENT mensaje (telefonos?,NumTelfUsuario,Fecha,Hora,Texto+)>
+<!ELEMENT telefonos (movil|fijo)>
+<!ELEMENT movil (#PCDATA)>
+<!ELEMENT fijo (#PCDATA)>
+<!ELEMENT NumTelfUsuario (#PCDATA)>
+<!ELEMENT Fecha (#PCDATA)>
+<!ELEMENT Hora (#PCDATA)>
+<!ATTLIST Hora franja CDATA #REQUIRED>
+<!ELEMENT Texto (#PCDATA)>

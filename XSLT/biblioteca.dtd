@@ -1,0 +1,12 @@
+<!ELEMENT biblioteca (libros)>
+<!ELEMENT libros (libro+)>
+<!ELEMENT libro (titulo,edicion,editorial,ISBN,numeroDePaginas,autores)>
+<!ATTLIST libro codigoLibro ID #REQUIRED>
+<!ATTLIST libro portada CDATA #IMPLIED>
+<!ELEMENT titulo (#PCDATA)>
+<!ELEMENT edicion (#PCDATA)>
+<!ELEMENT editorial (#PCDATA)>
+<!ELEMENT ISBN (#PCDATA)>
+<!ELEMENT numeroDePaginas (#PCDATA)>
+<!ELEMENT autores (#PCDATA|autor)*>
+<!ELEMENT autor (#PCDATA)>

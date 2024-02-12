@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<empleados>
+    <empleado dni= "58255t">
+        <nombre>
+
+        </nombre>
+        <apellidos>
+            <apellido>
+
+            </apellido>
+            <apellido>
+
+            </apellido>
+
+        </apellidos>
+        <fecha_nacimiento>
+            <dia>
+
+            </dia>
+            <mes>
+
+            </mes>
+            <anio>
+
+            </anio>
+        </fecha_nacimiento>
+        <antiguedad unidad="annios"> </antiguedad>
+    </empleado>
+</empleados>

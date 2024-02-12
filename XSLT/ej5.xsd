@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    
+    <xs:element name="personas">
+    
+    <xs:unique name="DNIUnico">
+        <selector xpath="persona"/>
+        <field xpath="@dni"/>
+    </xs:unique>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="persona" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="nombre" type="xs:string" />
+                            <xs:element name="apellidos" type="xs:string" />
+                        </xs:sequence>
+                        <xs:attribute name="dni" type="DNIUnico"/>
+                        <xs:attribute name="sexo" use="required" />
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+  
+
+</xs:schema>

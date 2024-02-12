@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<agenda xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="AGenda_xsd.xsd">
+    <contacto>
+       <nombre>Pepe García</nombre>
+       <calle>C/Ronda, 3</calle>
+       <ciudad>Moncófar</ciudad>
+       <pais>España</pais>
+       <codigo>18465</codigo>
+       <vip/>
+    </contacto>
+    <contacto>
+       <nombre>Lola García</nombre>
+       <calle>C/Paraiso, 5</calle>
+       <ciudad>Ciudad Real</ciudad>
+       <pais>España</pais>
+    </contacto>
+  </agenda>
