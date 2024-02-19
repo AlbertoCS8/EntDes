@@ -1,0 +1,6 @@
+[Unit]
+description=servicio creao por mi para dar la bienvenida
+[Service]
+Exectstart=/home/alumnot/Documentos/Script_servicio.sh
+[Install]
+Wantedby=multi-user.target=

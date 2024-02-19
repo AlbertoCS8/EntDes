@@ -1,0 +1,11 @@
+alumnot@a37pc04:~$ echo "hola" | nc localhost 6666
+alumnot@a37pc04:~$ echo "hola" | nc -N localhost 6666
+alumnot@a37pc04:~$ echo "que pasa" | nc -N localhost 6666
+alumnot@a37pc04:~$ echo "hola" | nc -N localhost 6666
+buenas tardes
+alumnot@a37pc04:~$ 
+alumnot@a37pc04:~$ echo "hola" | nc -N localhost 172.26.235.205 6666
+nc: port number invalid: 172.26.235.205
+alumnot@a37pc04:~$ echo "hola" | nc -N 172.26.235.205 6666
+Buenas tardes...
+

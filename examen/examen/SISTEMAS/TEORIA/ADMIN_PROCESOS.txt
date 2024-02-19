@@ -1,0 +1,280 @@
+----------------------------
+ ADMINISTRACION DE PROCESOS
+  EN LINUX
+----------------------------
+
+Â¿que es un proceso?
+===================
+es una estructura de datos (conjunto de variables q almacenan valores 
+relacionados entre si y q ocupan una zona de memoria ram correlativa)
+donde se guarda informacion relativa al conjunto de instrucciones de
+un ejecutable que lanza el usuario:
+
+		estructura BCP (block-control-process)
+	----------------------------------------------
+	- PID (process identification number)
+	- PPID (parent process identification number)
+	- variables de entorno proceso <--- variables d entorno del sistema
+					 q el proceso necesita
+	- ejecutable del proceso (directorio y nombre del binario)
+	- stack/heap <----- zonas de memoria del proceso para calculos
+	
+	- lista de threads
+	
+	- usuario/grupo ejecuta proceso
+	- prioridad <==== se crean con prioridad base 0 (prioridad max: +99)
+	
+en linux la creacion de un proceso siempre parte de la estructura BCP de
+un proceso padre (se clona) <==== este mecanismo se llama FORK
+
+cada aplicacion q lanza el usuario, el modulo del kernel encargado de la
+gestion de procesos (SCHEDULER) crea una estructura, y las mete en una lista (lista enlazada) Â¿PARA QUE HACE ESTO? para planificar el acceso 
+del proceso a la CPU para q se puedan ejecutar todos los procesos
+
+				BCP-systemd
+				  |
+				  ....
+	-------------------------------------------------------------
+	   |		   |		  |		  |
+	BCP-firefox	BCP-gedit	BCP-discord	BCP-terminal
+	
+	
+	
+				 || <=== algoritmo de planificacion del	
+				 CPU		SCHEDULER
+	    
+los tipos de algoritmos del scheduler son (man sched):
+
+  - algoritmos para procesos q necesitan acceder a cpu en tiempo real:
+  
+	SCHED_RR (round-robin): (algoritmo q el scheduler ejecuta
+		 por defecto cuando el usuario ejecuta una aplicacion)
+		asigna un intervalo de tiempo en CPU (quantum) a cada BCP
+		y una vez agotado ese quantum se saca de la cpu al bcp para
+		meter al siguiente, y el saliente se pone al final de la
+		lista (rotacion)
+	SCHED_FIFO (first in-first out):
+		el scheduler mete en la cpu los bcp por orden de creacion
+		(de llegada a la lista) hasta q no acaba un proceso no 
+		entra el siguiente.
+
+  en estos dos se pueden cambiar las prioridades base de los bcp
+
+
+
+  - algoritmos para procesos q no necesitan acceder a cpu en tiempo real:
+    !! OJO !!  el scheduler no permite modificar la prioridad base del bcp
+    
+      son FIFO todos ellos usados para procesos del sistema q no requieren
+      interaccion del usuario (segundo plano)
+  	SCHED_OTHER, SCHED_BATCH, SCHED_IDLE
+  	
+ 
+  
+   	
+  comandos linux planificacion procesos
+  =====================================
+ - pid del proceso de una aplicacion:
+ 
+ 		pidof nombre_aplicacion
+ 		 
+ - relacion con algoritmos de planificacion y cambio de procesos a un
+  determinado algoritmo del scheduler:
+  
+  	chrt [-opciones]
+ 
+ 
+ 
+  - para ver la lista de procesos en ejecucion:
+  
+  	ps [-opciones]
+  	   -----------
+  	   	|
+  	opciones de parametros de salida en pantalla de la info de bcp:
+  	(por defecto solo saca PID,TTY,TIME,CMD)
+
+  	  -f = full-format 	
+
+		ej:  ps -f -C firefox
+		     ps -f -p 1
+		     ps -f -e 
+		     ps -f -u pablo,santiago
+		     
+	  --forest = muestra jerarquia en arbol de la lista de procesos
+
+		ej:
+			ps -e -f --forest
+			
+  	   -o opc1,opc2,opc3... = personalizar las opciones de salida del
+  	   			comando ps (para saber q opciones poner,
+  	   		 en man ps <--- seccion STANDARD FORMAT SPECIFIERS
+  	   		  linea 475)	
+  	   	
+  	   	ej:
+  	   		ps -u pablo -o pid,ppid,pri,nice,stime,time,cmd
+  	   		ps -C bash -o pid,%cpu,%mem,pri,nice,sched,cmd
+  	   		
+  	   		
+  	   		
+  	   		
+  	   		
+  	   
+  	opciones para filtrar procesos por un determinado criterio:
+
+  	   -p pid1 [,pid2 ...] = saca info del bcp de los procesos con
+  	   			esos pid
+  	   			
+  	   	ej:  ps -p 3060,1
+  	   	
+  	   -u usuario[,usuario2,..] = saca info de los bcp de los procesos
+  	   			   lanzados por esos usuarios
+  	   			   
+  	   	ej:   ps -u ${USERNAME}
+  	   	
+  	    -e = saca info de todos los bcps de todos los procesos de TODOS
+  	         los usuarios
+  	         
+  	         ej:   ps -e
+  	         
+  	     -g grupo[,grupo2,...] = saca la info de los bcp de los proc.
+  	     			   lanzados por esos grupos de usuarios
+  	     			   
+  	     	 ej:  ps -g profesores
+  	     	 
+  	      -C aplicacion = saca la info del bcp perteneciente a esa
+  	      			aplicacion
+  	      			
+  	      	  ej:  ps -C firefox
+  	      	       ps -C bash
+  	      	       ps -C gedit
+  	      	        
+  	   	
+  - para ver la info de los procesos de forma continua:
+  
+  	top
+  	htop <--- no viene por defecto instalada, hay q instalarla:
+  			apt install htop	
+  	   	
+  	   	
+ ESTADOS DE UN PROCESO. COMO MANDAR SEÃ‘ALES A UN PROCESO para cambiar estado
+ ---------------------------------------------------------------------------
+ 
+ 
+ 	Ready(R) ------------------> Executing(E) -------- Finished(F)
+ 	el proceso esta		   el proceso esta	 proceso finalizado
+ 	cargado en ram		  en CPU ejecutandose
+ 	listo para entrar		|
+ 	en CPU por el			|
+ 	scheduler			|
+ 		|--------------	Waiting(w) proceso q se
+ 				suspende temporalmente su
+ 				ejecucion ante un evento
+ 				del sistema, cambio prioridad,..
+ 
+ 
+ el comando linux para mandar una seÃ±al a un proceso y q este cambie de
+ estado es:
+ 		kill [-opcion]
+ 		     ----------
+ 		     	|
+ 		      -l = lista de conjunto de seÃ±ales q puedes mandar
+ 		      	   a un proceso
+ 		      	   	ej:  kill -l
+ 		      -s NOMBRE_SEÃ‘AL | -NÂº_SEÃ‘AL  pid_proceso = mandas esa
+ 		      				seÃ±al (nombre o numero) a el
+ 		      				proceso con ese PID
+ 			ej:
+ 				-ejecutar firefox
+ 				-ver que pid tiene el proceso asociado
+
+ 					pidof firefox
+ 					ps -C firefox
+ 					
+ 				-matamos el proceso del firefox:
+ 					kill -s SIGKILL xxxx
+					kill -9 xxxx 		      
+					
+			ej:
+				-ejecutar firefox
+ 				-ver que pid tiene el proceso asociado
+
+ 					pidof firefox
+ 					ps -C firefox
+
+ 				- suspendemos proceso mandando seÃ±al SIGSTOP
+ 				
+ 					kill -s SIGSTOP xxxx
+ 					
+ 				para reaunudar su ejecucion mandar seÃ±al 
+ 				SIGCONT:
+ 					kill -s SIGCONT xxxx
+ 					
+ 					
+ PRIORIDAD EN LOS PROCESOS
+ -------------------------					
+ la prioridad es el grado de importancia q le da el scheduler a un proceso
+ de cara a ocupar la CPU para q se ejecute: a mayor prioridad, el scheduler
+ mete durante mas tiempo en la CPU a ese proceso
+ 
+ el rango de prioridades es numerico, cuando se crea el BCP el scheduler
+ siempre asigna prioridad 0; la prioridad por parte del scheduler
+ lo basa en un concepto q es la bondad (un proceso bondadoso es el que
+ deja a otros ejecutarse).
+ 
+  el rango de bondades van de:
+ 
+ 	-19 (minima bondad, maxima prioridad) a 
+ 	+20 (maxima bondad, minima prioridad)
+ 	
+ comandos para modificar/establecer la bondad:
+ 
+ 	nice <-------cuando el proceso aun no esta creado,  y lo quieres
+ 		    ejecutar con una determinada bondad(prioridad)
+ 		    
+ 		    ej: nice -n nÂº_bondad nombre_aplicacion
+ 		    
+ 		    		nice -n -3 firefox
+ 		    
+ 	renice <---- el proceso ya se esta ejecutando con una determinada
+ 			prioridad y lo quieres cambiar
+ 			
+ 		     ej: YA SE ESTA EJECUTANDO firefox con prioridad 0
+ 		      quiero aumentar la prioridad bajando su bondad 4 ptos
+ 		      
+ 		      	renice -n -4 -p `pidof firefox`
+ 		      	
+ 		      	
+COMO MANDAR EL PROCESO DE UNA APLICACION A BACKGROUND (2Âº PLANO)
+----------------------------------------------------------------
+el proceso consiste en mandar una aplicacion con la q estas interactuando
+y q de repente se queda pillada haciendo operaciones y te deja la terminal
+sin poder interactuar con ella, Y NO QUIERES MATARLA NI INTERRUMPIRLA, 
+quieres q se siga ejecutando
+
+	1Âº paso: es suspender la app. en ejecucion...CTRL + Z
+	te sale en la consola un nÂº identificador q se le asocia al 
+	proceso suspendido:   [nÂº] ..... +stopped
+	
+	2Âº paso: con el comando:  bg %nÂº <---- el sched manda el bcp a otro
+					 	algoritmo para q se siga
+					 	ejecutando
+					 	
+	para ver si se esta ejecutando:  jobs <--- te lista todos los proc.
+						 en background
+						 
+	Si quieres pasar de nuevo el proceso a 1Âº plano:
+	
+		fg %nÂº <------------- el sched pasa el bcp de nuevo
+				   a SCHED_RR y puedes interactuar con la ap
+				   
+				   
+SI QUIERES MANDAR UNA APP. QUE NO SE ESTA EJECUTANDO directamente 
+a background hay q poner detras del nombre de la app el simbolo &:
+
+		nombre_app  &
+		
+
+OTROS COMANDOS PARA LA ADMIN DE PROCESOS (funcionan con patrones o exp.reg)
+---------------------------------------------------------------------------
+ - seleccion de procesos en base a patrones:       pgrep
+ - mandar seÃ±ales a procesos q cumplen un patron:  pkill

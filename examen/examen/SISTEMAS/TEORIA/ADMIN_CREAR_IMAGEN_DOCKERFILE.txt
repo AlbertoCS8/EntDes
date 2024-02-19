@@ -1,0 +1,200 @@
+Crear imagenes con Dockerfile
+ José Antonio Torrado Navas
+
+ 2023-11-01
+
+Imagen nginx con web
+Vamos a crear una imágen propia partiendo de una iamgen oficial de nginx. Vamos a copiar los ficheros necesarios, en este caso un fichero html, css y javascript. El comando que vamso a ejecutar permite al contenedor arrancar al crearse nginx.
+
+Paso 1: Crear los ficheros de la página web
+index.html:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Sitio Web</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Hola, Docker!</h1>
+  <p>Bienvenido a mi sitio web estático.</p>
+  <script src="script.js"></script>
+</body>
+</html>
+styles.css:
+
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f0f0f0;
+  margin: 40px;
+}
+h1 {
+  color: #333366;
+}
+script.js:
+
+document.addEventListener('DOMContentLoaded', (event) => {
+  console.log('DOM completamente cargado y analizado');
+});
+Paso 2: Crear el Dockerfile
+El Dockerfile configurará Nginx y copiará los ficheros de la página web al contenedor.
+
+# Utilizar la imagen oficial de Nginx
+FROM nginx:latest
+
+# Definir el directorio de trabajo
+WORKDIR /usr/share/nginx/html
+
+# Copiar los ficheros de la página web al directorio de Nginx
+COPY index.html index.html
+COPY styles.css styles.css
+COPY script.js script.js
+
+# Configurar el ENTRYPOINT para iniciar Nginx y mantenerlo en primer plano
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
+Paso 3: Construir la imagen Docker
+docker build -t mi-sitio-nginx .
+Paso 4: Ejecutar un contenedor a partir de la imagen
+docker run -p 8080:80 mi-sitio-nginx
+Esto iniciará un contenedor y mapeará el puerto 8080 de tu máquina al puerto 80 del contenedor. Ahora deberías poder acceder a la página web en http://localhost:8080 desde tu navegador.
+
+En este ejemplo, ENTRYPOINT se usa para iniciar Nginx y mantenerlo en primer plano.
+
+Imagen de apache
+Paso 1: Crear los Archivos de la Página Web
+Primero, creemos una estructura de directorio simple para nuestro proyecto.
+
+mi-sitio-web/
+│   Dockerfile
+│   index.html
+|---css/
+    │   estilo.css
+index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/estilo.css">
+    <title>Mi Sitio Web</title>
+</head>
+<body>
+    <h1>Hola, bienvenido a mi sitio web!</h1>
+</body>
+</html>
+Y en css/estilo.css:
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 50px;
+}
+Paso 2: Crear el Dockerfile
+Usamos una imagen base de Apache y copiaremos nuestros archivos al contenedor.
+
+# Usar la imagen base de Apache
+FROM httpd:latest
+
+# Copiar los archivos de la página web al directorio de Apache
+COPY ./index.html /usr/local/apache2/htdocs/
+COPY ./css /usr/local/apache2/htdocs/css
+
+# Apache ya tiene un ENTRYPOINT predefinido no es necesario
+Paso 3: Construir la Imagen
+Desde el directorio mi-sitio-web, ejecuta el siguiente comando para construir tu imagen Docker:
+
+docker build -t mi-sitio-web .
+Paso 4: Ejecutar el Contenedor
+docker run -d -p 8080:80 mi-sitio-web
+Crear un contenedor con mysql
+La imagen oficial de MySQL y muchas imágenes oficiales de bases de datos permiten la inicialización a través de scripts en un directorio específico, en este caso docker-entrypoint-initdb.d. Puedes simplemente agregar los scripts SQL o scripts de shell en el directorio docker-entrypoint-initdb.d y estos se ejecutarán automáticamente la primera vez que se inicie el contenedor.
+
+Paso 1: Preparar los Scripts y Datos de Prueba
+Crea un archivo llamado database.sql :
+
+CREATE DATABASE IF NOT EXISTS prueba;
+
+USE prueba;
+
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    email VARCHAR(50) NOT NULL
+);
+
+INSERT INTO usuarios (nombre, email) VALUES ('Juan', 'juan@email.com');
+INSERT INTO usuarios (nombre, email) VALUES ('Maria', 'maria@email.com');
+Sí, la imagen oficial de MySQL y muchas imágenes oficiales de bases de datos permiten la inicialización a través de scripts en un directorio específico, en este caso docker-entrypoint-initdb.d. Al utilizar este método, no necesitas crear un script de entrada (entrypoint.sh) personalizado para inicializar la base de datos; en cambio, puedes simplemente agregar tus scripts SQL o scripts de shell en el directorio docker-entrypoint-initdb.d y estos se ejecutarán automáticamente la primera vez que se inicie el contenedor.
+
+Paso 2: Crear el Dockerfile
+# Usar la imagen oficial de MySQL
+FROM mysql:latest
+
+# Establecer variables de entorno para configurar MySQL
+ENV MYSQL_ROOT_PASSWORD=root
+ENV MYSQL_DATABASE=prueba
+ENV MYSQL_USER=usuario
+ENV MYSQL_PASSWORD=usuario
+
+# Copiar el script SQL al directorio de inicialización
+COPY database.sql /docker-entrypoint-initdb.d/
+Paso 3: Construir la Imagen
+docker build -t mi-mysql .
+Paso 4: Ejecutar el Contenedor
+docker run -d -p 3306:3306 mi-mysql
+Crear una imagen personalizada de MySQL que incluya una base de datos de prueba y se configure mediante ENTRYPOINT y CMD es un poco más complejo. A continuación, te guiaré paso a paso para hacerlo.
+
+Paso 5: Conectar y Verificar
+mysql -h 127.0.0.1 -u usuario -p
+USE prueba;
+SELECT * FROM usuarios;
+Crear un imagen cvs to json
+Vamos a crear una imagen de Docker que contenga una aplicación Python que transforma archivos CSV a formato JSON.
+
+Paso 1: Crear la Aplicación Python
+El script csv_to_json.py lee un archivo CSV desde la entrada estándar y escribirá el JSON resultante en la salida estándar.
+
+import sys
+import csv
+import json
+
+def csv_to_json(csv_file, json_file):
+    reader = csv.DictReader(csv_file)
+    data = [row for row in reader]
+    json.dump(data, json_file)
+
+if __name__ == "__main__":
+    csv_to_json(sys.stdin, sys.stdout)
+Paso 2: Crear el Dockerfile
+# Usar una imagen base de Python
+FROM python:3.9-slim
+
+# Copiar el script de Python al contenedor
+COPY csv_to_json.py /app/csv_to_json.py
+
+# Establecer el directorio de trabajo
+WORKDIR /app
+
+# Dar permisos de ejecución al script
+RUN chmod +x csv_to_json.py
+
+# Establecer el comando por defecto para ejecutar la aplicación Python
+ENTRYPOINT ["python", "csv_to_json.py"]
+Paso 3: Construir la Imagen
+docker build -t csv-to-json .
+Paso 4: Preparar un Archivo CSV de Ejemplo
+Crea un archivo CSV de ejemplo llamado ejemplo.csv:
+
+nombre,edad,ciudad
+Juan,30,Madrid
+Maria,25,Barcelona
+Paso 5: Usar la Imagen para Convertir CSV a JSON
+cat ejemplo.csv | docker run -i csv-to-json
+La opción -i permite mantener STDIN abierto incluso si no está adjunto.
+
+El contenedor leerá el archivo CSV de la entrada estándar, convertirá los datos a formato JSON y los escribirá en la salida est

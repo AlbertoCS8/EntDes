@@ -1,0 +1,410 @@
+----------------------------------------
+	administracion
+  programacion de tareas automaticas
+----------------------------------------
+una tarea automatica es un programa/script q se ejecutan o bien puntualmente
+en una fecha/hora determinada, o bien de forma periodica.
+
+ - Las tareas automaticas puntuales: at(d).service
+ - las tareas ciclicas:  	     cron.service, anacron.service
+ 
+ 
+ TAREAS CRON
+ -----------
+ estan controladas por el servicio cron.service, si este servicio se para
+ obviamente dejan de ejecutarse:
+ 
+ 	el estado servicio:	systemctl status cron.service
+ 	
+ 	el ejecutable q lanza 
+ 	el servicio:		/usr/sbin/cron  
+ 	
+ 	para verlo, en seccion [Service] <--- ExecStart
+ 	del servicio lo indica:  systemctl  cat cron.service
+ 	
+ 	
+ Â¿como funciona el servicio? cada minuto chequea los ficheros crontab
+ (ficheros donde se definen las tareas con su programacion) y en funcion
+ del hh:mm dia/mes dia de la semana va comprobando una a una si las tiene
+ q ejecutar:
+ 			ficheros crontabs
+ cron.service ------>   ------------------ 
+ 		||	crontab-1:  prog-1  comando
+ 	   cada min		    prog-2  comando
+ hh:mm dia/mes dia de la semana	    ...
+ 				    
+ 		        crontab-2:  prog-1  comando
+ 		        	    prog-2  comando
+ 	
+ los ficheros crontab (man 5 crontab) son ficheros de texto plano
+ donde al principio del fichero se pueden definir variables de entorno
+ para las tareas (son opcionales) y despues viene la prog. de cada tarea
+ y tiene este formato:
+ 
+  minuto  hora  diames  mes  diasemana	[usuario]	programa_a_ejecutar
+ 					---------
+ 					  \--> solo aparece en fich.crontab
+ 					  	del sistema
+en cada campo:
+	     puedes poner lista de valores: valor1,valor2,...
+  	     puedes poner rangos:  	    valor1-valorN 		  	       puedes poner saltos:    	    rango/salto		  	
+ 					  	
+  en minuto: valor de 0-59 q significa en q minuto de la hora quieres q
+  	     se ejecute la tarea. 
+ 
+  en hora: valor de 0-23 significa a q hora quieres ejecutar la tarea
+  diames: valores de 1 al 31, significa en q dia del mes ejecutas la tarea
+  mes: valores del 1 al 12, en q mes del aÃ±o quieres ejecutar la tarea
+  disemana: valores del 0 al 6, 0 y 7 son domingo, 1 Lunes, 2 martes,...
+  
+  
+  0,15,30  15   1,15,30  *  1,5     /ruta/script_backup_ficheros.sh
+  */15	   */2   *       9   *	    /ruta/mensaje_bienvenida_usuarios.sh
+  
+
+ ficheros crontab pueden ser:
+ 	- fichero crontab del sistema, solo lo puede modificar el root
+ 	   /etc/crontab:
+ 	   
+ 	   	cat /etc/crontab 
+ 
+ 
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+17 * * * *	root    cd / && run-parts --report /etc/cron.hourly
+				-----------------------------------
+					\ tarea del sistema q ejecuta
+					todos los programas/scripts situados
+					en el directorio /etc/cron.hourly
+					cada hora a 17min
+ 
+25 6	* * *	root	test -x /usr/sbin/anacron ||
+			 ( cd / && run-parts --report /etc/cron.daily ) 
+ 			 ----------------------------------------------
+ 			 	\tarea del sistema q ejecuta todos los
+ 			 	programas/scripts situados en el directorio
+ 			 	/etc/cron.daily cada dia a las 6h 25min
+ 			SIEMPRE Y CUANDO el fichero /usr/sbin/anacron
+ 			no este en el sistema o no tenga permisos de 
+ 			ejecucion
+ 			
+ 			
+ 47 6	* * 7	root	test -x /usr/sbin/anacron || 
+		( cd / && run-parts --report /etc/cron.weekly )
+ 			 ----------------------------------------------
+ 			 	\tarea del sistema q ejecuta todos los
+ 			 	programas/scripts situados en el directorio
+ 			 	/etc/cron.weekly cada semana a las 6h 47min
+ 			SIEMPRE Y CUANDO el fichero /usr/sbin/anacron
+ 			no este en el sistema o no tenga permisos de 
+ 			ejecucion
+ 
+ 52 6	1 * *	root	test -x /usr/sbin/anacron ||
+ 			 ( cd / && run-parts --report /etc/cron.monthly )
+ 			 ----------------------------------------------
+ 			 	\tarea del sistema q ejecuta todos los
+ 			 	programas/scripts situados en el directorio
+ 			 	/etc/cron.monthly el 1 de cada mes a las
+ 			 	 6h 52min
+ 			SIEMPRE Y CUANDO el fichero /usr/sbin/anacron
+ 			no este en el sistema o no tenga permisos de 
+ 			ejecucion
+
+ 
+ 	- ficheros crontab de los usuarios:
+ 	   son ficheros de tareas q crean cada usuario particular
+ 	   Para crearlos:
+ 	   
+ 	   	crontab -e 
+ 	   	
+ 	   para ver si se ha creado bien:
+ 	   
+ 	   	crontab -l
+ 	   	
+ 	   pq se almacenan en un directorio q solo tiene acceso el root
+ 	   donde estan todos los crontabs de todos los usuarios
+ 	   
+ 	   	/var/spool/cron/crontabs/ nombre_usuario <----- fich.crontab
+ 	   
+ 	   
+ 	   para borrar fichero crontab:
+ 	   
+ 	   	crontab -r
+ 	   	
+-----------------------------------------------------------
+practica:
+	- programar una tarea para q se ejecute de lunes a viernes
+	todos los dias del mes y  meses del aÃ±o, cada 15min, q
+	copie el contenido del directorio /home/<nombre_usuario>/Documentos
+	y  en /tmp/<nombre_usuario>
+	
+	a la vez mandar mensaje al log syslog con comando logger asi:
+	"se ha copiado tus documentos en /tmp a las <hora y dia>"
+	
+	ayuda: comando para copiar....... cp (si hay directorios opcion -r)
+	       comando mandar mensaje al log... logger "mensaje"
+
+
+ 1Âº paso:
+ 	crear tarea en fichero crontab del usuario:   crontab -e
+
+	*/15 * * * 1-5   cp -r /home/$USERNAME/Documentos/   /tmp/$USERNAME
+			   && logger -t mitarea "se ha copiado tus documentos en /tmp a las `date`"
+			   
+2Âº paso:
+	comprobamos si se copian ficheros en /tmp y se manda mensaje
+	al log:
+		sudo tail -f /var/log/syslog
+			   
+	en otra consola:
+		ls -l /tmp/<nombre_usuario>
+----------------------------------------------------------------------
+practica:
+	- el comando lastlog te muestra los inicios de sesion de todos
+	los usuarios del sistema (fecha y hora); si no han iniciado 
+	sesion te muestra mensaje "Nunca se ha accedido"
+	
+	programar una tarea q seleccione (filtre) de ese comando las lineas
+	q no tengan "Nunca..." (usuarios q han iniciado sesion) y las 
+	guarde en un fichero en /tmp/USUARIOS_LOGGIN.txt; mandar un mensaje
+	al log para comprobar q se ha ejecutado la tarea:
+		"...se ha generado fichero /tmp/USUARIOS_LOGGIN.txt a las.."
+	
+	de lunes a viernes, solo este mes, cada dos dias en el mes, cada
+	hora en punto
+	
+	ayuda:
+		- para filtrar lineas.... grep (ver opcion -v)
+		- para mandar lineas de la salida de un comando a un
+		fichero.... redireccion salida:   comando > /ruta/fichero
+		- para generar mensaje en log.... logger
+		
+1Âº paso:
+	- creamos tarea... crontab -e
+	
+	0  *  */2  10  mon-fri  lastlog | grep -v "Nunca" > /tmp/USUARIOS_LOGIN.txt && logger -t mitarea "se ha generado fichero /tmp/USUARIOS_LOGIN.txt a las `date`"
+			   
+2Âº comprobamos q se ejecuta:
+
+	-en una terminal ejecuta:   tail -f /var/log/syslog
+	-en otra terminal ejecuta:   cat /tmp/USUARIOS_LOGIN.txt
+--------------------------------------------------------------------------
+
+CONTROL DE LA PROGRAMACION DE TAREAS CRON
+=========================================
+el root puede permitir/denegar a determinados usuarios el programar tareas
+el servicio:  cron.service
+antes de ejecutar cualquier tarea mira el contenido de dos ficheros:
+
+	                si no existe			si no
+	/etc/cron.allow ------------> /etc/cron.deny ----------> PERMITIR
+		||			   ||
+	
+	usuario1			usuario1
+	usuario2			usuario2
+	....				..
+	   | 				  |	
+ si el nombre del usuario aparece    si el nombre del usuario aparece
+ en este fichero, automaticamente	en este fichero, automaticamente
+ se le permite el programar tareas	SE LE PROHIBE programar tareas
+
+ practica:
+ 	programar esta tarea como tu usuario normal:  crontab -e
+ 	
+ 	* * * * *   logger -t mitarea "...mensaje al log a las `date`"
+
+
+ en otra consola:    tail -f /var/log/syslog <--- deberian aparecer mensajes
+ 						de la tarea
+ 						
+ en otra consola como ROOT:  echo "pablo" > /etc/cron.deny
+ 	(al hacer esto, automaticamente se parara tarea iniciada en paso 1)
+ 	
+ en consola como ROOT:  echo "pablo" > /etc/cron.allow
+ 	(al hacer esto, automaticamente se vuelve a ejecutar la tarea)
+ 
+ 
+ TAREAS ANACRON (man anacron)
+ ==============
+ las tareas anacron, son tareas q se ejecutan por el servicio
+ 
+ 	anacron.service <----- este servicio, al contrario cron.service
+ 				no se esta ejecutando continuamente, depende
+ 				de un TIMER (cronometro) q se activa cada
+ 				hora y levanta el servicio anacron.service
+ 				
+ una vez q se levanta el servicio, va a fichero de tareas anacron (solo
+ existe un fichero):
+ 			/etc/anacrontab
+ 			   ||
+  en cada linea del fichero se define la ejecucion de una tarea anacron
+  tienen este formato: (man anacrontab)
+  
+  intervalo_ejecucion   tiempo_espera(delay)	nombre_id_tarea  tarea
+  -------------------	--------------------    --------------- 
+   en dias, no admite      en minutos		 fichero en 
+   horas,minutos...				/var/spool/anacron
+   						donde almacena:
+   						YYYYMMDD 
+  						de ejecucion de la tarea
+  						por ultima vez
+  ej:
+  
+1	5	cron.daily	run-parts --report /etc/cron.daily
+7	10	cron.weekly	run-parts --report /etc/cron.weekly
+@monthly 15	cron.monthly	run-parts --report /etc/cron.monthly
+  
+  como funciona:
+  --------------
+  
+  timer levanta
+  el servicio		va leyendo tareas de /etc/anacrontab
+  anacron.service ----> 1Âº tarea: mira fecha ultima ejecucion en
+  				/var/spool/anacron/<id_tarea>
+  
+  			la compara con la fecha actual, si el num.de 
+  			dias q hay en la programacion de la tarea es
+  			>= dif. de fecha actual - fecha ultima ejecucion
+  			
+  			la ejecuta de nuevo y refresca fecha en fichero
+  			/var/spool/anacrontab/<id_tarea>
+  			
+  			....
+  			
+ej:
+  			
+ 1  5	cron.daily	run-parts --report /etc/cron.daily		
+ 	
+ el contenido del fichero /var/spool/anacron/cron.daily --> 20231003
+ fecha actual: 2023/10/04 			
+  dif. de fechas:  2023/10/04 - 2023/10/03 = 1 dia <= fech.prog: 1dia
+  la tiene q ejecutar.... y en fichero almacena nueva fecha de ejecucion:
+		/var/spool/anacron/cron.daily --> 20231004
+  
+como ver el timer del q depende anacron:
+----------------------------------------
+	systemctl cat anacron.timer 
+
+[Unit]
+Description=Trigger anacron every hour
+
+[Timer]
+OnCalendar=*-*-* 07..23:30 <---- man systemd.time
+RandomizedDelaySec=5m
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+
+TAREAS PUNTUALES EN EL TIEMPO: tareas AT
+========================================
+instalar paquete at:
+
+   sudo apt update &&  sudo apt install at
+
+
+para ver si se ha instalado, miramos el estado del servicio:
+
+		systemctl status atd.service
+	
+para ver el fichero de configuracion del servicio de prog.de tareas puntuales:
+		systemctl cat atd.service
+		
+		
+para crear tarea AT: (man at)
+-----------------------------
+
+	at fecha_hora
+	
+	at> comando1
+	at> comando2
+	at> [Ctrl+D] <----- finalizas edicion de tarea puntual
+	
+te aparece en consola:
+
+	job num.id.tarea	fecha_hora_tarea
+	
+para mostrar tareas:   at -l
+para borrar tareas:    at -r nÂºid
+
+ej:
+	crearos en directorio /tmp varios ficheros de texto:
+		fich1.txt, fich2.txt, fich3.txt, fich4.txt
+	
+	crear una tarea puntual con at, para q se ejecute dentro de 5min
+	q borre de /tmp los ficheros .txt (comando para borrar rm)
+	ademas mandar mensaje a /var/log/syslog con comando logger con
+	este contenido:
+		"se han borrado todos los ficheros de texto de /tmp
+		a las: ....."
+
+
+
+
+
+
+
+
+	
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			   
+			    
+
+
+
+
+
+
+
+
+
+
+
+ 	   	
+ 	   	
+ 	   	
+ 	   
+ 	   
+ 	   
+ 	   
+ 	   
+ 	
+ 	
+ 	
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

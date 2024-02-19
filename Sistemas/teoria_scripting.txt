@@ -1,0 +1,389 @@
+-----------------------
+  bash scripting
+------------------------
+
+ SENTENCIAS CONDICIONALES
+ ========================
+ 
+  if comando-codigo-salida-0 <---- condicion true
+  then
+  	comando-1
+  	comando-2
+  	---
+  [elif comando-codigo-salida0
+   then
+   	comando-1
+   	comando-2
+   	...
+   else
+   	comando-1
+   	comando-2
+   	...
+    ]
+    
+   fi
+   
+ Condicional abreviada:
+ 
+	 comando-codigo-salida-0 && comando-si-ok || comando-sino
+
+ si quiero poner mas de un comando detras del && o || deben ir entre llaves
+ asi:
+ 
+	 comando-codigo-salida-0 && { comando-1; comando-2; ... } 
+	 			 || { comando-sino-1; comando-sino2; ... }
+ 
+--------- -----switch-case---------------------------
+ 
+ case  $contenido_variable in
+    caso1)
+    		comando-1
+    		comando-2
+    		...   		
+    		;;
+  
+    caso2)
+    		comando-1
+    		comando-2
+    		...		
+    		;;
+      		
+  	*)
+  		comando-1
+  		comando-2
+  		...
+  		;;  		
+  esac
+ 
+ 
+   
+   
+ ------------------------------------------------------------  
+ ej:
+ read -p "introduce directorio..." direct
+ if ls -l $direct   >/tmp/SALIDA_OK.txt  2>/tmp/SALIDA_MAL.txt
+ then
+ 	 echo "el directorio existe..."
+ else 
+ 	echo "el directorio no existe...."
+ fi 
+ --------------------------------------------------  
+   
+ ej:  
+ te debe pedir por el nombre de un directorio, comprobar con "cd"
+ si existe el directorio o no; si existe el directorio mostrar el mensaje
+ de q existe y si no q no existe; TANTO SI ACABA BIEN EL COMANDO cd como MAL
+ q no salga nada por pantalla del comando cd
+ 
+ read -p "introduce directorio..." undir
+ if cd $undir >/dev/null 2>/dev/null
+ then
+ 	echo "directorio existe, nos acabamos de meter en el"
+ else
+ 	echo "directorio no existe..."
+ fi
+ -----------------------------------------------------------
+ 
+ ej:
+ ls -l  >/dev/null 2>/dev/null && echo "...acabo bien.."
+ 			       || echo "directorio no existe..."
+
+ 
+ 
+ -------------------------------------
+ PATRONES EN BASH con GREP,SED,AWK...
+ --------------------------------------
+ caracteres especiales q se pueden meter en un patron:
+ 
+ ^ = principio de linea
+ $ = fin de linea
+ . = cualquier caracter en esa posicion
+ [car1car2car3..], [car1-carN] = en esa posicion debe aparecer un caracter definido en la
+ 				lista de caracteres q aparecen entre los corchetes
+ [^....] = en esa posicion NO DEBE aparecer un caracter definido en la lista
+ * = cero o mas repeticiones de la expresion anterior
+ + = una o mas repeticiones de la expresion anterior
+ ? = cero o una vez la expresion anterior
+ {n,m} = la expresion anterior se repite mas o igual q "n" y menos o igual q "m"
+ {n, } = la expresion anterior se repite minimo "n" veces
+ (expresion1 | expresion2 | .... ) = en esa posicion al menos debe aparecer una de esas
+  					expresiones
+  					\1 = repetir primer parentesis
+  					\2 = repetir segundo parentesis
+ 
+ alias de rangos:
+ [a-zA-Z] = \w
+ [0-9] = \d
+ [ ] = \s
+ 
+ ej:
+ 
+linea="pablo:x:1001:1001:pablo el puto amo:/home/pablo:/bin/bash"
+
+
+echo $linea | grep -e "^[pP][aA][bB][lL][oO]:x:.*"
+echo $linea | grep -e "^[a-zA-Z]{1,10}:x:[0-9]{1,}:"
+echo $linea | grep -e "^.*:x:0:0:.*"
+
+grep -e "^.*:x:0:0:.*" /etc/passwd
+grep -e ":/usr/sbin/nologin$" /etc/passwd
+grep -e ":.*\(nologin\|nosh\)$" /etc/passwd
+ 
+-------------------------------------------------------------------------------
+practica patrones con grep: 
+
+SOBRE FICHERO de usuarios /etc/passwd:
+
+ - sacar los usuarios cuyo UID sea igual o superior a 1000 (usuarios no del sistema)
+ 
+ 	grep -e ":x:[1-9][0-9]\{3,\}:" /etc/passwd | cut -d ":" -f 1
+ 	
+ 	
+ - sacar los usuarios q no tienen shell (usuarios del sistema generalmente del sistema)
+ 
+ 	grep -e ":/usr/sbin/nologin$" /etc/passwd | cut -d ":" -f 1
+ 	
+ 	
+ - sacar los usuarios cuya shell sea o /bin/bash o /bin/sh
+ 
+ 	grep -e "\(/bash\|/sh\)$" /etc/passwd | cut -d ":" -f 1
+ 	
+ - sacar los usuarios cuyo directorio personal sea /home/....
+ 
+ 	grep -e ":/home/.*" /etc/passwd | cut -d ":" -f 1
+ 	
+ 	
+ 	
+ 
+ SOBRE FICHERO de GRUPOS /etc/group:
+ 
+ - sacar los grupos que tienen usuarios (el ultimo campo no esta vacio)
+ 
+ 	grep -e ":.\+$" /etc/group | cut -d ":" -f 1
+ 	
+ 	
+ - sacar los grupos cuyo GID es igual o superior a 1000 (grupos no del sistema)
+
+	grep -e ":x:[1-9][0-9]\{3,\}:" /etc/group | cut -d ":" -f 1
+	
+	
+	
+ - sacar los usuarios que pertenecen al grupo "root" (administradores, gid=0)
+
+	 grep -e ":x:0:" /etc/group | cut -d ":" -f 4
+ 
+ ----------------------------------------------------------------------------
+ ARRAYS: 
+  como usar arrays basados en indice (posicion):
+  
+    nombre_array=( valor1  valor2   valor3 ... )
+ 		   ---------------------------
+ 		   	\---> lista de valores separados por espacios, TABS o \n
+ 		   	
+ 
+  otra forma de declararte el array:
+  
+  	declare -a nombre_array <---- crea array vacio
+  	nombre_array[0]=valor1
+  	nombre_array[2]=valor2
+  	...
+  	
+  	
+  	
+  como acceder a los valores del array:
+  -------------------------------------
+ 	${nombre_array[valor_indice]}
+  		       -------------
+  		       	\--> empiezan en pos.0 ... si pones un * te recupera todos los
+  		       		valores de golpe del array
+  
+  
+   para recorrerse todo el array:
+   ------------------------------
+    2 formas:
+    	- bucle for con un contador para el indice desde 0 hasta el numero de elementos del
+    	  array(length):   ${#nombre_array[*]}
+    	
+    		for ((a=0; a<=${#nombre_array[*]}; a++))
+    		do
+    			echo "en la posicion $a .... tenemos:  ${nombre_array[$a]}"
+    		done
+    		
+    	- bucle for recorriendo la lista de valores del array:
+    	
+    		for valor in ${nombre_array[*]}
+    		do
+    			echo "valor del array: $valor"
+    		done
+    	
+  
+ DICCIONARIOS, MAPAS, ARRAYS-BASADOS-EN-CLAVE-VALOR:
+ 
+ 	declare -A nombre_diccionario
+ 	nombre_diccionario=( [clave1]=valor  [clave]=valor   .... )
+ 	
+ o bien:
+ 
+ 	declare -A nombre_diccionario
+ 	nombre_diccionario[clave]=valor
+ 	...
+ 	
+ ej:
+ 	yo=( [nombre]='pablo' [apellidos]='gonzalez perez' [nif]='131323A' [edad]=20 )	
+ 	
+ 	
+ 	
+ para acceder a posicion del dic:
+ --------------------------------
+ 		${nombre_diccionario[clave]}
+ 				     ------
+ 				     	\----> si pones un * te muestra todos los valores
+ 				     	
+ 				     	
+  para saber las claves del diccionario:  ${!nombre_diccionario[*]}
+  para recorrerse un diccionario:
+  
+  	for clave in ${!nombre_diccionario[*]}
+  	do
+  		echo "en clave: $clave ..... el valor es: ${nombre_dic[$clave]}"
+  	done
+  	
+  =========================================================================
+  FUNCIONES y paso de valores a FUNCIONES como parametros:
+  
+  
+  
+  	function nombre_funcion(){
+  		local variable=valor
+  		local variable=valor
+  		...
+  		
+  		#----- los parametros pasados a la funcion: $1=valor1 $2=valor2 ...
+  		# shift <----- desplazas parametros a la izqda, perdiendo el valor1
+  		comando1
+  		comando2
+  		....
+  		
+  		return valor_entero
+  	
+  	}
+  	
+  	
+  para pasar valores a la funcion:
+  
+  	nombre_funcion  valor1  valor2  valor3 ... valor12  valor13 valor14 
+  	
+  	
+  	
+  	
+  	
+  	
+  	
+  	
+  	
+  	
+  	
+  	
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+   				     	
+ 				     	
+ 				     	
+ 				     	
+ 				     	
+ 				     	
+ 				     	
+ 				     	
+ 				     	
+ 				     	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 		
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+  
+  
+  
+  
+  
+  
+  
+  
+  	
+  	
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  

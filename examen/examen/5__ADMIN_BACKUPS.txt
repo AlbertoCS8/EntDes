@@ -1,0 +1,490 @@
+-------------------------
+ ADMINISTRACION BACKUPS
+ (copias de seguridad)
+-------------------------
+
+un backup es una copia de seguridad de fich. del sistema/usuarios
+
+TIPOS DE BACKUP
+---------------
+- backups totales: copia total de ficheros (como si anteriormente no se
+ hubiera hecho ningun tipo de copia). Es conveniente hacer un backup total
+ una vez al mes (tarea programada)
+
+- backups diferenciales: backup q se apoya en un backup total/diferencial
+  hecho con anterioridad (no se puede hacer si no existe un backup dif. o
+  total hecho con anterioridad), solo copia ficheros nuevos/modificados con
+  respecto al backup en el q se apoya. Es conveniente hacer un backup dif.
+  cada 15 dias
+
+- backups incrementales: backup q se apoya en un backup 
+  total/diferencial/incremental y copia ficheros nuevos/modificados con
+  respecto al backup en el q se apoya. Es conveniente hacerlo cada dia
+  
+comandos linux para hacer copias (backups)
+------------------------------------------
+1º el mismo comando cp, creas un script donde te pida dir.origen a copiar
+y vaya buscando dentro de ese directorio los ficheros nuevos/modificados
+con respecto la ultima copia q hayas hecho
+
+2º usando comando tar (TAR-FILES)
+
+	tar [-opcion] -f nombre_fichero.tar  [/ruta_a_copiar]
+	    ---------
+	       |
+	    -f /ruta/nombre_fichero.tar = nombre del fichero tar a crear
+	    -v = muestra todas las operaciones q va haciendo tar
+	    -c = crear un fichero tar
+	    -x = extraer el contenido de un fichero .tar
+	    	ej:
+	    		cd /tmp; tar -x -f /home/pablo/backupDocs.tar
+	    
+	    -r = añade contenido nuevo al fichero tar existente
+	    -t = muestra el contenido de un fichero tar sin extraerlo
+	    
+	    opciones de compresion del fichero tar:
+	    
+	    -z = comprime fichero tar usando comando gzip (usar .gz al final
+	    	del nombre)
+	    -j = comprime fichero tar  usando comando bzip (usar .bz al
+	        final del nombre)
+	        
+-------------------------------------------------------------------------	        
+ej: backup total con tar de directorio /home/pablo/Documentos
+
+  tar -c -v -z -f /tmp/backup-documentos.tar.gz  /home/pablo/Documentos	 
+
+
+vemos el contenido del fichero de backup .tar:
+
+	tar -v -t -z -f /tmp/backup-documentos.tar.gz
+
+
+extraemos el contenido del fichero .tar en otro directorio:
+
+	cd /home/pablo/Vídeos
+	tar -x -v -z -f /tmp/backup-documentos.tar.gz  
+	ls -l /home/pablo/Vídeos <----- debe aparecer el contenido del
+					fich.de backup
+
+----------------------------------------------------------------
+practica:
+	- crear backups totales cada 1min del directorio Documentos
+	 pero solo de ficheros *.txt, *.pdf, *.sh, *.doc
+	 
+	 en el nombre del backup tiene q ir la fecha y hora en este
+	 formato:  DDMMYYYY-HH.MM (para cambiar formato fecha: man date)
+
+	ej:  backup-ficheros-docs-18102023-17.01.tar.gz
+	
+	 meter los ficheros de backup en /tmp
+	 
+	 
+solucion:
+
+tar -c -v -z -f /tmp/backup-ficheros-docs-`date '+%d%m%Y-%H.%M'`.tar.gz
+		  /home/pablo/Documentos/*.{txt,sh,pdf,doc} 
+
+	 
+programarlo con crontab -e:
+
+	*/2 * * * *   tar .....	 
+
+--------------------------------------------------------------------	 
+BACKUPS INCREMENTALES CON TAR: tar utiliza un fichero de snapshots
+(un fichero de fechas) usando opcion -g /ruta/fichero_snapshots
+
+1º creas el backup total con esa opcion
+2º usando ese fichero de fechas, cualquier ejecucion del comando tar
+  hara un backup incremental
+  
+  
+ ej: sobre directorio /home/pablo/Documentos
+ 
+ 1º backup total:
+    tar -c -v -z -f /tmp/backup_total.tar.gz  -g /tmp/fechas_tar  /home/pablo/Documentos
+	
+ 2º backup incremental (apoyo en ese fichero de fechas)
+ 
+    tar -c -v -z -f /tmp/backup_incremental_1.tar.gz  -g /tmp/fechas_tar  /home/pablo/Documentos
+
+-------------------------------------------------------------------
+practica:
+
+	- crearos backup total de vuestros Documentos con fichero de fechas
+		en /tmp
+
+	- os creais 10 ficheros de texto en vuestros Documentos:
+	
+				touch fichero{1..10}.txt
+
+	- crear backup incremental de Documentos usando fichero de fechas
+	   de /tmp
+
+si todo ok....
+	- eliminais de Documentos los primeros 5 ficheros de texto:
+		fichero{1..5}.txt
+		
+		
+	- haceis backup incremental ¿¿ los quitara del backup ??
+	
+------------------------------------------------------------------------
+practica:
+	hacer un script para crear backups con TAR
+	q muestre este menu:
+	
+		BACKUPS CON TAR
+		---------------
+		1. backup total
+		2. backup incremental
+		3 --salir--
+		opcion:_
+	
+	en la opcion 1:
+		- te tiene que pedir el directorio del que quieres hacer
+		  backup, comprobar q existe (sino existe, q se salga)
+		
+		- te tiene que pedir el directorio de destino donde quieres
+		  guardar el backup, comprobar q existe (sino existe, q se
+		  salga)
+		  
+		- el nombre del backup va a ser:
+			backup_total_nombredirectorio_DDMMYY_HH-MM.tar.gz
+		  (hay q reemplazar las "/" del directorio por "_")
+		  		
+		- guardar fichero de fechas en tmp asi:
+			fechas_backup_nombredirectorio
+		  (hay q reemplazar las "/" del directorio por "_")
+			
+	en la opcion 2:
+		- te tiene que pedir el directorio del que quieres hacer
+		  backup, comprobar q existe (sino existe, q se salga)
+		
+		- te tiene que pedir el directorio de destino donde quieres
+		  guardar el backup, comprobar q existe (sino existe, q se
+		  salga)
+		  
+		- el nombre del backup incremental va a ser:
+	backup_incremental_nombredirectorio__(contador)_DDMMYY_HH-MM.tar.gz
+							  
+		apoyandose en fichero de fechas usado en el backup total
+		para ese directorio
+		
+
+3º comando CPIO: (empaquetador de ficheros) <--- el fichero initial-ramdisk esta creado asi
+a este comando le tienes q dar una lista de ficheros de la q quieres hacer el backup
+(se suele usar mucho junto con "find")
+
+para crear backup total:
+
+
+	find ..... | cpio -o [-resto_opciones] > /ruta/nombre_backup.cpio
+
+para extraer backup total:
+
+	cd /ruta 
+	cpio -i [-resto_opciones] < /ruta/nombre_backup.cpio
+
+
+
+sintaxis find:
+--------------
+	find directorio(s) [-opciones-seleccion-ficheros] [-exec accion '{}' \;]
+     						          ----------------------	
+								\
+								opcional, si no pones
+								accion a ejecutar por
+								cada fichero encontrado
+								find te muestra donde
+								se ha encontrado el
+								fichero
+	        
+opciones de seleccion:
+	- por tipo:   -type d <--- busqueda de directorios
+		      -type f <--- busqueda de ficheros
+		      -type l <--- busqueda de enlaces
+	- por nombre:
+			-name "nombre"  o -iname "nombre" (no distingue MAYS de MINS)
+
+	- por patron o expresion regular:
+
+			-regex "patron"  o  -iregex "patron" (no distingue MAYS de MINS)
+		      
+	- por pertenencia a un usuario o grupo:
+	
+			-user "nombre_usuario" o -uid "numero_id_usuario"
+			-group "nombre_grupo"  o -gid "numero_id_grupo"
+			
+	- por permisos q tengan ficheros o directorios_
+	
+			-perm lista_permisos
+			
+	- por fechas:
+			-newer /ruta/fichero_ref <--- buscaria ficheros creados a posterior
+							q ese fichero de referencia.
+			-atime NUMERO <--------buscaria ficheros accedidos dentro de ese
+						numero q pongas (dias, horas,...)
+			-ctime NUMERO <------ buscaria ficheros creados dentro de ese num.
+			...
+			
+	- por tamaño:   -size NUMERO
+						   
+ej: quiero buscar dentro de /home todos los ficheros q sean .pdf, .docx, .txt, .sh
+    cuyo tamaño sea mayor de 10k y hayan sido creados al menos hace una semana
+    
+     find /home/pablo 
+		    -type f 
+		    \( -name "*.pdf" -o -name "*.docx" -o -name "*.txt" -o -name "*.sh" \)
+		    -size +10k
+		    -ctime +7
+	    	    
+ej: crear backup total de todos tus documentos en /tmp/ llamado
+  backup_total_`fecha_hora`.cpio
+  
+  	find /home/pablo 
+  		\( -type d -o -type f \)
+  		-user pablo |  cpio -o -v -B > /tmp/backup_total_`date +%d%m%Y_%H-%M`.cpio
+  
+  
+  
+  os creais un directorio en /tmp<---- prueba_extraccion
+  y dentro extraeis el contenido del fichero backup creado con cpio
+	    
+	  mkdir /tmp/prueba_extraccion
+	  cd /tmp/prueba_extraccion
+	  cpio -i -v --no-absolute-filenames --make-directories < /tmp/backup_total_...cpio
+		     ------------------------------------------
+		     	\---> si no poneis estas opciones intenta extraerlo en el direct.
+		     		original desde donde se copiaron.
+	    
+	    
+
+
+ej: te creas 10 ficheros de texto en directorio /home/pablo/Documentos/prueba 
+crear backup incremental con cpio en /tmp y llamarlo
+
+	backup_incremental_`fecha_hora`.cpio
+
+
+  	find /home/pablo 
+  		\( -type d -o -type f \)
+  		-user pablo
+  		-newer /tmp/backup_total_....cpio
+  		 |  cpio -o -v -B > /tmp/backup_incremental_`date +%d%m%Y_%H-%M`.cpio
+	
+
+probarlo a extraer en /tmp<---- directorio: prueba_extraccion_incremental
+
+
+  mkdir /tmp/prueba_extraccion_incremental
+  cd /tmp/prueba_extraccion_incremental
+  cpio -i -v --no-absolute-filenames --make-directories < /tmp/backup_incremental_...cpio
+
+3º comando rsync: (remote syncronization) es una herramienta de sincronizacion de ficheros
+-----------------  de un directorio origen a un directorio destino; tanto origen como 
+		 destino pueden ser directorios locales o directorios en maquinas remotas
+		 
+la ventaja de rsync es q si borras ficheros/directorios en origen, tb se borran en destino
+(te ofrece la posibilidad de hacer copias de estos ficheros/directorios borrados)
+
+	cliente			servidor backup
+				 [servicio: rsyncd.service]
+  backup: /home --------------->  sincronizado en remoto: /backups
+  	|
+  	|
+  	|--sincronizado
+  	  localmente con:
+  	  	/media/KINGSTOM
+
+
+backups locales: (pull local)
+
+	rsync [-opciones] /directorio_local    /directorio_destino
+
+backups en remoto: (pull remoto, dos formas)
+
+	- si en el servidor remoto tienes una cuenta de usuario, rsync abre una
+	shell remota (rsh) para poder hacer la copia:
+	
+  rsync [-opciones]  /directorio_local  nombre_cuenta@IP_server:/direct_destino
+	
+	- si en el servidor remoto no tienes cuenta pero esta lanzado rsync como servicio
+	puedes contectarte como cliente al servicio (por defecto usa puerto 837)
+
+  rsync [-opciones]  /directorio_local  rsync://[nombre_usuario@]IP_server:837/direct_destino
+
+	como nombre_usuario NO ES UNA CUENTA LOCAL DEL SISTEMA!!!! sino q se almacenan
+	en ficheros de control de acceso a ese directorio de destino donde quieres 
+	sincronizar los ficheros
+	(hay q configurar el servicio en el server: /etc/rsync.conf <---- man rsync.conf)
+
+
+recuperar un backup (push)
+--------------------------
+	- backups locales:
+		rsync [-opciones] /direct_backup  /direct_extraccion_backup
+		
+	-backups remotos:
+		a) shell remota
+
+  rsync [-opciones]  nombre_cuenta@IP_server:/direct_backup  /direct_extraccion_backup
+  
+  		b) con servicio
+  
+  rsync [-opciones]  rsync://[nombre_usuario@]IP_server:837/direct_backup  /direct_extracc
+  
+ 
+ 
+ opciones:
+ 	-a (equivale a: -r -l -p -t -g -o -D
+ 	-v = te muestra todo lo q va haciendo mientras sincroniza
+ 	-z = comprime transf.ficheros
+ 	-r = modo recursivo
+ 	-l = copia enlaces
+ 	-t = mantiene fechas en ficheros de modif
+ 	-p = mantiene permisos originales
+ 	-g = mantiene grupo propietario
+ 	-o = mantiene usuario propietario
+ 	-D = mantiene disp.especiales
+ 	--no-whole-file = desactivas el copiar solo los bloques modificados en fich.origen
+ 			  (copia fich.entero de nuevo=
+ 	--delete = borra en dir.destino lo q se borra en dir.origen
+ 	--backup = conserva una copia de los fich.borrados en destino
+ 	--backup-dir /ruta = directorio donde se almacenan copia de fich.borrados
+ 	
+ 	 
+ --------------------------------------------------------------
+ practica:
+ 	- backup (sincronizacion de ficheros) dir.origen: /home/usuario/Documentos
+ 	  en local  dir.destino: /tmp/backup
+ 	  
+ 	  rsync -a -v -z /home/pablo/Documentos  /tmp/backup
+ 	  
+ 	  borrais un fichero en vuestros Documentos, y os creais un nuevo y lanzais
+ 	  el comando de nuevo, vereis q el nuevo fichero lo mete pero el borrado lo
+ 	  conserva.
+ 	  
+ 	  ahora lo lanzais asi:
+ 	  
+	rsync -a -v -z --delete --backup --backup-dir=/tmp/backup/borrados
+						 /home/pablo/Documentos  /tmp/backup 	  
+
+
+	y probais a crear y borrar fichero, vereis como si lo borra y el fichero borrado
+	lo guarda en el directorio de backup.
+
+--------------------------------------------------------------------------------------
+practica:
+- backup (sincronizacion de ficheros) dir.origen: /home/usuario/Documentos 	  
+ 	  en remoto dir.remoto: /tmp/backup en ip_server: 172.26.239.116 usuario:prueba
+  								     password:prueba1234
+ 	  	
+ 	  	cliente				servidor backup (rsync)
+ 	  	 		id_rsa			|| id_rsa.pub
+ 	  	 rsync .... -------------------> datos-cifrados --- datos
+ 	  	
+ 	  	
+ 	  	
+  en clientes:	  			
+ 	1º) nos creamos clave publica-privada para cifrar comunicaciones contra
+ 	   un servidor (en este caso nuestro servidor de backup)
+ 	   
+ 	   	ssh-keygen -f /home/pablo/.ssh/id_rsa -q -P ""	 
+ 
+  	
+  	2º) subo clave publica al servidor:
+  	
+  		scp /home/pablo/.ssh/id_rsa.pub  prueba@IP_SERVIDOR:/home/prueba/.ssh/authorized_keys
+  	
+	3º) ejecuto comando
+	
+	  	rsync -a -v -z -e "ssh -i /home/pablo/.ssh/id_rsa"  /home/pablo/Documentos  prueba@IP_SERVIDOR:/tmp/prueba
+  	
+  	
+  en servidor:
+  	1º) instalar servidor ssh:
+  			apt install openssh-server
+  	
+  	2º) crear usuario como root: prueba con password: prueba1234
+  		
+  		adduser prueba
+  	
+  	3º) creamos directorio oculto dentro del directorio del usuario: /home/prueba 
+  	   llamado .ssh <---- vamos a almacenar clave(s) publicas con las q se van
+  	   a conectar los clientes
+  	   
+  	   	mkdir /home/prueba/.ssh
+  	   	chown prueba:prueba  /home/prueba/.ssh
+  	   	
+  	   
+  -----------------------------------------------------------------------	   
+ como servicio:
+  	   
+  	
+  en cliente:
+  	
+ 	1º) lanzo comando rsync:
+ 	
+  	rsync -a -v -z /home/pablo/Documentos rsync://pepe@IP_SERVIDOR:873/backup
+	
+  en servidor:	
+ 	1º) editar fichero de config.de variables globales de rsync:
+ 		/etc/default <---- rsync
+ 		
+ 	    habilitar variable:  RSYNC_ENABLE=false <--- editar y poner a true
+
+ 	2º)	
+ 	me creo fichero /etc/rsyncd.conf <----- man rsyncd.conf
+
+uid = nobody
+gid = nogroup
+max connections = 4
+use chroot = no 
+ 	 
+[backup]
+path = /tmp/backup <------------------- crear directorio y cambiar propietario
+					chown nobody:nogroup /tmp/backup
+comment = "ruta de backups remotos"
+read only = no
+auth users = pepe,manolo,gema
+secrets file = /tmp/fichero_usuarios <---- permisos rwx --- ---
+					   chmod 700 /tmp/fichero_usuarios
+	en /tmp/fichero_usuarios:
+	
+pepe:pepe1234
+manolo:manolo1234
+gema:gema1234
+
+
+ 	3º) se reinicia servicio:  systemctl restart rsync.service
+ 	
+ 	
+ 	
+ 	
+ 	
+ 		
+	
+
+  			
+   
+  
+  
+  
+
+
+
+
+
+  
+  
+  
+  
+
+
+
+
+
+
+
+
+

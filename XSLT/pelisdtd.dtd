@@ -1,7 +1,0 @@
-<!ELEMENT pelicula (titulo,fechaEstreno,actores)>
-<!--<!ELEMENT pelicula ((titulo|fechaEstreno),actores) Uno u otro>-->
-<!ELEMENT titulo (#PCDATA)>
-<!ELEMENT fechaEstreno (#PCDATA)>
-<!ELEMENT actores (actor+)>
-<!--<!ELEMENT actores ANY )>-->
-<!ELEMENT actor (#PCDATA)>

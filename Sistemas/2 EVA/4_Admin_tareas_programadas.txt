@@ -1,0 +1,244 @@
+---------------------------------
+ PROGRAMACION TAREAS AUTOMATICAS
+   servicio: SCHEDULE
+---------------------------------
+para ver tareas automaticas programadas, hay un herramienta administrativa: taskschd.msc
+el servicio q se encarga de ejecutar/planificar/administrar estas tareas: SCHEDULE
+
+			get-service -name schedule 
+
+clasifica estas tareas en poolsets(bibliotecas), cada tarea programada tiene una serie de atributos q la definen:
+
+	- nombre de la tarea
+	- programacion de la tarea <---- Desencadenadores o disparadores de la tarea (triggers)
+	- autor, usuario,  ... <-------- credenciales de ejecucion de la tarea
+	- accion o ejecutable de la tarea
+
+cuando programas una tarea el servicio SCHEDULE almacena todos los detalles de esa tarea en el registro
+en dos claves:
+
+	HKEY_LOCAL_MACHINE\ SOFTWARE \ Microsoft \ Windows NT \ CurrentVersion \ Schedule \ TaskCache
+
+		\----> dos claves:
+				
+				TREE <------ se definen subclaves para los pools, y dentro de cada pool una clave por cada
+						tarea del mismo. En ella se almacena el ID-tarea generado por el windows-manager
+						cuando crea el objeto
+				TASKS <------ en esta clave estan TODOS LOS IDS-TAREAS, y en cada id, estarian los datos de la tarea
+						respectiva (nombre,programacion, la accion, ....)
+
+
+------------------------------------------------------
+comandos powershell/wmic control de tareas programadas
+------------------------------------------------------
+para ver todos los comandos powershell ref.tareas programadas:  get-command -name *task* -Module scheduledTasks
+
+ - para ver tareas o detalles de una tarea:
+
+	Get-ScheduledTask [-opciones] <----- sin opciones, te lista tooooodas las tareas programadas en el sistema.
+					    Cada tarea es un objeto, si quiero acceder a una tarea por nombre:
+
+							Get-ScheduledTask -TaskName nombre_tarea
+						ej:
+							Get-ScheduledTask -TaskName mieditor
+
+						el tipo de objeto tarea, es un objeto de una clase WMI (powershell no tiene clases
+						propias para tratar tareas programadas):
+
+			Microsoft.Management.Infrastructure.CimInstance # Root/Microsoft/Windows/TaskScheduler/MSFT_ScheduledTask
+									  -------------------------------------------------------
+											\---> nombre de la clase wmi
+	
+							(Get-ScheduledTask -TaskName mieditor).GetType()
+							Get-ScheduledTask -TaskName mieditor | Get-Member
+
+
+
+					   para acceder a todas las tareas de un pool:
+
+							Get-ScheduledTask -TaskPath /ruta/pool
+
+						ej:
+
+							Get-ScheduledTask -TaskPath \mistareas\
+
+
+  comando wmic para obtener todas las tareas:
+	en simbolo sistema:  
+			wmic /namespace:\\root\Microsoft\Windows\TaskScheduler\ path MSFT_ScheduledTask GET /ALL
+	en powershell:
+		Get-CimInstance -Namespace "Root/Microsoft/Windows/TaskScheduler" -ClassName "MSFT_ScheduledTask"
+
+
+ para obtener una det.tarea, filtras con WHERE
+
+	en simbolo sistema:  
+			wmic /namespace:\\root\Microsoft\Windows\TaskScheduler\ path MSFT_ScheduledTask WHERE "TaskName='mieditor'" GET /ALL
+
+	en powershell:
+		Get-CimInstance -Namespace "Root/Microsoft/Windows/TaskScheduler" -ClassName "MSFT_ScheduledTask" -Filter "TaskName='mieditor'"
+
+
+
+-----------EJERCICIOS: ------------------------------------------------------------------------------
+- mostrar todas las tareas en estado READY, pedir el nombre de una de ellas y DESHABILITARLA...
+	
+	clear-host
+	Get-ScheduledTask | Where-Object { $_.State -ieq "ready" } | ForEach-Object { write-host "tarea..." $_.TaskName }
+
+	[string]$tarea=Read-host "nombre tarea_"
+
+	#...si ejecutas directamente el comando Disable-ScheduledTask tienes q pasar aparte del TaskName el TaskPath...mejor con tuberia,asi
+	Get-ScheduledTask -TaskName $tarea |  Disable-ScheduledTask 
+
+	Write-Host "Tarea deshabilitada...."
+
+
+
+
+- lo mismo, pero numerando las tareas del 1 al ..., pedir el NUMERO DE LA TAREA a deshabilitar, y deshabilitarla
+
+	clear-host
+	#...nos creamos un array con todas las tareas en estado "Ready", basado en indice....
+	$tareas=( Get-ScheduledTask.Where({ $_.State -ieq "ready"}) )
+
+	for($a=0; $a -lt $tareas.Count; $a++)
+	{
+		write-host $a "....." $tareas[$a].TaskName
+	}	
+
+	[int]$numtarea=Read-host "numero tarea_"
+	$tareas[$numtarea] | Disable-ScheduledTask
+
+	Write-Host "Tarea deshabilitada...."
+
+----------------------------------------------------------------------------
+COMO PROGRAMAR UNA TAREA:
+
+ - necesitas antes de registrar una tarea en el servicio de prog.de tareas:
+
+			Register-ScheduledTask [-opciones]
+					       -----------
+						  |
+					a parte del nombre con el q se identifica la tarea 
+					necesitas crearte 3 objetos:
+
+						- objeto de tipo ScheduledTaskAction <--- ejecutable de la tarea:
+												New-ScheduledTaskAction								
+						- objeto(s) de tipo ScheduledTaskTrigger <--- eventos desencadenadores de la tarea
+												New-ScheduledTaskTrigger
+
+						- objeto ScheduledTaskSettings <--------- conf. del entorno de la tarea (no es obligatorio)
+										si no lo pones por defecto añade unos settings para todas las
+										tareas; si quieres personalizarlo:
+												New-ScheduledTaskSettings
+
+						- objeto ScheduledTaskPrincipal <---------- credenciales con las q se ejecuta la tarea
+												New-ScheduledTaskPrincipal
+
+
+
+
+PRACTICA usando la ayuda comando Register-ScheduledTask:
+---------------------------------------------------------
+ - programar una tarea que haga una copia de seguridad de todos el directorio personal de tu usuario y lo haga en C:\Windows\Temp
+   la ejecute los L,X,V a las 23:00
+    ---------
+    solucion
+    ---------
+	1º) nos creamos script backup_prog_tarea.ps1
+<#
+    ...script backup docs de directorio personal "Documentos" en c:\windows\temp\backup-dd_mm_yy ...
+#>
+[string]$destino="C:\Windows\Temp\backup-$((get-date).ToShortDateString().Replace("/","_"))"
+[string]$origen="$env:USERPROFILE\Documents"
+
+Copy-Item -Path $origen -Destination $destino -Recurse -Force 
+
+
+
+	2º) programamos tarea:
+
+# comandos para programar tarea que ejecute este script los L,X,V a las 23:00 ... <==OJO!!! ESTOS COMANDOS VAN
+#  FUERA DEL SCRIPT!!!!
+
+# 1º objeto ScheduledTaskAction...
+$accion=New-ScheduledTaskAction -Execute "powershell.exe" -Argument "C:\Users\pmr_a\Documents\scripts\admin_tareas\backup_prog_tarea.ps1"
+
+# 2º objeto ScheduledTaskPrincipal....
+#(tb se puede poner como un string usando opcion -User en comando Register-ScheduledTask:
+# con este formato:  .... "nombre_maquina\nombre_usuario" ---> "$env:COMPUTERNAME\$env:USERNAME" )
+$usuario=New-ScheduledTaskPrincipal -UserId "$env:USERNAME"
+
+# 3º objeto(s) SheduledTaskTrigger...
+$trigger=New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Wednesday,Friday -At 23:00
+
+# 4º objeto ScheduledTaskSettings (opcional)....
+$settings=New-ScheduledTaskSettingsSet
+
+# ---- registramos tarea----
+Register-ScheduledTask -TaskName "backupdocs" -TaskPath "\mistareas\" -Principal $usuario -Action $accion -Settings $settings -Trigger $trigger
+
+
+
+ - programar una tarea que se ejecute cada vez que el usuario inicia sesion, y la tarea va a ejecutar o lanzar las apps q el usuario
+ suele utilizar siempre:  firefox, visual studio code, notepad
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

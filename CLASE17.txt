@@ -1,0 +1,245 @@
+SELECT CASE
+         WHEN count(*) < 3 THEN
+          'POCOS'
+         WHEN COUNT(*) = 3 THEN
+          'ACEPTABLE'
+         WHEN COUNT(*) < 7 THEN
+          'MUCHOS'
+         ELSE
+          'MULTITUD'
+       
+       END AS CATEGORIA,
+       LEVEL,
+       COUNT(*)
+
+  FROM EMPLE
+
+CONNECT BY PRIOR EMP_NO = DIR
+
+ START WITH APELLIDO = 'REY'
+
+ GROUP BY LEVEL
+
+ ORDER BY LEVEL;
+
+--SUMA DE SALARIOS Y TOTAL TRABAJADORES Y CATALOGA COMO: SUMA SALARIO < 250000 DEMASIADO POCO, < 300000 ACEPTABLE Y RESTO MUCHO
+
+-- QUE SEAN OFICIO  EMPLEADOS DE CADA ESCALAFON
+
+SELECT LEVEL AS ESCALAFON,
+       COUNT(*) TRABAJADORES,
+       SUM(SALARIO) AS "SALARIO EMPLEADOS",
+       CASE
+         WHEN SUM(SALARIO) < 250000 THEN
+          'DEMASIADO POCO'
+         WHEN SUM(SALARIO) < 300000 THEN
+          'ACEPTABLE'
+         ELSE
+          'MUCHO'
+       END AS CATALOGACION
+  FROM EMPLE
+ WHERE OFICIO = 'EMPLEADO'
+CONNECT BY PRIOR EMP_NO = DIR
+ START WITH APELLIDO = 'REY'
+ GROUP BY LEVEL;
+
+-- ESCALAFON Y TOTAL TRABAJADORES CON MAYOR NUMERO DE TRABAJADORES
+
+SELECT LEVEL, COUNT(*)
+  FROM EMPLE
+CONNECT BY PRIOR EMP_NO = DIR
+ START WITH APELLIDO = 'REY'
+ GROUP BY LEVEL
+HAVING COUNT(*) = (SELECT MAX(COUNT(*))
+                     FROM EMPLE
+                   CONNECT BY PRIOR EMP_no = dir
+                    START WITH APELLIDO = 'REY'
+                    GROUP BY LEVEL);
+
+-- NOMBRE DE LOS  TRABAJADORES DEL ESCALAFON CON MAYOR NUMERO DE TRABAJADORES
+
+SELECT APELLIDO
+  FROM EMPLE
+ WHERE LEVEL = (SELECT LEVEL                
+                  FROM EMPLE                
+                CONNECT BY PRIOR EMP_NO = DIR               
+                 START WITH APELLIDO = 'REY'               
+                 GROUP BY LEVEL               
+                HAVING COUNT(*) = (SELECT max(COUNT(*))                                 
+                                    FROM EMPLE                                 
+                                  CONNECT BY PRIOR EMP_no = dir                                
+                                   START WITH APELLIDO = 'REY'                                 
+                                   GROUP BY LEVEL                                
+                                  )              
+                )
+CONNECT BY PRIOR EMP_NO = DIR
+ START WITH APELLIDO = 'REY';
+
+-- NOMBRE DEPARTAMETO Y LOCACIDADES DE LOS  TRABAJADORES DEL ESCALAFON CON MAYOR NUMERO DE TRABAJADORES
+
+SELECT DNOMBRE, LOC
+  FROM DEPART
+ WHERE DEPT_NO IN
+       (SELECT DEPT_NO    
+          FROM EMPLE     
+         WHERE LEVEL = (SELECT LEVEL                      
+                          FROM EMPLE                        
+                        CONNECT BY PRIOR EMP_NO = DIR                       
+                         START WITH APELLIDO = 'REY'                       
+                         GROUP BY LEVEL                       
+                        HAVING COUNT(*) = (SELECT MAX(COUNT(*))                                         
+                                            FROM EMPLE                                         
+                                          CONNECT BY PRIOR EMP_no = dir                                         
+                                           START WITH APELLIDO = 'REY'                                         
+                                           GROUP BY LEVEL                                        
+                                          )                      
+                        )      
+        CONNECT BY PRIOR EMP_NO = DIR     
+         START WITH APELLIDO = 'REY'     
+        );
+
+-- NOMBRE DEPARTAMETO Y APELLIDOS DE LOS  TRABAJADORES DEL ESCALAFON CON MENOR NUMERO DE TRABAJADORES
+
+SELECT DNOMBRE, APELLIDO
+  FROM EMPLE E
+ INNER JOIN DEPART D
+    ON E.DEPT_NO = D.DEPT_NO
+ WHERE E.DEPT_NO IN
+       (SELECT DEPT_NO      
+          FROM EMPLE      
+         WHERE LEVEL = (SELECT LEVEL                       
+                          FROM EMPLE                        
+                        CONNECT BY PRIOR EMP_NO = DIR                       
+                         START WITH APELLIDO = 'REY'                       
+                         GROUP BY LEVEL                        
+                        HAVING COUNT(*) = (SELECT MIN(COUNT(*))                                         
+                                            FROM EMPLE                                         
+                                          CONNECT BY PRIOR EMP_no = dir                                          
+                                           START WITH APELLIDO = 'REY'                                         
+                                           GROUP BY LEVEL                                         
+                                          )                      
+                        )       
+        CONNECT BY PRIOR EMP_NO = DIR       
+         START WITH APELLIDO = 'REY'       
+        );
+
+-- ESCALAFON CON MAYOR NUMERO DE EMPLEADOS DECODIFICADO
+
+SELECT CASE LEVEL    
+         WHEN 1 THEN
+          'EN LA CÚSPIDE'      
+         WHEN 2 THEN
+          'UN PELO Y LLEGAS'     
+         WHEN 3 THEN
+          'PRGRESANDO'      
+         WHEN 4 THEN
+          'CASTA PARIA'     
+         ELSE
+          'NO COMPUTADO'    
+       END AS CATEGORIA
+
+  FROM EMPLE
+CONNECT BY PRIOR EMP_NO = DIR
+ START WITH APELLIDO = 'REY'
+ GROUP BY LEVEL
+ HAVING COUNT(*) = (SELECT MAX(COUNT(*))
+                     FROM EMPLE                 
+                   CONNECT BY PRIOR EMP_no = dir                 
+                    START WITH APELLIDO = 'REY'                 
+                    GROUP BY LEVEL);
+   --tb                 
+SELECT DECODE (LEVEL,
+                    1,'EN LA CÚSPIDE',
+                    2,'UN PASO Y LLEGAS',
+                    3,'PROGRESANDO',
+                    4,'NO SE',
+                    'NO CONCRETO'
+                    ) AS CATEGORIA
+
+  FROM EMPLE
+CONNECT BY PRIOR EMP_NO = DIR
+ START WITH APELLIDO = 'REY'
+ GROUP BY LEVEL
+ HAVING COUNT(*) = (SELECT MAX(COUNT(*))
+                     FROM EMPLE                 
+                   CONNECT BY PRIOR EMP_no = dir                 
+                    START WITH APELLIDO = 'REY'                 
+                    GROUP BY LEVEL);                    
+                    
+                    
+                    
+
+-- APELLIDOS DE LOS TRABAJADORFES DEL ESCALAFON CON
+-- MAYOR NUMERO DE TRABAJADORES
+
+SELECT APELLIDO, LEVEL
+  FROM EMPLE
+ WHERE LEVEL = (SELECT LEVEL              
+                  FROM EMPLE              
+                CONNECT BY PRIOR EMP_NO = DIR
+                
+                 START WITH APELLIDO = 'REY'
+                
+                 GROUP BY LEVEL
+                
+                HAVING COUNT(*) = (SELECT MAX(COUNT(*))
+                                  
+                                    FROM EMPLE
+                                  
+                                  CONNECT BY PRIOR EMP_no = dir
+                                  
+                                   START WITH APELLIDO = 'REY'
+                                  
+                                   GROUP BY LEVEL
+                                  
+                                  )
+                
+                )
+
+CONNECT BY PRIOR EMP_NO = DIR
+
+ START WITH APELLIDO = 'REY';
+
+--OFICIO/S DONDE TRABAJAN LOS TRABAJADORES CON 
+--MENOR NUMERO DE TRABAJADORES EN CADA NIVEL
+
+SELECT OFICIO
+  FROM EMPLE
+ WHERE LEVEL = (SELECT LEVEL              
+                  FROM EMPLE            
+                CONNECT BY PRIOR EMP_NO = DIR               
+                 START WITH APELLIDO = 'REY'              
+                 GROUP BY LEVEL              
+                HAVING COUNT(*) = (SELECT MIN(COUNT(*))                                
+                                    FROM EMPLE                                
+                                  CONNECT BY PRIOR EMP_no = dir                                 
+                                  START WITH APELLIDO = 'REY'                                
+                                   GROUP BY LEVEL                                
+                                  )              
+                )
+CONNECT BY PRIOR EMP_NO = DIR
+ START WITH APELLIDO = 'REY';
+
+
+-- ESCALAFON DE SALA
+
+SELECT LEVEL
+  FROM EMPLE
+ WHERE APELLIDO = 'SALA'
+
+CONNECT BY PRIOR EMP_NO = DIR
+
+ START WITH APELLIDO = 'REY';
+
+--CUANTOS TIENEN EL MISMO NIVEL QUE SANCHEZ
+
+SELECT COUNT(*)
+  FROM EMPLE
+ WHERE LEVEL = (SELECT LEVEL              
+                  FROM EMPLE               
+                 WHERE APELLIDO = 'SÁNCHEZ'               
+                CONNECT BY PRIOR EMP_NO = DIR               
+                 START WITH APELLIDO = 'REY'               
+                )
+CONNECT BY PRIOR EMP_NO = DIR
+ START WITH APELLIDO = 'REY';

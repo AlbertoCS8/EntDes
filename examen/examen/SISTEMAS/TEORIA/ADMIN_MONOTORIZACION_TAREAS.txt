@@ -1,0 +1,300 @@
+--------------------------------------------
+  MONITORIZACION DE TAREAS EN EL SISTEMA
+  (LOGS DEL SISTEMA: rsyslog)
+--------------------------------------------  
+
+como funciona rsyslog
+---------------------
+
+  im-modules  -------------> servicio rsyslogd -------> om-modules
+(input modules)			||			(output-modules)
+ modulos generadores		fichero			modulos de registro de
+de mensajes			conf.de reglas:		salida
+				/etc/rsyslog.conf	
+
+
+fichero configuracion reglas rsyslog.conf (man rsyslog.conf)
+------------------------------------------------------------
+se divide en 3 secciones:
+
+	-1Âº seccion se definen los im-modules y om-modules con los q va a 
+	 trabajar el servicio rsyslog
+
+	-2Âº seccion (directivas globales) o parametros de funcionamiento
+	del servicio:
+			$instruccion  valor
+			$instruccion  valor
+			....
+
+	-3Âº seccion reglas de registro de mensajes por parte del servicio
+	  o vienen definidas por la directiva:
+
+		$IncludeConfig  /ruta/directorio/ficheros.config
+						----------------
+						   |---> reglas de registro
+	ej:
+		
+		$IncludeConfig /etc/rsyslog.d/*.conf
+			       -------------- ------ 
+				directorio	ficheros donde estan reglas
+
+
+formato de las reglas de registro
+---------------------------------
+en cada linea del fichero supone una regla de registro, el servicio las procesa
+todas:
+
+ filtro(selector)			destino om-module
+ ------					-----------------
+  \---> el formato			  \---> lugar donde se registran
+puede ser:					los mensajes q cumplen el filtro
+
+1Âº caso:
+--------  
+ origen_im[, origen2_im,...].importancia_mensaje [;...] 
+
+origen_im: quien ha originado el mensaje, rsyslog las agrupa en
+	   aplicaciones o servicios de autentificacion: auth, authpriv
+	   aplicaciones de correo:  mail
+	   servicios kernel,procesos..:  kern
+	   tareas automaticas:		 cron
+	   ...
+importancia_mensaje: 
+	emerg > alert > crit > err > warn > notice > info > debug
+
+2Âº caso:
+--------
+:propiedad, [!]operador, valor
+	    -----------
+	    	|
+	   contains = chequea si en la propiedad contiene el valor q pones
+	   isequal = chequea si la propiedad es exactamente igual al valor
+	   startswith = chequea si la propiedad comienza con el valor
+	   regex = chequea si la propiedad cumple con el patron indicado
+
+ ej: metemos en fichero 50-default.conf:
+ 
+  :msg, contains, "authentication failure"  /var/log/sesiones_fallidas.log
+
+ reiniciamos servicio:  systemctl restart rsyslog.service
+ creamos fichero log:  touch /var/log/sesiones_fallidas.log
+ 		       chown syslog:adm /var/log/sesiones_fallidas.log
+
+ para probarlo, generas fallo con sudo y miras fichero con tail -f
+ 
+---------------------------------------------------------------------
+ ej: mismo ejemplo pero mandando mensajes a un script para procesarlos
+ 
+  :msg, contains, "authentication failure"  ^/tmp/script.sh
+  ----------------------------------------  ----------------
+  	\---> mensajes q cumplan condicion	\--> se reciben en el
+  		selector...			   script como parametros
+
+
+nos creamos el script en /tmp lo llamamos script.sh (cambiar permisos:
+chmod a+x /tmp/script.sh )
+
+#!/bin/bash
+echo "...mensaje recibido por fallo en SUDO a las `date`.." >> /tmp/sesiones_fallidas.log
+
+echo "ESTE ES EL MENSAJE:  $*" >> /tmp/sesiones_fallidas.log
+
+
+ reiniciamos servicio:  systemctl restart rsyslog.service
+ para probarlo, generas fallo con sudo y miras fichero con tail -f
+
+
+
+
+
+
+formato destino om-module
+-------------------------
+por defecto rsyslog suele registrar los mensajes en "ficheros" log (ficheros
+de texto donde se almacenan mensajes q cumplen los filtros de seleccion)
+
+	/var/log <---- fichero.log
+
+ej:
+	auth,authpriv.*				/var/log/auth.log[;nombre_plantilla]
+        ------------  -				-----------------
+	 im-module   importancia			destino
+
+
+
+no solo puedo almacenar los mensajes en ficheros:
+
+	| /ruta/pipe <---- manda mensajes a un buffer local temporal (pipe)
+	@ip_servidor[:puerto] <--- manda mensajes por TCP al servidor q escucha
+				   por ese puerto
+	@@ip_servidor[:puerto] <-- manda mensajes por UDP al servidor q escucha
+				   por ese puerto
+        ^ /ruta/script <-- manda mensajes como parametros de entrada al script
+	
+	:om-nombre_modulo, parametros_config_modulo
+
+
+---------------------------------------------------------------------------------
+ practica:
+	generar plantilla para registrar mensajes de im-auth,authpriv
+	con este formato:
+
+	"intento de autentificacion a las <fecha-hora>, 
+         desde <ip o nombre equipo> con este usuario <user>"
+
+----------------------------------------
+  ROTACION DE LOGS:  logrotate.service
+----------------------------------------
+el servicio logrotate.service se encarga de evitar q los ficheros log
+crezcan de forma no controlada (pudiendo llegar a colapsar la particion
+donde se encuentra el s.op)
+
+
+al ver el estado del servicio, aparece como inactivo (o dead):
+
+	systemctl status logrotate.service <------ depende de un timer
+						de systemd q lo despierta
+						cada cierto periodo de
+						tiempo (1 vez al dia)
+  
+					systemctl cat logrotate.timer
+					
+					[Timer]
+					OnCalendar=daily <---- diaria
+					AccuracySec=12h
+
+ si es insuficiente, dos formas de evitarlo:
+ 	- o modificas el timer y en variable OnCalendar estableces 
+ 	  el periodo en q quieres levantar el servicio (man systemd.time)
+					
+	- o programas una tarea cron donde fuerzas la ejecucion del 
+	 servicio usando su ejecutable:
+	 
+	 	systemctl cat logrotate.service <---- 
+			[Service]
+			...
+			ExecStart=/usr/sbin/logrotate /etc/logrotate.conf
+	 			  -------------------  ------------------
+					|			|
+				  ejecutable		fichero de reglas
+				  			de rotacion
+	ej: programamos tarea cron para q se ejecute todos los dias, meses
+	    del aÃ±o, dias de la semana a las 15min de cada hora
+	    POR EL ROOT!!! meterlo en /etc/crontab:
+	    
+	    15 * * * * 	root  /usr/sbin/logrotate -f	/etc/logrotate.conf
+				  
+				  
+FICHERO DE CONFIGURACION DE REGLAS DE ROTACION: /etc/logrotate.conf
+-------------------------------------------------------------------
+(todos los comandos q aparecen en las reglas:  man logrotate.conf)
+
+el fichero esta formado por:
+
+	comandos para todos los logs:
+	
+	comando-global-1		weekly
+	comando-global-2		su root adm
+	comando-global-3		rotate 4
+	...
+	/ruta/fichero1.log
+	/ruta/fichero2.log
+	... {
+		comando
+		comando
+		...
+	}
+	
+	
+ej:		/var/log <--- auth.log
+				     
+				      |rot:script	
+        rotate 4  1Âº semana: auth.log---> auth.log.1.gz
+        weekly	  2Âº semana: auth.log---> auth.log.1.gz --> auht.log.2.gz
+        missingok			|		|
+        notifempty			rot:script     rot:script
+        compress
+        delaycompress
+        sharedscripts
+        postrotate
+                /usr/lib/rsyslog/rsyslog-rotate
+        endscript
+-------------------------------------------------------------------
+practica:
+	-modificamos fichero /etc/logrotate.d/rsyslog
+	 para el log /var/log/auth.log teneis q poner estas reglas:
+	 
+	 rotar el log 5 veces
+	 rotar diariamente
+	 rotar cuando alcance tamaÃ±o de 10k
+	 comprimir rotaciones
+	 no rotar si esta vacio
+	 retardar compresion de ficheros rotados
+	 ejecutar script post rotacion /usr/lib/rsyslog/rsyslog-rotate
+	 (mirar q hace el script)
+	 en los ficheros rotados, en vez de numerarlos poner fecha (mirar
+	 comando en man logrotate.conf)
+	 
+	 - para probar si se hace rotacion:
+	 	borramos fichero auth.log y todas sus rotaciones previas:
+	 	
+	 		echo "" > /var/log/auth.log
+	 		rm /var/log/auth.log.*
+	 		
+	 	para ir viendo como se incrementa su tamaÃ±o, lanzas en
+	 	otra terminal:
+	 	
+	 		while true
+	 		do
+	 			clear
+	 			ls -l /var/log/auth*
+	 			sleep 1s
+	 		done	
+	 
+	 	mandamos mensajes al log de forma infinita en otra terminal:
+	 	
+ 	while true
+ 	do
+ 	 mensaje="...mandando mensaje al log auth.log a las `date`"
+ 	 echo $mensaje
+ 	 logger -t pruebarotacion -p auth.err  $mensaje
+	 sleep 1s
+	 #--------compruebo tamaÃ±o del fichero auth.log para provoca rotac--
+	 size=`ls -l /var/log/auth.log | awk '{print $5}'`
+	 [ $size -ge 10000 ] && /usr/sbin/logrotate -f /etc/logrotate.conf
+	done
+	 
+	 
+	 - mirar en /var/log <----- tiene q haber 2 o mas ficheros
+	 			   auth.log....
+	 
+	 
+----------------------------------------------------------------------
+practica:
+	 
+puesto receptor	(ip:x.y.z.w)		puestos emisor-1  emisor-2 ....	 
+     ||	 							
+habilitamos rsyslog
+para q reciba mensajes
+de forma remota:
+
+/etc/rsyslog.conf
+
+- 1Âº descomentar lineas:
+
+#module(load="imudp")
+#input(type="imudp" port="514")
+
+- 2Âº crear plantilla personificada para
+  mostrar ips de quien manda mensajes:
+  
+ $template miplantilla, " mensaje recibido desde %HOSTNAME% a las %timereported%"
+ 
+
+
+3Âº: en fichero de reglas: /etc/rsyslog.d/50-default.conf
+
+auth,authpriv.*		/var/log/auth.log;miplantilla
+
+
+4Âº: reiniciar servicio rsyslog.service 

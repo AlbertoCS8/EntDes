@@ -1,0 +1,15 @@
+#!/bin/bash
+read -p "introduce el nombre del servicio" serv 
+systemctl status $serv.service
+if true
+	then read -p "quieres pararlo?" resp1
+	else read -p "quieres arrancarlo?" resp2
+	if $resp1 = s
+	if $resp2 = s
+	then systemctl enable $serv.service
+	fi
+	then systemctl disable $serv.service
+	fi
+fi
+
+

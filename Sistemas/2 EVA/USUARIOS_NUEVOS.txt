@@ -1,0 +1,6 @@
+----------------GRUPO: 1DAWA:1dawA ---------------
+USER: jorge:J0rG3:directorio_personal:Jorge Perez Zambrano, 666 77 99 77, jorge@gmail.com
+USER: gema:G3m4:directorio_personal:Gema Mengual, 677 11 22 33, gema.meng@yahoo.es
+----------------GRUPO2: 1ASIRA:1asirA---------------
+USER: alvaro:AlVar0xx:directorio_personal:Alvaro Jimemenz, 688 88 99 99, alvaro.jimenez@msn.es
+

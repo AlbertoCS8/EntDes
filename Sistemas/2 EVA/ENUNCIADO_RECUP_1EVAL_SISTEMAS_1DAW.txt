@@ -1,0 +1,76 @@
+﻿====================================================
+ EXAMEN SISTEMAS RECUPERACION 2º EVALUACION - 1ºDAW
+	tiempo: 3 horas 
+=====================================================
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+1º EJERCICIO ( 5,0 ptos) <== SCRIPT CONTROL CUENTAS USUARIOS ==>
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+Eres el administrador del sistema y te pasan un fichero llamado USUARIOS_NUEVOS.txt donde viene la info de los grupos y los usuarios dentro de cada
+grupo para dar de alta en el sistema (os paso uno de ejemplo para hacer pruebas); el formato del fichero es el siguiente:  (el numero de usuarios por
+grupo es variable)
+
+		----------------GRUPO: nombre_grupo:passwordGrupo --------------- <--- linea q delimita el final de un grupo comienzo de otro
+		USER: nombre_usuario1:password1:directorio_personal:comentarios
+		USER: nombre_usuario2:password2:directorio_personal:comentarios
+		----------------GRUPO2: nombre_grupo:passwordGrupo --------------- <--- linea q delimita el final de un grupo comienzo de otro
+		USER: nombre_usuario1:password1:directorio_personal:comentarios
+		USER: nombre_usuario2:password2:directorio_personal:comentarios
+		USER: nombre_usuario3:password3:directorio_personal:comentarios
+		USER: nombre_usuario4:password4:directorio_personal:comentarios
+		----------------GRUPO3: nombre_grupo:passwordGrupo --------------- <--- linea q delimita el final de un grupo comienzo de otro
+		....
+		
+
+tienes que hacer un script que leyendo el fichero linea a linea:
+			- a) genere el grupo en el sistema con el nombre especificado y la contraseña de acceso al mismo
+			  se tiene q mostrar un mensaje como:
+			  		"GRUPO NUMERO ... CON NOMBRE: ... y PASSWORD: .... DADO DE ALTA"
+												 
+			- b) añadir al mismo los usuarios que hay a continuacion del nombre del grupo  con las contraseñas q se especifican, 
+			el directorio personal q se pone y los comentarios a la cuenta q se especifican. 
+			
+			Ademas  !!SE HARA ADMIN del GRUPO al 1º usuario de la lista!!! y al resto añadirlos
+			 como usuarios normales al grupo q pertenezcan
+			 se tiene q ir mostrando un mensaje con cada usuario q se crea:
+					"USUARIO: .... con LOGIN: .... y PASSWORD: ....  DADO DE ALTA EN EL GRUPO: ...."
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+2º EJERCICIO ( 5,0 ptos) <== SCRIPT CONTROL SERVICIOS Y PROCESOS ==>
+---------------------------------------------------------------------------------------------------------------------------------------------------
+crear un script que:
+
+	- a) muestre un listado de los servicios cuyo estado sea "running" o ejecutandose en este momnento,
+	  te debe pedir el nombre del servicio y debes mostrar el fihcero de configuracion del mismo
+
+	   Una vez mostrado, te debera mostrar esta info del proceso asociado al ejecutable del servicio (esta en variable ExecStart del fich.
+	 de configuracion del servicio):
+			- pid
+			- ppid
+			- tiempo de ejecucion
+			- prioridad
+			- bondad
+			- estado proceso
+			- usuario
+			- comando 
+
+
+	- b) pedir el nombre del servicio en estado running del listado anterior, y preguntar si quieres matar su proceso, si es q si
+	  matarlo...una vez finalizado el proceso comprobar el estado del servicio, y ver si ya no esta RUNNING
+
+	- c) pedir si quieres MATAR todos los procesos a la vez de los servicios en estado running del primer apartado, si es q si,
+	  tendras que ir uno por uno matando el proceso asociado al ejecutable del servicio correspondiente mostrando este mensaje por
+	  pantalla:
+			proceso del servicio: ....  con pid: ....  matado !!!
+			proceso del servicio: ....  con pid: ....  matado !!!
+			proceso del servicio: ....  con pid: ....  matado !!!
+
+	 mostrar despues el estado de todos estos servicios
+
+	 si se ha logrado matar el proceso del servicio ok, hacer q rsyslog lo almacene con esta plantilla en el fichero /var/log/milogservices.log
+	"---mensaje script control procesos de servicios ---:  se ha matado proceso del servicio:  <nombre_servicio> a las hh:mm:ss "
+
+	(poner config.de rsyslog para q haga esto) 
+

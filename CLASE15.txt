@@ -1,0 +1,91 @@
+
+SELECT APELLIDO
+
+FROM EMPLE
+
+WHERE EMP_NO IN (SELECT DIR
+
+                 FROM EMPLE
+
+                 GROUP BY DIR
+
+                  HAVING SUM(SALARIO) = (SELECT MAX(SUM(SALARIO))
+
+                                     FROM EMPLE
+
+                                     GROUP BY DIR
+
+                                     )
+
+              );                                     
+
+
+
+
+
+--NOMBRE DEL EMPLEADO CON MENOS GENTE A SU CARGO DIRECTA
+SELECT APELLIDO
+       FROM EMPLE
+       WHERE EMP_NO IN (SELECT DIR FROM EMPLE
+                       GROUP BY DIR
+                       HAVING COUNT(*)=(SELECT MIN(COUNT(*))
+                                         FROM EMPLE
+                                         GROUP BY DIR)
+                      );
+
+
+
+----------------------------------------------
+
+SELECT --------------
+
+FROM ------------------
+
+[WHERE --------------------]
+
+[CONNECT BY -----------
+
+         STARt WITH ----------]
+
+[GROUP BY  ----------
+
+       [HAVING ---------]]
+
+[ORDER BY ---------];
+
+------------------------
+
+
+
+;
+
+SELECT apellido,level FROM EMPLE FOR UPDATE;
+
+
+
+-- TODA LA JERARQUÍA DE LA EMPRESA;
+
+SELECT APELLIDO,EMP_NO,DIR,LEVEL
+
+  FROM EMPLE
+
+  CONNECT BY   EMP_NO= prior DIR
+
+  START WITH APELLIDO='SÁNCHEZ'
+  order by level;
+
+  
+
+  
+
+ --COLOCACON DE LA JERARQUÍA
+
+ 
+
+SELECT LPAD(APELLIDO,LENGTH(APELLIDO)+ 6*LEVEL), OFICIO AS TRABAJADORES ,LEVEL
+
+  FROM EMPLE
+
+  CONNECT BY  PRIOR EMP_NO=DIR
+
+  START WITH APELLIDO='REY'; 

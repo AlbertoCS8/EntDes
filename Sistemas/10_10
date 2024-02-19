@@ -1,0 +1,400 @@
+alumnot@a37pc04:~$ rsyslog status
+
+Orden «rsyslog» no encontrada. Quizá quiso decir:
+
+  la orden «rsyslogd» del paquete deb «rsyslog (8.2001.0-1ubuntu1.3)»
+
+Pruebe con: apt install <nombre del paquete deb>
+
+alumnot@a37pc04:~$ systemctl status rsyslog
+● rsyslog.service - System Logging Service
+     Loaded: loaded (/lib/systemd/system/rsyslog.service; enabled; vendor prese>
+     Active: active (running) since Tue 2023-10-10 15:59:08 CEST; 10min ago
+TriggeredBy: ● syslog.socket
+       Docs: man:rsyslogd(8)
+             https://www.rsyslog.com/doc/
+   Main PID: 869 (rsyslogd)
+      Tasks: 4 (limit: 18913)
+     Memory: 3.6M
+     CGroup: /system.slice/rsyslog.service
+             └─869 /usr/sbin/rsyslogd -n -iNONE
+
+Warning: some journal files were not opened due to insufficient permissions.
+...skipping...
+● rsyslog.service - System Logging Service
+     Loaded: loaded (/lib/systemd/system/rsyslog.service; enabled; vendor prese>
+     Active: active (running) since Tue 2023-10-10 15:59:08 CEST; 10min ago
+TriggeredBy: ● syslog.socket
+       Docs: man:rsyslogd(8)
+             https://www.rsyslog.com/doc/
+   Main PID: 869 (rsyslogd)
+      Tasks: 4 (limit: 18913)
+     Memory: 3.6M
+     CGroup: /system.slice/rsyslog.service
+             └─869 /usr/sbin/rsyslogd -n -iNONE
+
+Warning: some journal files were not opened due to insufficient permissions.
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+alumnot@a37pc04:~$ systemctl status rsyslogd.service
+Unit rsyslogd.service could not be found.
+alumnot@a37pc04:~$ cat rsyslog.service
+cat: rsyslog.service: No existe el archivo o el directorio
+alumnot@a37pc04:~$ cd /etc/rsyslog.config
+bash: cd: /etc/rsyslog.config: No existe el archivo o el directorio
+alumnot@a37pc04:~$ cd etc
+bash: cd: etc: No existe el archivo o el directorio
+alumnot@a37pc04:~$ cd /etc
+alumnot@a37pc04:/etc$ cat rsyslog.conf
+# /etc/rsyslog.conf configuration file for rsyslog
+#
+# For more information install rsyslog-doc and see
+# /usr/share/doc/rsyslog-doc/html/configuration/index.html
+#
+# Default logging rules can be found in /etc/rsyslog.d/50-default.conf
+
+
+#################
+#### MODULES ####
+#################
+
+module(load="imuxsock") # provides support for local system logging
+#module(load="immark")  # provides --MARK-- message capability
+
+# provides UDP syslog reception
+#module(load="imudp")
+#input(type="imudp" port="514")
+
+# provides TCP syslog reception
+#module(load="imtcp")
+#input(type="imtcp" port="514")
+
+# provides kernel logging support and enable non-kernel klog messages
+module(load="imklog" permitnonkernelfacility="on")
+
+###########################
+#### GLOBAL DIRECTIVES ####
+###########################
+
+#
+# Use traditional timestamp format.
+# To enable high precision timestamps, comment out the following line.
+#
+$ActionFileDefaultTemplate RSYSLOG_TraditionalFileFormat
+
+# Filter duplicated messages
+$RepeatedMsgReduction on
+
+#
+# Set the default permissions for all log files.
+#
+$FileOwner syslog
+$FileGroup adm
+$FileCreateMode 0640
+$DirCreateMode 0755
+$Umask 0022
+$PrivDropToUser syslog
+$PrivDropToGroup syslog
+
+#
+# Where to place spool and state files
+#
+$WorkDirectory /var/spool/rsyslog
+
+#
+# Include all config files in /etc/rsyslog.d/
+#
+$IncludeConfig /etc/rsyslog.d/*.conf
+alumnot@a37pc04:/etc$ cd rsyslog.d
+alumnot@a37pc04:/etc/rsyslog.d$ ls
+20-ufw.conf  50-default.conf
+alumnot@a37pc04:/etc/rsyslog.d$ cat 20-ufw.conf
+# Log kernel generated UFW log messages to file
+:msg,contains,"[UFW " /var/log/ufw.log
+
+# Uncomment the following to stop logging anything that matches the last rule.
+# Doing this will stop logging kernel generated UFW log messages to the file
+# normally containing kern.* messages (eg, /var/log/kern.log)
+#& stop
+alumnot@a37pc04:/etc/rsyslog.d$ cat 50-default.conf
+#  Default rules for rsyslog.
+#
+#			For more information see rsyslog.conf(5) and /etc/rsyslog.conf
+
+#
+# First some standard log files.  Log by facility.
+#
+auth,authpriv.*			/var/log/auth.log
+*.*;auth,authpriv.none		-/var/log/syslog
+#cron.*				/var/log/cron.log
+#daemon.*			-/var/log/daemon.log
+kern.*				-/var/log/kern.log
+#lpr.*				-/var/log/lpr.log
+mail.*				-/var/log/mail.log
+#user.*				-/var/log/user.log
+
+#
+# Logging for the mail system.  Split it up so that
+# it is easy to write scripts to parse these files.
+#
+#mail.info			-/var/log/mail.info
+#mail.warn			-/var/log/mail.warn
+mail.err			/var/log/mail.err
+
+#
+# Some "catch-all" log files.
+#
+#*.=debug;\
+#	auth,authpriv.none;\
+#	news.none;mail.none	-/var/log/debug
+#*.=info;*.=notice;*.=warn;\
+#	auth,authpriv.none;\
+#	cron,daemon.none;\
+#	mail,news.none		-/var/log/messages
+
+#
+# Emergencies are sent to everybody logged in.
+#
+*.emerg				:omusrmsg:*
+
+#
+# I like to have messages displayed on the console, but only on a virtual
+# console I usually leave idle.
+#
+#daemon,mail.*;\
+#	news.=crit;news.=err;news.=notice;\
+#	*.=debug;*.=info;\
+#	*.=notice;*.=warn	/dev/tty8
+alumnot@a37pc04:/etc/rsyslog.d$ cd
+alumnot@a37pc04:~$ hash --help
+hash: hash [-lr] [-p ruta] [-dt] [nombre ...]
+    Almacena o muestra la ubicación de los programas.
+    
+    Determina y almacena la ruta completa de cada órden NOMBRE. Si
+    no se proporcionan argumentos, se muestra la información de las
+    órdenes almacenadas.
+    
+    Opciones:
+      -d	olvida la ubicación almacenada de cada NOMBRE
+      -l	muestra en un formato que se puede reutilizar como entrada
+      -p ruta	usa RUTA como la ruta completa de NOMBRE
+      -r	olvida todas las ubicaciones almacenadas
+      -t	muestra la ubicación almacenada de cada NOMBRE,
+    		cada ubicación precedida del NOMBRE correspondiente
+    		si se dan varios NOMBREs
+    Argumentos:
+      NOMBRE	Cada NOMBRE se busca en $PATH y se agrega a la lista
+    		de órdenes almacenadas.
+    
+    Estado de Salida
+    Devuelve correcto a menos que no se encuentre NOMBRE o se proporcione
+    una opción inválida.
+alumnot@a37pc04:~$ cd /var/log
+alumnot@a37pc04:/var/log$ ls
+alternatives.log        boot.log.7       kern.log.2.gz
+alternatives.log.1      bootstrap.log    kern.log.3.gz
+alternatives.log.10.gz  btmp             kern.log.4.gz
+alternatives.log.11.gz  btmp.1           lastlog
+alternatives.log.12.gz  cups             openvpn
+alternatives.log.2.gz   dist-upgrade     private
+alternatives.log.3.gz   dmesg            samba
+alternatives.log.4.gz   dmesg.0          speech-dispatcher
+alternatives.log.5.gz   dmesg.1.gz       syslog
+alternatives.log.6.gz   dmesg.2.gz       syslog.1
+alternatives.log.7.gz   dmesg.3.gz       syslog.2.gz
+alternatives.log.8.gz   dmesg.4.gz       syslog.3.gz
+alternatives.log.9.gz   dpkg.log         syslog.4.gz
+apport.log              dpkg.log.1       syslog.5.gz
+apport.log.1            dpkg.log.10.gz   syslog.6.gz
+apport.log.2.gz         dpkg.log.11.gz   syslog.7.gz
+apport.log.3.gz         dpkg.log.12.gz   ubuntu-advantage.log
+apport.log.4.gz         dpkg.log.2.gz    ubuntu-advantage.log.1
+apport.log.5.gz         dpkg.log.3.gz    ubuntu-advantage.log.2.gz
+apport.log.6.gz         dpkg.log.4.gz    ubuntu-advantage.log.3.gz
+apport.log.7.gz         dpkg.log.5.gz    ubuntu-advantage.log.4.gz
+apt                     dpkg.log.6.gz    ubuntu-advantage.log.5.gz
+auth.log                dpkg.log.7.gz    ubuntu-advantage.log.6.gz
+auth.log.1              dpkg.log.8.gz    unattended-upgrades
+auth.log.2.gz           dpkg.log.9.gz    vbox-setup.log
+auth.log.3.gz           faillog          vbox-setup.log.1
+auth.log.4.gz           fontconfig.log   vbox-setup.log.2
+boot.log                gdm3             vbox-setup.log.3
+boot.log.1              gpu-manager.log  vbox-setup.log.4
+boot.log.2              hp               vmware
+boot.log.3              installer        vmware-installer
+boot.log.4              journal          vnetlib
+boot.log.5              kern.log         wtmp
+boot.log.6              kern.log.1
+alumnot@a37pc04:/var/log$ cat auth.log
+cat: auth.log: Permiso denegado
+alumnot@a37pc04:/var/log$ ls -l
+total 7580
+-rw-r--r--  1 root              root                568 oct 10 13:39 alternatives.log
+-rw-r--r--  1 root              root               8667 sep 15 08:55 alternatives.log.1
+-rw-r--r--  1 root              root                127 oct  4  2022 alternatives.log.10.gz
+-rw-r--r--  1 root              root                359 sep 21  2022 alternatives.log.11.gz
+-rw-r--r--  1 root              root                127 sep  5  2022 alternatives.log.12.gz
+-rw-r--r--  1 root              root                415 jun 14 20:07 alternatives.log.2.gz
+-rw-r--r--  1 root              root                144 may 25 06:13 alternatives.log.3.gz
+-rw-r--r--  1 root              root                903 abr 27 18:57 alternatives.log.4.gz
+-rw-r--r--  1 root              root               1156 mar 28  2023 alternatives.log.5.gz
+-rw-r--r--  1 root              root                129 mar  2  2023 alternatives.log.6.gz
+-rw-r--r--  1 root              root                126 ene 31  2023 alternatives.log.7.gz
+-rw-r--r--  1 root              root                127 ene 17  2023 alternatives.log.8.gz
+-rw-r--r--  1 root              root                157 nov 17  2022 alternatives.log.9.gz
+-rw-r-----  1 root              adm                   0 sep 20 12:24 apport.log
+-rw-r-----  1 root              adm                 345 sep 19 16:21 apport.log.1
+-rw-r-----  1 root              adm                 231 sep 12 19:17 apport.log.2.gz
+-rw-r-----  1 root              adm                 256 abr 21 17:18 apport.log.3.gz
+-rw-r-----  1 root              adm                1071 mar 28  2023 apport.log.4.gz
+-rw-r-----  1 root              adm                 900 mar 27  2023 apport.log.5.gz
+-rw-r-----  1 root              adm                 262 mar 23  2023 apport.log.6.gz
+-rw-r-----  1 root              adm                 843 mar 14  2023 apport.log.7.gz
+drwxr-xr-x  2 root              root               4096 oct 10 13:39 apt
+-rw-r-----  1 syslog            adm               11493 oct 10 16:30 auth.log
+-rw-r-----  1 syslog            adm               61699 oct 10 12:22 auth.log.1
+-rw-r-----  1 syslog            adm                5677 oct  2 16:03 auth.log.2.gz
+-rw-r-----  1 syslog            adm                4962 sep 25 08:24 auth.log.3.gz
+-rw-r-----  1 syslog            adm                7840 sep 18 08:21 auth.log.4.gz
+-rw-------  1 root              root              11708 oct 10 15:59 boot.log
+-rw-------  1 root              root              28799 oct 10 12:22 boot.log.1
+-rw-------  1 root              root              41354 oct  6 08:28 boot.log.2
+-rw-------  1 root              root              19903 oct  5 08:17 boot.log.3
+-rw-------  1 root              root               9909 oct  4 11:44 boot.log.4
+-rw-------  1 root              root               9838 oct  3 16:03 boot.log.5
+-rw-------  1 root              root              29878 oct  2 16:03 boot.log.6
+-rw-------  1 root              root              28022 sep 29 08:19 boot.log.7
+-rw-r--r--  1 root              root             104003 abr 23  2020 bootstrap.log
+-rw-rw----  1 root              utmp                  0 oct  2 16:03 btmp
+-rw-rw----  1 root              utmp               2688 sep 12 17:44 btmp.1
+drwxr-xr-x  2 root              root               4096 oct 10 12:22 cups
+drwxr-xr-x  2 root              root               4096 abr  8  2020 dist-upgrade
+-rw-r--r--  1 root              adm               82674 oct 10 15:59 dmesg
+-rw-r--r--  1 root              adm               83266 oct 10 12:22 dmesg.0
+-rw-r--r--  1 root              adm               19927 oct  6 16:01 dmesg.1.gz
+-rw-r--r--  1 root              adm               19953 oct  6 11:27 dmesg.2.gz
+-rw-r--r--  1 root              adm               19991 oct  6 08:28 dmesg.3.gz
+-rw-r--r--  1 root              adm               19874 oct  5 16:01 dmesg.4.gz
+-rw-r--r--  1 root              root              31156 oct 10 13:39 dpkg.log
+-rw-r--r--  1 root              root             177419 sep 21 08:33 dpkg.log.1
+-rw-r--r--  1 root              root               9512 oct 28  2022 dpkg.log.10.gz
+-rw-r--r--  1 root              root               4556 sep 28  2022 dpkg.log.11.gz
+-rw-r--r--  1 root              root              11376 sep  5  2022 dpkg.log.12.gz
+-rw-r--r--  1 root              root               7833 jun 14 20:08 dpkg.log.2.gz
+-rw-r--r--  1 root              root               4625 may 25 06:14 dpkg.log.3.gz
+-rw-r--r--  1 root              root               8299 abr 28 16:55 dpkg.log.4.gz
+-rw-r--r--  1 root              root              12535 mar 29  2023 dpkg.log.5.gz
+-rw-r--r--  1 root              root               3657 feb 28  2023 dpkg.log.6.gz
+-rw-r--r--  1 root              root               2610 ene 31  2023 dpkg.log.7.gz
+-rw-r--r--  1 root              root               2471 dic 20  2022 dpkg.log.8.gz
+-rw-r--r--  1 root              root               5116 nov 29  2022 dpkg.log.9.gz
+-rw-r--r--  1 root              root              32192 sep  4 13:10 faillog
+-rw-r--r--  1 root              root              11284 jun  7 19:19 fontconfig.log
+drwx--x--x  2 root              gdm                4096 oct  7  2019 gdm3
+-rw-r--r--  1 root              root               1356 oct 10 15:59 gpu-manager.log
+drwxr-xr-x  3 root              root               4096 abr 23  2020 hp
+drwxrwxr-x  2 root              root               4096 dic  9  2020 installer
+drwxr-sr-x+ 5 root              systemd-journal    4096 sep  3  2021 journal
+-rw-r-----  1 syslog            adm              116031 oct 10 16:51 kern.log
+-rw-r-----  1 syslog            adm             1208421 oct 10 12:22 kern.log.1
+-rw-r-----  1 syslog            adm              290538 oct  2 16:03 kern.log.2.gz
+-rw-r-----  1 syslog            adm              296683 sep 25 08:24 kern.log.3.gz
+-rw-r-----  1 syslog            adm              433003 sep 18 08:21 kern.log.4.gz
+-rw-rw-r--  1 root              utmp             293752 sep  4 13:10 lastlog
+drwxr-xr-x  2 root              root               4096 sep  5  2019 openvpn
+drwx------  2 root              root               4096 abr 23  2020 private
+drwxr-x---  3 root              adm                4096 oct 10 12:22 samba
+drwx------  2 speech-dispatcher root               4096 ene 19  2020 speech-dispatcher
+-rw-r-----  1 syslog            adm              676953 oct 10 16:51 syslog
+-rw-r-----  1 syslog            adm             1346645 oct 10 12:22 syslog.1
+-rw-r-----  1 syslog            adm              250693 oct  6 08:28 syslog.2.gz
+-rw-r-----  1 syslog            adm              134161 oct  5 08:17 syslog.3.gz
+-rw-r-----  1 syslog            adm               71355 oct  4 11:44 syslog.4.gz
+-rw-r-----  1 syslog            adm               76157 oct  3 16:03 syslog.5.gz
+-rw-r-----  1 syslog            adm              184350 oct  2 16:03 syslog.6.gz
+-rw-r-----  1 syslog            adm              191054 sep 29 08:19 syslog.7.gz
+-rw-------  1 root              root               8632 oct 10 16:09 ubuntu-advantage.log
+-rw-------  1 root              root              36520 sep 29 16:09 ubuntu-advantage.log.1
+-rw-------  1 root              root                500 jun 15 18:09 ubuntu-advantage.log.2.gz
+-rw-------  1 root              root               1472 may 31 15:08 ubuntu-advantage.log.3.gz
+-rw-------  1 root              root                929 abr 28 16:20 ubuntu-advantage.log.4.gz
+-rw-------  1 root              root               1435 mar 30  2023 ubuntu-advantage.log.5.gz
+-rw-------  1 root              root               1379 feb 28  2023 ubuntu-advantage.log.6.gz
+drwxr-x---  2 root              adm                4096 oct  2 16:03 unattended-upgrades
+-rw-r--r--  1 root              root                102 oct 10 15:59 vbox-setup.log
+-rw-r--r--  1 root              root                102 oct 10 12:22 vbox-setup.log.1
+-rw-r--r--  1 root              root                102 oct  6 16:01 vbox-setup.log.2
+-rw-r--r--  1 root              root                102 oct  6 11:27 vbox-setup.log.3
+-rw-r--r--  1 root              root                102 oct  6 08:28 vbox-setup.log.4
+drwxr-xr-x  2 root              root               4096 oct 10 15:59 vmware
+-rw-r--r--  1 root              root              55967 jun 24  2021 vmware-installer
+-rw-r--r--  1 root              root              93469 sep  8  2021 vnetlib
+-rw-rw-r--  1 root              utmp             997632 oct 10 16:00 wtmp
+alumnot@a37pc04:/var/log$ systemctl status sshd.service
+● ssh.service - OpenBSD Secure Shell server
+     Loaded: loaded (/lib/systemd/system/ssh.service; enabled; vendor preset: e>
+     Active: active (running) since Tue 2023-10-10 15:59:08 CEST; 1h 10min ago
+       Docs: man:sshd(8)
+             man:sshd_config(5)
+    Process: 958 ExecStartPre=/usr/sbin/sshd -t (code=exited, status=0/SUCCESS)
+   Main PID: 999 (sshd)
+      Tasks: 1 (limit: 18913)
+     Memory: 2.1M
+     CGroup: /system.slice/ssh.service
+             └─999 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+
+Warning: some journal files were not opened due to insufficient permissions.
+alumnot@a37pc04:/var/log$ sshd --help
+unknown option -- -
+OpenSSH_8.2p1 Ubuntu-4ubuntu0.9, OpenSSL 1.1.1f  31 Mar 2020
+usage: sshd [-46DdeiqTt] [-C connection_spec] [-c host_cert_file]
+            [-E log_file] [-f config_file] [-g login_grace_time]
+            [-h host_key_file] [-o option] [-p port] [-u len]
+alumnot@a37pc04:/var/log$ man sshd
+alumnot@a37pc04:/var/log$ cd /tmp
+alumnot@a37pc04:/tmp$ mkfifo
+mkfifo: falta un operando
+Pruebe 'mkfifo --help' para más información.
+alumnot@a37pc04:/tmp$ mkfifo /tmp/mibuffer
+alumnot@a37pc04:/tmp$ ls -l
+total 84
+-rw------- 1 alumnot alumnot     0 oct 10 15:59 config-err-nBFFAH
+prw-rw-r-- 1 alumnot alumnot     0 oct 10 17:12 mibuffer
+drwx------ 3 root    root     4096 oct 10 15:59 snap-private-tmp
+drwx------ 2 alumnot alumnot  4096 oct 10 15:59 ssh-tvlb6lwiCe9f
+drwx------ 3 root    root     4096 oct 10 15:59 systemd-private-4714c8107ab64cfa8973b4f40bde4ca9-bolt.service-AazZYe
+drwx------ 3 root    root     4096 oct 10 15:59 systemd-private-4714c8107ab64cfa8973b4f40bde4ca9-colord.service-LDfn4h
+drwx------ 3 root    root     4096 oct 10 15:59 systemd-private-4714c8107ab64cfa8973b4f40bde4ca9-fwupd.service-uL99ij
+drwx------ 3 root    root     4096 oct 10 15:59 systemd-private-4714c8107ab64cfa8973b4f40bde4ca9-ModemManager.service-vMRL2f
+drwx------ 3 root    root     4096 oct 10 15:59 systemd-private-4714c8107ab64cfa8973b4f40bde4ca9-switcheroo-control.service-guLJmf
+drwx------ 3 root    root     4096 oct 10 15:59 systemd-private-4714c8107ab64cfa8973b4f40bde4ca9-systemd-logind.service-hYECwg
+drwx------ 3 root    root     4096 oct 10 15:59 systemd-private-4714c8107ab64cfa8973b4f40bde4ca9-systemd-resolved.service-C4VPjf
+drwx------ 3 root    root     4096 oct 10 15:59 systemd-private-4714c8107ab64cfa8973b4f40bde4ca9-systemd-timesyncd.service-iUF7Pf
+drwx------ 3 root    root     4096 oct 10 15:59 systemd-private-4714c8107ab64cfa8973b4f40bde4ca9-upower.service-2LHKwf
+drwx------ 2 alumnot alumnot  4096 oct 10 16:01 Temp-ba11574a-699e-41f8-98e7-d24a7e064165
+drwx------ 2 alumnot alumnot  4096 oct 10 15:59 tracker-extract-files.1002
+drwx------ 2 gdm     gdm      4096 oct 10 15:59 tracker-extract-files.125
+-rw-r--r-- 1 root    root    26313 oct 10 15:59 vboxdrv-Module.symvers
+alumnot@a37pc04:/tmp$ echo "... esto es mi primer buffer..." > /tmp/mibuffer
+alumnot@a37pc04:/tmp$ ^C
+alumnot@a37pc04:/tmp$ 
+------------------------------------------------------------------------------
+alumnot@a37pc04:/tmp$ cat mibuffer
+... esto es mi primer buffer...
+alumnot@a37pc04:/tmp$ ^ --help
+bash: :s^ --help: substitution failed
+alumnot@a37pc04:/tmp$ man ^
+Ninguna entrada del manual para ^
+alumnot@a37pc04:/tmp$ $template miplantilla
+miplantilla: orden no encontrada
+alumnot@a37pc04:/tmp$ 
+
+

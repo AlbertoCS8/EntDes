@@ -1,0 +1,201 @@
+alumnot@a37pc04:~$ ls -l
+total 43515976
+drwxr-xr-x  2 alumnot alumnot        4096 oct  6 17:47  Descargas
+drwxr-xr-x  2 alumnot alumnot        4096 oct  2 21:23  Documentos
+-rw-rw-r--  1 alumnot alumnot         677 sep 28 20:16  EjerciciosIfElse.html
+drwxr-xr-x  6 alumnot alumnot        4096 oct  4 17:45  Escritorio
+drwxr-xr-x  2 alumnot alumnot        4096 sep 20 16:17  Imágenes
+drwxrwxr-x  2 alumnot alumnot        4096 sep 11 19:18 'maquinas 2223'
+-rw-rw-r--  1 alumnot alumnot         150 sep 19 16:39  mostrar_procesos.sh
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Música
+drwxrwxr-x 14 alumnot alumnot        4096 oct  5 21:06  NetBeansProjects
+-rwxrwxrwx  1 alumnot alumnot 22856859648 oct  5 17:47  oracle2223.vdi
+drwxrwxr-x  3 alumnot alumnot        4096 oct  5 17:47  oracle2324
+-rwxr-xr-x  1 alumnot alumnot 21703426048 sep 18 19:49  oracle2324.vdi
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Plantillas
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Público
+-rw-rw-r--  1 alumnot alumnot         173 sep 19 16:59  script1.sh
+drwx------  5 alumnot alumnot        4096 sep 13 20:46  snap
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Vídeos
+drwxrwxr-x  3 alumnot alumnot        4096 oct  4 17:39 'VirtualBox VMs'
+alumnot@a37pc04:~$ ls -l; echo $?
+total 43515976
+drwxr-xr-x  2 alumnot alumnot        4096 oct  6 17:47  Descargas
+drwxr-xr-x  2 alumnot alumnot        4096 oct  2 21:23  Documentos
+-rw-rw-r--  1 alumnot alumnot         677 sep 28 20:16  EjerciciosIfElse.html
+drwxr-xr-x  6 alumnot alumnot        4096 oct  4 17:45  Escritorio
+drwxr-xr-x  2 alumnot alumnot        4096 sep 20 16:17  Imágenes
+drwxrwxr-x  2 alumnot alumnot        4096 sep 11 19:18 'maquinas 2223'
+-rw-rw-r--  1 alumnot alumnot         150 sep 19 16:39  mostrar_procesos.sh
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Música
+drwxrwxr-x 14 alumnot alumnot        4096 oct  5 21:06  NetBeansProjects
+-rwxrwxrwx  1 alumnot alumnot 22856859648 oct  5 17:47  oracle2223.vdi
+drwxrwxr-x  3 alumnot alumnot        4096 oct  5 17:47  oracle2324
+-rwxr-xr-x  1 alumnot alumnot 21703426048 sep 18 19:49  oracle2324.vdi
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Plantillas
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Público
+-rw-rw-r--  1 alumnot alumnot         173 sep 19 16:59  script1.sh
+drwx------  5 alumnot alumnot        4096 sep 13 20:46  snap
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Vídeos
+drwxrwxr-x  3 alumnot alumnot        4096 oct  4 17:39 'VirtualBox VMs'
+0
+alumnot@a37pc04:~$ ls -l /hhuskjfja; echo $?
+ls: no se puede acceder a '/hhuskjfja': No existe el archivo o el directorio
+2
+alumnot@a37pc04:~$ if ls -l
+> then
+> echo "estoy en el then"
+> echo $?
+> fi
+total 43515976
+drwxr-xr-x  2 alumnot alumnot        4096 oct  6 17:47  Descargas
+drwxr-xr-x  2 alumnot alumnot        4096 oct  2 21:23  Documentos
+-rw-rw-r--  1 alumnot alumnot         677 sep 28 20:16  EjerciciosIfElse.html
+drwxr-xr-x  6 alumnot alumnot        4096 oct  4 17:45  Escritorio
+drwxr-xr-x  2 alumnot alumnot        4096 sep 20 16:17  Imágenes
+drwxrwxr-x  2 alumnot alumnot        4096 sep 11 19:18 'maquinas 2223'
+-rw-rw-r--  1 alumnot alumnot         150 sep 19 16:39  mostrar_procesos.sh
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Música
+drwxrwxr-x 14 alumnot alumnot        4096 oct  5 21:06  NetBeansProjects
+-rwxrwxrwx  1 alumnot alumnot 22856859648 oct  5 17:47  oracle2223.vdi
+drwxrwxr-x  3 alumnot alumnot        4096 oct  5 17:47  oracle2324
+-rwxr-xr-x  1 alumnot alumnot 21703426048 sep 18 19:49  oracle2324.vdi
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Plantillas
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Público
+-rw-rw-r--  1 alumnot alumnot         173 sep 19 16:59  script1.sh
+drwx------  5 alumnot alumnot        4096 sep 13 20:46  snap
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Vídeos
+drwxrwxr-x  3 alumnot alumnot        4096 oct  4 17:39 'VirtualBox VMs'
+estoy en el then
+0
+alumnot@a37pc04:~$ 
+alumnot@a37pc04:~$ if ls -l
+> then
+> echo "por aqui no"
+> else
+> echo "por aqui si"
+> echo $?
+> fi
+total 43515976
+drwxr-xr-x  2 alumnot alumnot        4096 oct  6 17:47  Descargas
+drwxr-xr-x  2 alumnot alumnot        4096 oct  2 21:23  Documentos
+-rw-rw-r--  1 alumnot alumnot         677 sep 28 20:16  EjerciciosIfElse.html
+drwxr-xr-x  6 alumnot alumnot        4096 oct  4 17:45  Escritorio
+drwxr-xr-x  2 alumnot alumnot        4096 sep 20 16:17  Imágenes
+drwxrwxr-x  2 alumnot alumnot        4096 sep 11 19:18 'maquinas 2223'
+-rw-rw-r--  1 alumnot alumnot         150 sep 19 16:39  mostrar_procesos.sh
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Música
+drwxrwxr-x 14 alumnot alumnot        4096 oct  5 21:06  NetBeansProjects
+-rwxrwxrwx  1 alumnot alumnot 22856859648 oct  5 17:47  oracle2223.vdi
+drwxrwxr-x  3 alumnot alumnot        4096 oct  5 17:47  oracle2324
+-rwxr-xr-x  1 alumnot alumnot 21703426048 sep 18 19:49  oracle2324.vdi
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Plantillas
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Público
+-rw-rw-r--  1 alumnot alumnot         173 sep 19 16:59  script1.sh
+drwx------  5 alumnot alumnot        4096 sep 13 20:46  snap
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Vídeos
+drwxrwxr-x  3 alumnot alumnot        4096 oct  4 17:39 'VirtualBox VMs'
+por aqui no
+alumnot@a37pc04:~$ if ls -l; then echo "por aqui no"; else echo $?; fi
+total 43515976
+drwxr-xr-x  2 alumnot alumnot        4096 oct  6 17:47  Descargas
+drwxr-xr-x  2 alumnot alumnot        4096 oct  2 21:23  Documentos
+-rw-rw-r--  1 alumnot alumnot         677 sep 28 20:16  EjerciciosIfElse.html
+drwxr-xr-x  6 alumnot alumnot        4096 oct  4 17:45  Escritorio
+drwxr-xr-x  2 alumnot alumnot        4096 sep 20 16:17  Imágenes
+drwxrwxr-x  2 alumnot alumnot        4096 sep 11 19:18 'maquinas 2223'
+-rw-rw-r--  1 alumnot alumnot         150 sep 19 16:39  mostrar_procesos.sh
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Música
+drwxrwxr-x 14 alumnot alumnot        4096 oct  5 21:06  NetBeansProjects
+-rwxrwxrwx  1 alumnot alumnot 22856859648 oct  5 17:47  oracle2223.vdi
+drwxrwxr-x  3 alumnot alumnot        4096 oct  5 17:47  oracle2324
+-rwxr-xr-x  1 alumnot alumnot 21703426048 sep 18 19:49  oracle2324.vdi
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Plantillas
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Público
+-rw-rw-r--  1 alumnot alumnot         173 sep 19 16:59  script1.sh
+drwx------  5 alumnot alumnot        4096 sep 13 20:46  snap
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Vídeos
+drwxrwxr-x  3 alumnot alumnot        4096 oct  4 17:39 'VirtualBox VMs'
+por aqui no
+alumnot@a37pc04:~$ if ls -l /hashbfjh
+> then
+> else
+bash: error sintáctico cerca del elemento inesperado `else'
+alumnot@a37pc04:~$ echo"esta siiiiiiiiiiiii"
+echoesta siiiiiiiiiiiii: orden no encontrada
+alumnot@a37pc04:~$ if ls -l /hashbfjh; then else
+bash: error sintáctico cerca del elemento inesperado `else'
+alumnot@a37pc04:~$ read -p "introduce directorio" direct; if ls -l $direct > /dev/null; then echo "el directorio existe"; else echo "el directorio no existe...";fi
+introduce directorio/kjsd
+ls: no se puede acceder a '/kjsd': No existe el archivo o el directorio
+el directorio no existe...
+alumnot@a37pc04:~$ read -p "introduce directorio" direct; if ls -l $direct > /dev/null; then echo "el directorio existe"; else echo "el directorio no existe...";fi
+introduce directorioEscritorio
+el directorio existe
+alumnot@a37pc04:~$ read -p "introduce directorio" direct; if ls -l $direct > /tmp/SALIDA_OK.txt 2>/tmp/SALIDA_MAL.txt; then echo "el directorio existe"; else echo "el directorio no existe...";fi
+introduce directoriohju
+el directorio no existe...
+alumnot@a37pc04:~$ read -p "introduce directorio" direct; if ls -l $direct > /tmp/SALIDA_OK.txt 2>/tmp/SALIDA_MAL.txt; then echo "el directorio existe"; else echo "el directorio no existe...";fi
+introduce directorioEscritorio
+el directorio existe
+alumnot@a37pc04:~$ 
+----------------------------------------------------------------------------------------------------------------------------------------------
+te debe pedir el nombre de un directorio y comprobar con cd si existe el directorio si existe el directorio mostrar el mensaje de que existe y si no que no existe;tanto si acaba bien el comando cd como mal que no salga nada por pantalla del comando CD
+----------------------------------------------------------------------------------------------------------------------------------------------
+alumnot@a37pc04:~$ read -p "introduce directorio" direct; if cd/$direct; then echo " el directorio existe"; else echo "el directorio no existe"
+> Escritorio
+> /Escritorio
+> ^C
+alumnot@a37pc04:~$ read -p "introduce directorio" direct; if cd/$direct; then echo " el directorio existe"; else echo "el directorio no existe"; Escritorio; /Escritorio
+> ^C
+alumnot@a37pc04:~$ read -p "introduce directorio" direct; if cd/$direct; then echo " el directorio existe"; else echo "el directorio no existe"
+> ^C
+alumnot@a37pc04:~$ read -p "introduce directorio" direct; if cd/$direct; then echo " el directorio existe"; else echo "el directorio no existe";fi
+introduce directorioEscritorio
+bash: cd/Escritorio: No existe el archivo o el directorio
+el directorio no existe
+alumnot@a37pc04:~$ read -p "introduce directorio" direct; if cd/$direct; then echo " el directorio existe"; else echo "el directorio no existe";fi
+introduce directorio
+bash: cd/: No existe el archivo o el directorio
+el directorio no existe
+alumnot@a37pc04:~$ read -p "introduce directorio" direct; if cd $direct; then echo " el directorio existe"; else echo "el directorio no existe";fi
+introduce directorioEscritorio
+ el directorio existe
+alumnot@a37pc04:~/Escritorio$ cd
+alumnot@a37pc04:~$ 
+---------------------------ESTO QUERIA EL PROFE--------------------------------
+alumnot@a37pc04:~$ read -p "introduce directorio" direct; if cd $direct >/dev/null 2>/dev/null; then echo " el directorio existe"; else echo "el directorio no existe";fi
+introduce directorioEscritorio
+ el directorio existe
+alumnot@a37pc04:~/Escritorio$ 
+---------------------------------------------------------------------------------
+alumnot@a37pc04:~$ ls -l && echo "acaba bien" || echo "el directorio no existe"
+total 43515976
+drwxr-xr-x  2 alumnot alumnot        4096 oct  6 17:47  Descargas
+drwxr-xr-x  2 alumnot alumnot        4096 oct  2 21:23  Documentos
+-rw-rw-r--  1 alumnot alumnot         677 sep 28 20:16  EjerciciosIfElse.html
+drwxr-xr-x  6 alumnot alumnot        4096 oct  4 17:45  Escritorio
+drwxr-xr-x  2 alumnot alumnot        4096 sep 20 16:17  Imágenes
+drwxrwxr-x  2 alumnot alumnot        4096 sep 11 19:18 'maquinas 2223'
+-rw-rw-r--  1 alumnot alumnot         150 sep 19 16:39  mostrar_procesos.sh
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Música
+drwxrwxr-x 14 alumnot alumnot        4096 oct  5 21:06  NetBeansProjects
+-rwxrwxrwx  1 alumnot alumnot 22856859648 oct  5 17:47  oracle2223.vdi
+drwxrwxr-x  3 alumnot alumnot        4096 oct  5 17:47  oracle2324
+-rwxr-xr-x  1 alumnot alumnot 21703426048 sep 18 19:49  oracle2324.vdi
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Plantillas
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Público
+-rw-rw-r--  1 alumnot alumnot         173 sep 19 16:59  script1.sh
+drwx------  5 alumnot alumnot        4096 sep 13 20:46  snap
+drwxr-xr-x  2 alumnot alumnot        4096 sep 11 16:17  Vídeos
+drwxrwxr-x  3 alumnot alumnot        4096 oct  4 17:39 'VirtualBox VMs'
+acaba bien
+alumnot@a37pc04:~$ ls -l /dhjbfhbhfjbab  && echo "acaba bien" || echo "el directorio no existe"
+ls: no se puede acceder a '/dhjbfhbhfjbab': No existe el archivo o el directorio
+el directorio no existe
+alumnot@a37pc04:~$ ls -l >/dev/null 2>/dev/null && echo "acaba bien" || echo "el directorio no existe"
+acaba bien
+//sin mensajeeeeeeeeeeee//
+-----------------
+
+

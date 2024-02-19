@@ -1,0 +1,307 @@
+--------------------------------------------
+  ADMINISTRACION USUARIOS Y GRUPOS
+ ==>  AUTENTIFICACION Y AUTORIZACION  <==
+--------------------------------------------
+En el proceso de autentificacion:
+					   LSASS.exe
+	WinLogon.exe: username + password ---------->  backend: SAM (en registro de windows) <--- objetos Usuario
+					      ok
+					      ||
+			modulo del kernel
+			SRM (Security Reference Monitor)
+			Genera un ACCESS-TOKEN para el usuario:
+
+					SID-usuario <-------- security identification number, num.exclusivo q id. de forma unica
+					SID-grupo-principal	al usuario o grupo:
+					SID-grupos alternativos		S-x-y-xxxxxxxxxxx-xxxxxxxxxxxxx-xxxxxxxxxxx-zzzzz
+					derechos acceso			  --- ------------------------------------  -----
+								   	 version	id.maquina generacion SID    RID:relative-id
+	Este ACCESS-TOKEN es el q realmente usa el usuario para
+	hacer uso de los recursos del sistema
+
+comandos administrar cuentas usuario por el LSASS:
+
+	get-command -Module Microsoft.PowerShell.LocalAccounts																
+
+ - para recuperar cuentas de usuario:
+			cada cuenta es un objeto clase: Microsoft.PowerShell.Commands.LocalUser
+
+			Get-LocalUser [-opciones]
+				      -----------> sin opciones muestra todas las cuentas def.en el sistema; para seleccionar una cuenta:
+						-Name nombre <---- selecciona cuenta de usuario asociado a ese login
+						-SID num_sid <----- igual para ese SID
+						
+
+					ej: recuperacion info de cuenta Adminstrador por su SID
+
+				Get-LocalUser -SID S-1-5-21-3702729373-206956135-2542522718-500 | Select-Object -Property *
+
+ - para crear una nueva cuenta y almacenarla en la SAM:
+
+		New-LocalUser [-opciones] --->  -AccountExpires fecha <=== fecha en q la cuenta se DESHABILITA
+						-AccountNeverExpires <==== cuenta nunca expira
+						-Descripcion "....." <==== comentarios describen cuenta
+						-Disabled <=============== cuenta deshabilitada al crearse, no se pueda iniciar sesion
+						-Name "login" <=========== login de acceso
+						-FullName "nombre_completo" <=== nombre completo usuario aparece en WinLogon
+						-Password "hash_secure_string" <=== OJO!!!no va la password en texto plano!!!
+											usar la opcion -AsSecureString de Read-host
+						-NoPassword <========= cuenta sin contraseña (generalmente windows por politicas de grupo
+									y de equipo no admite cuentas sin password)
+
+						-PasswordNeverExpires <==== nunca expira la contraseña
+						-UserMayNotChangePassword <== si expira la contraseña, no puede el usuario cambiarla, se la tiene
+										q cambiar el administrador
+
+
+
+- para modificar una cuenta existente:
+
+		Set-LocalUser -Name nombre_login | -SID num_sid   -opciones_a_cambiar 
+
+
+- para borrar una cuenta existente:
+
+		Remove-LocalUser -Name nombre_login | -SID num_sid 
+
+Comandos gestion WMIC usuarios:
+
+	- cuentas usuarios normales: alias UserAccount <---- Win32_UserAccount
+
+		wmic useraccount get /? <------- props.de la clase Win32_UserAccount
+		wmic useraccount call /? <------ metodos de la clase Win32_UserAccount
+
+	ej: recuperar props. Name,FullName y SID de la cuenta con login "pmr_a"
+
+		wmic useraccount where 'Name="pmr_a"' get Name,FullName,SID
+		Get-CimInstance -ClassName Win32_UserAccount -Filter "Name='pmr_a'" | Select-Object -Property Name,FullName,SID
+
+
+
+
+
+	- cuentas usurios sistema: alias SysAccount <------- Win32_SystemAccount 
+
+
+		wmic sysaccount get /? <------- props.de la clase Win32_SystemAccount (menos props. q en Win32_UserAccount)
+		wmic sysaccount call /? <------ metodos de la clase Win32_SystemAccount <== no hay ninguno
+
+	ej: recupero de todas las cuentas del sistema el nombre y su SID:
+
+		wmic sysaccount get Name,SID
+		Get-CimInstance -ClassName Win32_SystemAccount | Select-Object -Property Name,SID
+
+
+
+
+
+COMANDOS GESTION DE GRUPOS LOCALES
+----------------------------------
+- para crear un grupo nuevo:
+
+	New-LocalGroup  -Name "nombre_grupo" [-Description "...." ]
+
+- para modificar un grupo:
+
+	Set-LocalGroup   -Name "nombre_grupo" | -SID "sid..." [-opciones_cambio]
+
+ - para obtener info de todos los grupos o de un grupo:
+
+	Get-LocalGroup [ -Name "nombre_grupo" | -SID "sid..." ] <==== cada grupo es un objeto de la clase:
+									Microsoft.PowerShell.Commands.LocalGroup
+ - para borrar un grupo:
+
+	Remove-LocalGroup  -Name "nombre_grupo" | -SID "sid..." [-opciones_confirmacion]
+
+ - para cambiar el nombre de un grupo (se puede hacer con Set-LocalGroup)
+	
+	Rename-LocalGroup      
+
+=========================================
+ Para la gestion de miembros del grupo:
+
+	Add-LocalGroupMember   
+
+	Get-LocalGroupMember   
+
+	Remove-LocalGroupMember
+
+
+
+-------------------------------------------------------------------------
+practica:
+	- crear una cuenta de usuario:  alumno1daw con password alumno1daw,habilitada q la contraseña caduque en 3min y no pueda cambiar el 
+					la contraseña
+
+	(borrarla)
+
+
+	- script: crear 10 cuentas de usuario llamadas:  alumno1daw-1 .... alumno1daw-10 (misma password q login)
+							nombre complento el mismo q el login, y en descripcion: "cuenta del grupo 1DAW-A"
+							la contraseña expira en 1 mes, y no pueden cambiar la password
+
+	
+	mostrar por pantalla de cada cuenta su login y su SID
+	(borrarlas cuando se ejecute ok)
+--------------------------------------------------------------------------
+
+========================
+PROCESO DE AUTORIZACION
+(ACCESO A RECURSOS)
+=======================
+cuando el usuario se autentifica, el modulo del kernel SRM(Security-Reference-Monitor) crea al usuario un Access-Token
+				intento acceso a recurso(fichero,directorio,unidad,unidad compartida,...)
+
+  usuario logueado   <=====================================>   (SD)Security-Descriptor del recurso creado por el Objetc-Manager
+   ACCESS-TOKEN			SRM				metadatos del recurso (nombre,fechas,...)
+ ------------------						--------------------------------
+   SID-usuario							DACL: (Discriminatory Access Control List)
+ ------------------						    - regla ACE-1 <=== 1º regla control acceso al recurso
+   SID-grupos							    - regla ACE-2 <=== 2º regla control acceso al recurso
+ ------------------							....
+ en funcion de los						--------------------------------
+ grupos:							SACL: (Reglas de Auditoria recurso)
+  -derecho1								- regla SACE-1 <=== 1º regla de como se registra acceso al recurso en log
+  -derecho2								- regla SACE-2 <=== 2º regla de como se registra acceso al recurso en log
+  ...									....
+
+NO CONFUNDIR CON PERMISOS!!!						||
+derechos de acceso son privilegios			parte de estas reglas ACE tanto en DACL (como en SACL, mas raro) vienen
+q tiene el usuario por pertenecer a			heredadas de contenedores superiores (directorios) para evitar repetirlas
+esos grupos						Puedes anular dicha herencia de reglas
+
+
+comandos powershell para ver DACL de un recurso y poner/ver reglas ACE:
+----------------------------------------------------------------------
+
+ - para ver todo el SD del recurso (tanto metadados, reglas en DACL, reglas en SACL)
+
+		Get-Acl -Path /ruta/recurso [-Audit] <======== el SD del recurso se mapea contra objeto de clase:
+					    --------			- sobre ficheros:    System.Security.AccessControl.FileSecurity
+						|--->te muestra SACL	- sobre directorios: System.Security.AccessControl.DirectorySecurity
+
+	la DACL es un objeto de la clase: 			System.Security.AccessControl.AuthorizationRuleCollection
+	y cada regla ACE de la misma es objeto de la clase: 	System.Security.AccessControl.FileSystemAccessRule
+
+ - para intentar cambiar una regla ACE de la DACL de un recurso:
+
+		Set-Acl -Path /ruta/recurso [-opciones]
+
+------------------------------------------------------------------------------------
+practica:
+	- crearse un fichero .txt nuevo en tus documentos llamado PRUEBA.txt
+	listar SD del mismo, y sus reglas ACE de la DACL
+
+		(Get-Acl -Path $env:HOMEPATH\Documents\PRUEBA.txt).Access
+
+	- añadir una nueva regla ACE a la DACL del mismo, q PERMITA al grupo INVITADOS el permiso de CONTROL TOTAL
+	 una vez añadida, comprobar de nuevo y mostrar todas las reglas de la DACL del fichero para ver si esta añadida ok
+	(mirarlo tb en el entorno grafico)
+
+		#1º creacion de regla ACE usando 2º sobrecarga constructor de la clase FileSystemAccessRule (tres parametros)
+
+[string]$indentity="Invitados"
+[System.Security.AccessControl.FileSystemRights]$permisos=[System.Security.AccessControl.FileSystemRights]::FullControl
+[System.Security.AccessControl.AccessControlType]$tipo=[System.Security.AccessControl.AccessControlType]::Allow
+
+[System.Security.AccessControl.FileSystemAccessRule]$nuevaACE=[System.Security.AccessControl.FileSystemAccessRule]::new($indentity, $permisos, $tipo)
+
+		#2º paso añadir esa regla a la DACL del SD usando metodo .SetAccessRule(__regla_ACE__) de la clase FileSecurity
+
+[System.Security.AccessControl.FileSecurity]$ficheroSD=Get-Acl -Path $env:HOMEPATH\Documents\PRUEBA.txt
+$ficheroSD.SetAccessRule($nuevaACE)
+
+
+		#3º paso el DACL modificado insertarlo(refrescarlo) en el SD del fichero
+
+		Set-Acl -Path $env:HOMEPATH\Documents\PRUEBA.txt -AclObject $ficheroSD
+
+
+
+
+	- quitar esta regla recien añadida, comprobarlo tb en consola y en entorno grafico
+
+-------------------------------------------------------------------------------------------------------------------------
+MANEJO DACL CON WMIC:
+
+	la clase que se maneja para obtener el SD de un recurso: Win32_LogicalFileSecuritySetting
+		para obtener props.clase: 
+						wmic path win32_logicalfilesecuritysetting get /?
+		para obtener metodos.clase:
+						wmic path win32_logicalfilesecuritysetting call /? <--- tiene un metodo:
+													.GetSecurityDescriptor()
+											devuelve un objeto de la clase q representa el SD:
+													Win32_SecurityDescriptor
+											tiene como prop. DACL y dentro de la misma cada
+											regla ACE es un objeto de la clase Win32_ACE
+	esquema:
+		-------- objeto clase: Win32_LogicalFileSecuritySetting, metodo .GetSecurityDescriptor()
+		recurso <------ SD (metadatos,DACL,SACL): objeto clase Win32_SecurityDescriptor	
+		--------					.DACL <---- ACE-1 <==== objeto clase Win32_ACE
+									    ACE-2 <==== objeto clase Win32_ACE
+									    ....
+
+	ej:
+		- quiero recuperar desde wmic el SD del notepad.exe:
+
+		objeto de la clase win32_LogicalFileSecuritySettings del fichero notepad.exe:
+
+			wmic path win32_LogicalFileSecuritySetting where 'Path="c:\\windows\\system32\\notepad.exe"' get /all /format:list
+		powershell: 
+			Get-CimInstance -ClassName win32_LogicalFileSecuritySetting -Filter "Path='c:\\windows\\system32\\notepad.exe'"
+
+
+
+		para obtener el SD ejecuto el metodo del objeto: .GetSecurityDescriptor		
+
+			wmic path win32_LogicalFileSecuritySetting where 'Path="c:\\windows\\system32\\notepad.exe"' call GetSecurityDescriptor
+
+		powershell:
+			$secfich=Get-CimInstance -ClassName win32_LogicalFileSecuritySetting -Filter "Path='c:\\windows\\system32\\notepad.exe'"
+			$sd=Invoke-CimMethod -InputObject $secfich -MethodName GetSecurityDescriptor
+
+				o bien en un paso:
+
+	$sd=Invoke-CimMethod -Query "SELECT * FROM Win32_LogicalFileSecuritySetting WHERE Path='c:\\Windows\\System32\\notepad.exe'" 
+			     -MethodName GetSecurityDescriptor
+
+			$sd.Descriptor <----- muestra todo el SD
+
+
+----------------------------------------------------------------------------------------------
+practica:
+	- script para administra DACL de un recurso:
+
+		ADMIN DACL recurso
+		==================
+		1. Mostrar reglas ACE de la DACL <------- ruta al recurso, mostrar reglas tanto comando powershell, como wmic
+		2. Agregar nueva regla ACE a la DACL <--- ruta al recurso, pedir: permisos(control total,lectura,...), tipo(permitir,denegar)
+		3. Quitar regla ACE de la DACL			objeto(nombre usuario o nombre grupo) <== una vez ok, comprobar si se ha agregado
+		4. --SALIR--					(valientes: hacerlo con clases wmic)
+		  opcion:_				<---- ruta al recurso, mostrar reglas ACE numeradas, pedir numero de regla a eliminar y	
+								quitarla de la DACL <== si ok, comprobarlo
+								(valientes: hacerlo con clases wmic)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

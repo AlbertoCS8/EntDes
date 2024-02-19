@@ -1,0 +1,242 @@
+alumnot@a37pc04:~$ ps -p -C firefox -o pid,ppid,pri,nice,cmd
+error: error de sintaxis en el proceso ID
+
+Uso:
+ ps [opciones]
+
+ Intente «ps --ayuda <simple|lista|salida|hilos|varios|todos>»
+  o «ps --ayuda <s|l|a|h|v|t>»
+ para más texto de ayuda.
+
+Para más información vea ps(1).
+alumnot@a37pc04:~$ ^C
+alumnot@a37pc04:~$ ps -C firefox -o pid,pri,ppid,nice,cmd
+    PID PRI    PPID  NI CMD
+   7728  19    4277   0 /usr/lib/firefox/firefox -new-window
+alumnot@a37pc04:~$ renice -n -4 -p `pidof firefox`
+renice: no se ha podido establecer la prioridad de 7983 (process ID): Permiso denegado
+renice: no se ha podido establecer la prioridad de 7979 (process ID): Permiso denegado
+renice: no se ha podido establecer la prioridad de 7975 (process ID): Permiso denegado
+renice: no se ha podido establecer la prioridad de 7888 (process ID): Permiso denegado
+renice: no se ha podido establecer la prioridad de 7839 (process ID): Permiso denegado
+renice: no se ha podido establecer la prioridad de 7795 (process ID): Permiso denegado
+renice: no se ha podido establecer la prioridad de 7728 (process ID): Permiso denegado
+alumnot@a37pc04:~$ sudo renice -n -4 -p `pidof firefox`
+[sudo] contraseña para alumnot: 
+alumnot no está en el archivo sudoers. Se informará de este incidente.
+alumnot@a37pc04:~$ renice -n 1 -p `pidof firefox`
+7983 (process ID) prioridad anterior 0, nueva prioridad 1
+7979 (process ID) prioridad anterior 0, nueva prioridad 1
+7975 (process ID) prioridad anterior 0, nueva prioridad 1
+7888 (process ID) prioridad anterior 0, nueva prioridad 1
+7839 (process ID) prioridad anterior 0, nueva prioridad 1
+7795 (process ID) prioridad anterior 0, nueva prioridad 1
+7728 (process ID) prioridad anterior 0, nueva prioridad 1
+alumnot@a37pc04:~$ ps -C firefox -o pri
+PRI
+ 18
+alumnot@a37pc04:~$ background --help
+background: orden no encontrada
+alumnot@a37pc04:~$ bg --help
+bg: bg [id_trabajo ...]
+    Mueve trabajos al segundo plano.
+    
+    Coloca los trabajos identificados por cada IDTRABAJO en segundo plano,
+    como si se hubieran iniciado con `&'.  Si IDTRABAJO no está presente,
+    se usa la noción del intérprete (shell) del trabajo actual.
+    
+    Estado de Salida:
+    Devuelve éxito a menos que el control de trabajos no esté activado o
+    suceda un error.
+alumnot@a37pc04:~$ jobs --help
+jobs: jobs [-lnprs] [idtrabajo ...] o jobs -x orden [args]
+    Muestra el estado de los trabajos.
+    
+    Muestra los trabajos activos.  IDTRABAJO restringe la salida a
+    esa trabajo.  Sin opciones, se muestra el estado de todas los trabajos
+    activos.
+    
+    Opciones:
+      -l	muestra los IDs de los procesos, además de la información normal
+      -n	solo muestra los procesos que han cambiado de estado desde
+    		la última notificación
+      -p	solo muestra los IDs de los procesos
+      -r	restringe la salida a los trabajos en ejecución
+      -s	restringe la salida a los trabajos detenidos
+    
+    Si se especifica -x, la ORDEN se ejecuta después de que todas las
+    especificaciones de trabajo que aparecen en ARGS se hayan reemplazado
+    con el ID de proceso del líder del grupo de procesos de dicho trabajo.
+    
+    Estado de Salida:
+    Devuelve correcto a menos que se dé una opción inválida o suceda un
+    error.  Si se usa -x, devuelve el estado de salida de la ORDEN.
+alumnot@a37pc04:~$ jobs -l
+alumnot@a37pc04:~$ fg --help
+fg: fg [id_trabajo]
+    Mueve el trabajo al primer plano.
+    
+    Ubica al trabajo identificado con IDTRABAJO en el primer plano, y
+    lo hace el trabajo actual.  Si IDTRABAJO no está presente, se usa
+    la noción del intérprete (shell) del trabajo actual.
+    
+    Estado de Salida:
+    El estado del comando ubicado en primer plano, o falla si sucede un error.
+alumnot@a37pc04:~$ 
+alumnot@a37pc04:~$ while true; do clear; echo "nucle infinito"; sleep 1s; done
+nucle infinito
+^Z
+[1]+  Detenido                sleep 1s
+alumnot@a37pc04:~$ bg 1
+[1]+ sleep 1s &
+alumnot@a37pc04:~$ jobs
+[1]+  Hecho                   sleep 1s
+alumnot@a37pc04:~$ fg 1
+bash: fg: 1: no existe ese trabajo
+alumnot@a37pc04:~$ jobs
+alumnot@a37pc04:~$ 
+alumnot@a37pc04:~$ firefox &
+[1] 8612
+alumnot@a37pc04:~$ ATTENTION: default value of option mesa_glthread overridden by environment.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+,mmk
+,mmk: orden no encontrada
+alumnot@a37pc04:~$ jobs
+[1]+  Ejecutando              firefox &
+alumnot@a37pc04:~$ fg 1
+firefox
+jobs
+nadaaaaaaaaaaaaaaaaaaaaaaaaa
+
+alumnot@a37pc04:~$ pkill --help
+
+Uso:
+ pkill [opciones] <patrón>
+
+Opciones:
+ -<sig>, --signal <sig>    señal a enviar (o número o nombre)
+ -e, --echo                mostrar qué se ha matado
+ -c, --count               contar procesos coincidentes
+ -f, --full                usar nombre completo del proceso para coincidencias
+ -g, --pgroup <PGID,...>   emparejar ID de grupo de proceso listado
+ -G, --group <GID,...> emparejar ID de grupo reales
+ -i, --ignore-case emparejar insensiblemente a mayúsculas y minúsculas
+ -n, --newest              selecciona los iniciados más recientemente
+ -o, --oldest              selecciona los iniciados menos recientemente
+ -P, --parent <PPID,...>   emparejar solo procesos hijo del padre dado
+ -s, --session <SID,...>   emparejar ID de sesión
+ -t, --terminal <tty,...>  seleccionar por terminal de control
+ -u, --euid <ID,...> emparejar por ID efectivas
+ -U, --uid <ID,...> emparejar por ID reales
+ -x, --exact               seleccionar con el nombre de orden exactamente
+ -F, --pidfile <archivo>      leer PIDs de un archivo
+ -L, --logpidfile          falla si el archivo PID no está bloqueado
+ -r, --runstates <state>   match runstates [D,S,Z,...]
+ --ns <PID> emparejar los procesos que pertenecen al mismo
+                           espacio de nombres como <pid>
+ --nslist <ns,...> lista para los cuales los espacios de nombre son considerados
+
+ -h, --help     mostrar esta ayuda y salir
+ -V, --version  mostrar la información de la versión y salir
+
+Para más detalles vea pgrep(1).
+alumnot@a37pc04:~$ pkill firefox
+alumnot@a37pc04:~$ 
+alumnot@a37pc04:~$ pkill `pidof firefox`
+pkill: Solo se puede proporcionar un patrón
+Pruebe «pkill --help» para más información.
+alumnot@a37pc04:~$ pkill -9 firefox
+alumnot@a37pc04:~$ 
+
+alumnot@a37pc04:~$ if true
+> then
+> echo "la condicion es true"
+> echo"tb"
+> echo"si"
+> ls -l
+> ps -C firefox -f
+> echo "y todo esto"
+> fi
+la condicion es true
+echotb: orden no encontrada
+echosi: orden no encontrada
+total 42185792
+drwxr-xr-x 2 alumnot alumnot        4096 sep 20 16:52  Descargas
+drwxr-xr-x 2 alumnot alumnot        4096 sep 20 17:04  Documentos
+drwxr-xr-x 5 alumnot alumnot        4096 sep 19 16:29  Escritorio
+drwxr-xr-x 2 alumnot alumnot        4096 sep 20 16:17  Imágenes
+drwxrwxr-x 2 alumnot alumnot        4096 sep 11 19:18 'maquinas 2223'
+-rw-rw-r-- 1 alumnot alumnot         150 sep 19 16:39  mostrar_procesos.sh
+drwxr-xr-x 2 alumnot alumnot        4096 sep 11 16:17  Música
+drwxrwxr-x 3 alumnot alumnot        4096 sep 15 16:56  NetBeansProjects
+-rwxrwxrwx 1 alumnot alumnot 21494759424 sep 18 19:48  oracle2223.vdi
+drwxrwxr-x 3 alumnot alumnot        4096 sep 18 19:48  oracle2324
+-rwxr-xr-x 1 alumnot alumnot 21703426048 sep 18 19:49  oracle2324.vdi
+drwxr-xr-x 2 alumnot alumnot        4096 sep 11 16:17  Plantillas
+drwxr-xr-x 2 alumnot alumnot        4096 sep 11 16:17  Público
+-rw-rw-r-- 1 alumnot alumnot         173 sep 19 16:59  script1.sh
+drwx------ 5 alumnot alumnot        4096 sep 13 20:46  snap
+drwxr-xr-x 2 alumnot alumnot        4096 sep 11 16:17  Vídeos
+UID          PID    PPID  C STIME TTY          TIME CMD
+alumnot     9521    4277  1 16:52 ?        00:00:13 /usr/lib/firefox/firefox -new-window
+y todo esto
+alumnot@a37pc04:~$ 
+
+alumnot@a37pc04:~$ if false
+> then
+> echo "no se ejecuta porque es falso"
+> echo "tampoco"
+> else
+> echo "esto si se ejecuta"
+> echo "tamnien"
+> ls -l
+> kill -l
+> ps -C firefox -f
+> echo "todo lo anterior se ejecuta"
+> fi
+esto si se ejecuta
+tamnien
+total 42185792
+drwxr-xr-x 2 alumnot alumnot        4096 sep 20 16:52  Descargas
+drwxr-xr-x 2 alumnot alumnot        4096 sep 20 17:04  Documentos
+drwxr-xr-x 5 alumnot alumnot        4096 sep 19 16:29  Escritorio
+drwxr-xr-x 2 alumnot alumnot        4096 sep 20 16:17  Imágenes
+drwxrwxr-x 2 alumnot alumnot        4096 sep 11 19:18 'maquinas 2223'
+-rw-rw-r-- 1 alumnot alumnot         150 sep 19 16:39  mostrar_procesos.sh
+drwxr-xr-x 2 alumnot alumnot        4096 sep 11 16:17  Música
+drwxrwxr-x 3 alumnot alumnot        4096 sep 15 16:56  NetBeansProjects
+-rwxrwxrwx 1 alumnot alumnot 21494759424 sep 18 19:48  oracle2223.vdi
+drwxrwxr-x 3 alumnot alumnot        4096 sep 18 19:48  oracle2324
+-rwxr-xr-x 1 alumnot alumnot 21703426048 sep 18 19:49  oracle2324.vdi
+drwxr-xr-x 2 alumnot alumnot        4096 sep 11 16:17  Plantillas
+drwxr-xr-x 2 alumnot alumnot        4096 sep 11 16:17  Público
+-rw-rw-r-- 1 alumnot alumnot         173 sep 19 16:59  script1.sh
+drwx------ 5 alumnot alumnot        4096 sep 13 20:46  snap
+drwxr-xr-x 2 alumnot alumnot        4096 sep 11 16:17  Vídeos
+ 1) SIGHUP	 2) SIGINT	 3) SIGQUIT	 4) SIGILL	 5) SIGTRAP
+ 6) SIGABRT	 7) SIGBUS	 8) SIGFPE	 9) SIGKILL	10) SIGUSR1
+11) SIGSEGV	12) SIGUSR2	13) SIGPIPE	14) SIGALRM	15) SIGTERM
+16) SIGSTKFLT	17) SIGCHLD	18) SIGCONT	19) SIGSTOP	20) SIGTSTP
+21) SIGTTIN	22) SIGTTOU	23) SIGURG	24) SIGXCPU	25) SIGXFSZ
+26) SIGVTALRM	27) SIGPROF	28) SIGWINCH	29) SIGIO	30) SIGPWR
+31) SIGSYS	34) SIGRTMIN	35) SIGRTMIN+1	36) SIGRTMIN+2	37) SIGRTMIN+3
+38) SIGRTMIN+4	39) SIGRTMIN+5	40) SIGRTMIN+6	41) SIGRTMIN+7	42) SIGRTMIN+8
+43) SIGRTMIN+9	44) SIGRTMIN+10	45) SIGRTMIN+11	46) SIGRTMIN+12	47) SIGRTMIN+13
+48) SIGRTMIN+14	49) SIGRTMIN+15	50) SIGRTMAX-14	51) SIGRTMAX-13	52) SIGRTMAX-12
+53) SIGRTMAX-11	54) SIGRTMAX-10	55) SIGRTMAX-9	56) SIGRTMAX-8	57) SIGRTMAX-7
+58) SIGRTMAX-6	59) SIGRTMAX-5	60) SIGRTMAX-4	61) SIGRTMAX-3	62) SIGRTMAX-2
+63) SIGRTMAX-1	64) SIGRTMAX	
+UID          PID    PPID  C STIME TTY          TIME CMD
+alumnot     9521    4277  1 16:52 ?        00:00:14 /usr/lib/firefox/firefox -new-window
+todo lo anterior se ejecuta
+alumnot@a37pc04:~$ 
+alumnot@a37pc04:~/Documentos$ 20
+20: orden no encontrada
+alumnot@a37pc04:~/Documentos$ bondad=0
+alumnot@a37pc04:~/Documentos$ while [ $bondad -lt 20 ]
+> do
+> read -p "introduce valor bondad..." bondad
+> echo "has metido $bondad ..."
+> done
+
+

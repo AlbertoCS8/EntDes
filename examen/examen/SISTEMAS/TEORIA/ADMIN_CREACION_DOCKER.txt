@@ -1,0 +1,444 @@
+--------------------------------------------
+	administracion/creacion DOCKER
+--------------------------------------------
+arquitectura docker (cliente-servidor)
+									regitro(s) docker
+	cliente docker	------->   docker-engine --------------------> docker-hub
+	suite-docker		servicio docker				imagenes oficiales
+					||				imagenes usuarios
+				repo local:
+				  - contenedores
+				  - imagenes (descargadas)
+
+IMAGENES Y ADMIN DE IMAGENES EN DOCKER
+--------------------------------------
+Una imagen es un objeto a partir del cual se crean los contenedores !!!SON INMUTABLES!!!
+no se pueden modificar. Una imagen esta formada por capas, cada capa tiene una funcion
+y se apoyan en las q tienen debajo, la primera capa de una imagen suele ser un s.op base
+muy muy liviano. Cada capa se identifica por un numero unico o hash, y la imagen tiene como
+id. un hash creado a partir de los hashes de las distintas capas:
+
+
+  imagen:   ubuntu - hash id
+  		capa - N   (hash)
+  		capa - N-1 (hash)
+		...
+		capa - 1   (hash)
+
+iniciar/cerrar sesion en docker-hub desde consola:
+--------------------------------------------------
+	docker login <------ necesario para poder subir (commit) imagenes a tu repo
+	docker logout <----- cierras sesion
+		
+		
+admin de imagenes en cliente docker:
+------------------------------------
+	docker image [comando] [-opciones]
+
+buscar imagenes:   docker search nombre_buscar
+
+descargar imagenes en repo local desde docker-hub: 
+
+		docker image pull [nombre_usuario/]nombre[:version]
+				  -----------------	 ----------
+				  	|--> si no lo		|---> si no pones version
+				  	pones es imagen			por defecto: latest
+				  	oficial
+		
+	ej:
+		docker image pull ubuntu
+		docker image pull dockette/nodejs:latest
+		
+listar imagenes descargadas/creadas en mi repo local:
+
+		docker image ls
+
+
+como ver/inspeccionar capas de la imagen:
+
+		docker image inspect <id_imagen>
+
+para ver historico del desarrollo de la imagen:	
+		
+		docker image history <id_imagen>
+		
+para borrar una imagen del repo local:
+
+		docker image rm [-f] <id_iamgen>
+				----
+				  \---> fuerza el borrado aunque haya algun contenedor q use
+				  	la imagen
+				  	
+	- para borrar todas, necesitas bucle:
+	
+		for idimage in `docker image ls | awk '{print $3}' | grep -v "IMAGE"`
+		do 
+			docker image rm -f $idimage
+		done		
+		
+	- o bien, obtener los ids de todas las imagenes asi:
+		
+		docker image rm -f `docker image ls -q`
+
+ para exportar (backup) una imagen a un fichero tar:
+ 
+ 		docker image save id_imagen  > /ruta/fichero_imagen.tar
+ 		docker image save id_imagen  --output=/ruta/fichero_imagen.tar
+
+ para importar (restaurar) una imagen desde un fichero tar:
+
+		docker image load < /ruta/fichero_imagen.tar 		
+ 	ej:
+ 		docker image save e4c5 > /home/pablo/Descargas/ubuntu.tar
+
+ 		docker image rm -f e4c5 <----- borro la imagen
+ 		docker image ls <------------- no aparece...
+
+ 		docker image load < /home/pablo/Descargas/ubuntu.tar
+		docker image ls <-------------- aparece de nuevo 
+ 
+ para subir a docker-hub una imagen de nuestro repo-local:
+ 
+ 	docker image push [usuario/]nombre_imagen[:version]
+ 
+ 
+ 
+admin de contenedores en cliente docker:
+---------------------------------------
+un contenedor es un objeto creado a partir de una imagen en particular, es de ESCRITURA
+(modificable) pq docker aÃ±ade como ultima capa una capa de L/W sobre la q puedes hacer lo 
+q quieras...por cada contenedor el s.op le asigna un proceso con un entorno aislado
+
+comando para admin.contenedores desde cliente:
+----------------------------------------------
+	docker container [comando] [-opciones] 
+ 
+ crear un contenedor a partir de una imagen
+ 
+ 	docker container run [-opciones]  [usuario/]nombre_imagen[:version]
+ 			     -----------
+ 			       -i = abre contenedor en forma interactiva
+ 			       -t = abre terminal
+ 			       -d = modo demonio, lanza el contenedor en background como servic
+ 			       -e NOMBRE_VARIABLE=VALOR ... = def.variables de entorno antes
+ 			       					de crear contenedor
+ 			       	--name nombre_contenedor = nombre contenedor
+ 			       	-p puerto_host_local: puerto_contendor = redireccionar puertos
+ 			       	
+ 	ej:
+ 		(....borrar antes imagen de repo local...)
+ 		docker container run -i -t ubuntu
+ 
+ 
+ para ver contenedores creados:
+ 
+ 	docker container ps <----como son procesos, ps.... te lista contenedores parados/ejec
+ 				para mostrar contenedores q se estan ejecutando solo:
+ 				
+ 					docker container ps -a
+ 					
+ para parar/arrancar contenedores:
+ 
+ 	docker container stop/start  [nombre_contenedor | uid_contenedor ]
+ 
+ 		ej:
+ 			docker container start e546
+ 			docker container stop e546
+ 
+ 
+ COMO PASAR DATOS (COMUNICAR) ENTRE HOST-CONTENEDOR
+ ---------------------------------------------------
+ 2 formas:
+ 
+ 	- copiando los ficheros/directorios entre host-contenedor con el comando
+ 	
+ 		docker cp  origen  destino
+ 		
+ 	    ej:
+ 	    	copiar fichero(s)/directorio(s) host --> contenedor:
+ 	    	
+ 	    		docker cp /ruta/local	nombre_contenedor:/ruta/contenedor
+ 
+ 
+ 	    	copiar fichero(s)/directorio(s)  contenedor --> host:
+ 				
+ 
+ 	    		docker cp  nombre_contenedor:/ruta/contenedor  /ruta/local
+ 
+ 
+ 
+ 	- compartiendo directorio entre host-contenedor (crear un volumen)
+ 			
+ 			host		contenedor
+ 			  |-----------------|
+ 			  	 volumen
+ 				(son directorios de intercambio de datos)
+ 				
+ 		1Âº te creas un volumen:  docker volume create nombre_volumen
+ 		2Âº al crear el contenedor asignas el volumen al mismo
+ 		
+ 			docker run ... -v nombre_volumen:/ruta/contenedor_docker/montaje ...
+ 
+ ------------------------------------------------------------------------------------------
+ practica: paso de datos con docker cp
+ 
+ 	para borrar contenedor:  docker container rm nombre_contenedor
+ 
+ 	1Âº) crearse un contenedor a partir de la imagen httpd
+ 	----------------------------------------------------
+ 		docker run -d  -p 8080:80 --name miserver  httpd
+ 		docker container ps -a 
+ 		
+ 	2Âº) abrir el navegador en el host:  http://localhost:8080
+ 	3Âº) si funciona...creais un fichero "index.html" en /tmp
+ 	
+ 		<html>
+ 		<head> <title>...bienvenido a mi server docker....</title> </head>
+ 		<body>
+ 			<p> estas dentro del server apache del contenedor...</p>
+ 		<body>
+ 		</html>
+ 		
+ 	   y lo subis al contenedor compiandolo en la ruta del contenedor (comprobarlo
+ 	   metiendote en el contenedor en ese directorio)
+ 	   
+ 	   	/usr/local/apache2/htdocs
+ 	   ---------------------------------------------------
+ 	   	docker cp /tmp/index.html  miserver:/usr/local/apache2/htdocs/
+ 	   	docker exec -i -t miserver /bin/bash
+ 	   
+ 	   te sale prompt en shell del contenedor..
+ 	   	root@/usr/local/apache2#_  cd htdocs && ls -l && cat index.html
+ 	   	
+ 	   	
+ 	   	
+ 	 4Âº) abrir el navegador en el host:  http://localhost:8080 <---tiene q mostrar nueva
+ 	 								pagina 
+ 	
+---------------------------------------------------------------
+practica:  https://docs.portainer.io/start/install-ce/server/docker/linux
+	  instalar PORTAINER (necesario crear volumen)
+	  
+	  1Âº creando volumen:
+	  	docker volume create portainer_data
+	  	docker volume ls
+
+	  2Âº  creando contendor desde imangen portainer/portainer-ce:latest
+	  
+	  docker  run   -d 
+		  	-p 8000:8000
+		  	-p 9443:9443
+		  	--name portainer 
+		  	--restart=always 
+		  	-v /var/run/docker.sock:/var/run/docker.sock
+		  	-v portainer_data:/data 
+		  	portainer/portainer-ce:latest
+ --------------------------------------------------------------------------------------
+
+ COMO CONFIGURAR VARIABLES DE ENTORNO EN CONTENEDORES:(tipico de contenedores con sgBD)
+ -----------------------------------------------------
+ para pasar valores a variables de entorno desde el host al contenedor:
+ 
+ 	-e NOMBRE_VARIABLE=valor  -e NOMBRE_VARIABLE=valor ....
+ 
+ estas opciones irian en el docker run junto al resto q necesites:
+ 
+ ej: contenedor con bd mysql, se aconseja definir variables de entorno:
+ 
+ 	MYSQL_ROOT_PASSWORD <---- contraseÃ±a de usuario admin o root de mysql
+ 	MYSQL_USER <----------- nuevo usuario para acceso 
+   nos creamos contenedor mysql:
+   
+   	docker run -d -p 3307:3306 -e MYSQL_ROOT_PASSWORD=prueba --name mimysql  mysql
+ 	docker container ps
+ 	
+ 		|-------------------- mi localhost -------------|
+						 contenedor
+		cliente				sevidor bd MYSQL
+		||
+     instalamos cliente mysql 
+     para lanzar querys al servidor
+     en docker:
+     
+     	sudo apt install mysql-client	
+
+	mysql --help <---- ayuda de opciones de conexion a un server mysql
+	mysql -h ip_servidor_mysql -u root -P  3307 -p 
+		 -----------------
+		 	127.0.0.1
+	mysql> help;
+	mysql> show databases;
+	mysql> use sys;
+	mysql> show tables;
+	
+------------------------------------------------------------------------
+practica:  crear un contenedor con una sgbd mongo (imagen mongo)
+	variables de entorno a configurar:
+
+		MONGO_INITDB_ROOT_USERNAME
+		MONGO_INITDB_ROOT_PASSWORD		
+
+creamos contenedor:
+
+	docker run -d -e MONGO_INITDB_ROOT_USERNAME=mongoadmin 
+		      -e MONGO_INITDB_ROOT_PASSWORD=prueba 
+		      -p 27017:27017 
+		      -v /home/pablo/mongodb/Databases:/data/db  
+		      --name mongodb
+		      mongo
+
+instalamos cliente: (mongosh, necesitas repositorio de mongo:
+https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/)
+
+1Âº importamos clave publica del repo donde esta mongodb:
+
+	curl  https://pgp.mongodb.com/server-7.0.asc | \
+   		sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+
+2Âº creas fichero repo en /etc/apt/sources.list.d:
+
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+
+3Âº actualizas:  sudo apt update
+
+/home/pablo/mongodb/Databases <--- volumen ------> /data/db	
+	   |----------------------------------------|
+	   |	    			  	 contenedor
+	cliente					servidor mongoDB
+	  ||
+     sudo apt install mongosh
+     mongosh -h ip_servidor -u mongoadmin -p prueba --authenticationDatabase admin
+     		----------
+     		  127.0.0.1
+     mongosh> show dbs
+     mongosh> exit
+     
+ si quieres abrir terminal en el contenedor desde cliente:
+ 
+ 	docker exec -i -t mongodb /bin/bash
+ 	
+ 
+ -------------------------------------------------------
+ COMO CREAR NUESTRAS PROPIAS IMAGENES
+ ====================================	
+ 2 formas:
+ 	- a partir de un contenedor existente:
+ 		(docker login <---- si no estas logueado te la creara en el repo local)
+ 		
+ 	docker container commit nombre_contenedor [nombre_usuario/]nombre_imagen[:version]
+ 	
+ 	ej: creamos un contenedor a partir de la imagen base de ubuntu, montamos un
+ 	  servidor apache:
+ 	
+ 		docker run -i -t --name miubuntu  ubuntu
+
+ 	   dentro del contenedor:
+ 		 apt update && apt upgrade -y <---- 1Âº paso antes de instalar nada
+ 		 apt install apache2 apache2-utils
+ 		 apt install nano
+ 		 cd /var/www/html <--- el index.html (modificarla)
+ 		 
+ 		 [pulsas Ctrl+P, Ctrl+Q] <----- pausas el contenedor, sin pararlo
+ 		 				(te puedes salir perfectamente tb)
+ 		 		
+ 		 (si quieres unirte al contenedor)
+ 		 
+ 		 	docker container attach miubuntu
+ 		 
+ 		 		
+ 	creamos imagen:
+ 		docker login
+ 		docker container commit mibuntu  pamaruiz69/mibuntu:1.0
+ 		
+ 		
+ 		
+ 	para probarlo:
+ 	
+ 		te creas un contenedor a partir de esa imagen, redireccionando puerto local
+ 		6666 al 80 del contenedor:
+ 		
+	docker run -d -p 6666:80 
+		      --name miapache  
+		      pamaruiz69/miubuntu:1.0  /etc/init.d/apache2 start 
+ 		
+ 		en el navegador del cliente:  http://localhost:6666
+ 	
+ ---------------------------------------------------------------------------------------	
+ 	
+ 	- usando ficheros DOCKERFILE, son ficheros de texto en cuyo interior van una serie
+ 	de comandos especificos para estos ficheros. Un dockerfile sirve para construir
+ 	una imagen, con la ventaja que puedes ver como ha sido creada.
+ 	
+ 	su nombre siempre: "Dockerfile"
+ 	
+ 	para construir la imagen a partir del fichero docker-file es usando:
+ 	
+ 		docker build [nombre_usuario/]nombre_imagen[:version]  /ruta/fichero/Dockerfile
+ 	
+ 	
+ 	comandos que puedo poner en un fichero Dockerfile:
+ 		
+ 		IMAGE nombre_imagen
+ 		FROM nombre_imagen[:version] <----- usar como imagen base para crearte tu
+ 							nueva imagen
+ 		ENV variable=valor <----- definir variables de entorno en la imagen
+ 		ENV variable=valor
+ 		...
+ 		
+ 		COPY /ruta/dir_local  /ruta/contenedor <---- copia ficheros origen destino
+ 		COPY /ruta/dir_local  /ruta/contenedor
+		... 		
+ 		ADD url|fichero.tar.gz|/ruta/dir_local  /ruta/contenedor <--- igual q COPY
+ 		ADD url|fichero.tar.gz|/ruta/dir_local  /ruta/contenedor	permite copiar
+ 									recursos externos y
+		... 							comprimidos
+		
+		RUN comando <------ ejecutar este comando dentro de la imagen q se esta creando
+				OJO!!! por cada comando RUN se crea una capa en la imagen,
+				a mas comandos mas capas, y mas pesa, mas tarda en descargarse
+		RUN comando
+		...
+		
+		CMD [ "ruta/comando", "arg1", "arg2", ... ] <---- comando q se lanza en cada
+								contenedor q se crea usando
+								esta imagen, solo puede apare
+								cer un cmd
+				
+				
+			cuando te creas un contenedor a partir de esta imagen, este comando
+			puede machacarse, asi:
+			
+				docker run ..... nombre_imagen --cmd=/comando arg1 arg2..
+				
+		ENTRYPOINT [ "/ruta/comando" , "arg1", "arg2", ...] <----comando q se lanza
+		CMD ["arg3", "arg4",...]			en cada contenedor cuando 
+		(opcional)					se crea a partir de la imagen
+								como el CMD pero OJO!!!no pued
+								sobreescribirse (se machaca
+								si o si)
+				
+		
+		si aparece un cmd detras de un entrypoint serian argumentos OPCIONALES
+		para el ejecutable del entrypoint, q se pueden sobreescribir cuando creas
+		el contenedor
+		 
+ ---------------------------------------------------------------------------------------
+ script gestion contenedores:
+ 
+ 			ADMIN GESTION CONTAINERS DOCKERS
+ 			================================
+ 			1Âº Listar contenedores <---todos los contenedores o solo los running
+ 			2Âº Parar contenedor    |
+ 			3Âº Arrancar contenedor | <--- pedir nombre contenedor parar,arr...
+ 			4Âº Borrar contenedor   |      comprobar q el contenedor existe
+ 			5Âº Ejecutar comando    |     pedir comando a ejecutar en contenedor
+ 			6Âº Crear contenedor	     (comprobar si el contenedor esta UP)
+ 			7Âº ---salir----	
+ 				opcion:_
+ 	
+ 	
+ opcion 6:
+ 		- nombre contenedor
+ 		- imagen a partir de la cual crear contenedor
+ 		- Â¿ejecutar en modo demonio s/n? <--- si es q SI hay q aÃ±adir opcion -d
+ 		- Â¿ejecutar en modo interactivo s/n? <-- si es q SI hay q aÃ±aidr opcion -i -t

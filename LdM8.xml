@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<formulario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="EJ8.xsd">
+    <datos_solicitante>
+        <nombre_completo>
+            yhdghggaf
+        </nombre_completo>
+        <dni>09104092T</dni>
+        <domicilio>jdasjgfhjdvghjdh</domicilio>
+        <municipio>sgjhdskjg</municipio>
+        <provincia>akhjfkljaf</provincia>
+        <CP>28809</CP>
+        <telefono>966666666</telefono>
+        <email>melola@educamadrid.org</email>
+        <fax>919999999</fax>
+    </datos_solicitante>
+    <datos_representante>
+        <nombre_completo>
+            yhdghggaf
+        </nombre_completo>
+        <dni>09104092T</dni>
+        <domicilio>jdasjgfhjdvghjdh</domicilio>
+        <municipio>sgjhdskjg</municipio>
+        <provincia>akhjfkljaf</provincia>
+        <CP>28809</CP>
+        <movil>666666666</movil>
+        <email>melola@educamadrid.org</email>
+        <fax>919999999</fax>
+        <modeloRepresentacion>Familiar</modeloRepresentacion>
+    </datos_representante>
+</formulario>

@@ -1,0 +1,168 @@
+SELECT *
+  FROM EMPLE;
+  
+SELECT APELLIDO , COMISION
+   FROM EMPLE
+   WHERE COMISION IS NULL;  
+   
+SELECT APELLIDO , COMISION
+   FROM EMPLE
+   WHERE COMISION ='';   
+   
+SELECT APELLIDO , COMISION
+   FROM EMPLE
+   WHERE COMISION IS NOT NULL;
+   
+SELECT APELLIDO, SALARIO
+  FROM EMPLE
+  WHERE SALARIO >= 300000;   
+  
+SELECT APELLIDO,SALARIO
+  FROM EMPLE
+  WHERE SALARIO <> 390000;  
+  
+  
+  SELECT *
+    FROM NOTAS_ALUMNOS;
+    
+  SELECT NOMBRE_ALUMNO,NOTA1,NOTA2,NOTA3
+    FROM NOTAS_ALUMNOS
+    WHERE NOTA1 IS NULL OR
+          NOTA2 IS NULL OR
+          NOTA3 IS NULL;
+  
+   SELECT NOMBRE_ALUMNO,NOTA1,NOTA2,NOTA3
+    FROM NOTAS_ALUMNOS
+    WHERE NOTA1 IS NULL AND
+          NOTA2 IS NULL AND 
+          NOTA3 IS NULL;           
+     
+ SELECT *
+   FROM emple
+   WHERE apellido = 'GIL';
+   
+  SELECT *
+   FROM emple
+   WHERE apellido = upper('gil');  
+   
+SELECT *
+   FROM EMPLE
+   WHERE FECHA_ALT > '1/7/1981';   
+   
+   
+ SELECT NOMBRE_ALUMNO, NOTA1, NOTA2, NOTA3, ROWID
+    FROM NOTAS_ALUMNOS;
+      
+   
+ SELECT *
+   FROM EMPLE 
+   WHERE SALARIO > 200000
+    AND OFICIO = 'ANALISTA';  
+ -- ASCENDENTE     
+SELECT *
+  FROM EMPLE
+  ORDER BY SALARIO ASC;
+  
+ SELECT APELLIDO,OFICIO,SALARIO
+  FROM EMPLE
+  ORDER BY OFICIO DESC , SALARIO DESC;
+  
+  
+SELECT NOMBRE_ALUMNO, NOTA1, NOTA2, NOTA3, (NVL(NOTA1,0) + 
+                                            NVL(NOTA2,0) + 
+                                            NVL(NOTA3,0) 
+                                            ) / 3 AS MEDIAS
+  FROM NOTAS_ALUMNOS;    
+   
+  SELECT NOMBRE_ALUMNO, NOTA1, NOTA2, NOTA3, (NVL(NOTA1,0) + 
+                                            NVL(NOTA2,0) + 
+                                            NVL(NOTA3,0) 
+                                            ) / 3 AS MEDIAS
+  FROM NOTAS_ALUMNOS
+  ORDER BY MEDIAS;
+  
+  --CASCA
+  SELECT NOMBRE_ALUMNO, NOTA1, NOTA2, NOTA3, (NVL(NOTA1,0) + 
+                                            NVL(NOTA2,0) + 
+                                            NVL(NOTA3,0) 
+                                            ) / 3 AS MEDIAS
+  FROM NOTAS_ALUMNOS
+  WHERE MEDIAS >= 7
+  ORDER BY MEDIAS;
+  
+  
+  SELECT NOMBRE_ALUMNO, NOTA1, NOTA2, NOTA3, (NVL(NOTA1,0) + 
+                                            NVL(NOTA2,0) + 
+                                            NVL(NOTA3,0) 
+                                            ) / 3 AS MEDIAS
+  FROM NOTAS_ALUMNOS
+  WHERE  (NVL(NOTA1,0) +  NVL(NOTA2,0) + NVL(NOTA3,0) 
+         ) / 3     >= 7
+  ORDER BY MEDIAS; 
+  
+  
+  SELECT APELLIDO, DEPT_NO, OFICIO
+    FROM EMPLE
+    WHERE DEPT_NO = 10
+          OR
+          DEPT_NO = 30;
+          
+          
+   SELECT APELLIDO, DEPT_NO, OFICIO
+     FROM EMPLE
+     WHERE DEPT_NO IN (10,30);
+     
+     SELECT APELLIDO, DEPT_NO, OFICIO
+     FROM EMPLE
+     WHERE DEPT_NO NOT IN (10,30);   
+    
+  SELECT APELLIDO,OFICIO
+    FROM EMPLE
+    WHERE OFICIO NOT IN ('ANALISTA','PRESIDENTE');
+    
+    
+SELECT *
+  FROM EMPLE
+  WHERE FECHA_ALT >= '1/7/1981'
+        AND
+        OFICIO NOT IN ('ANALISTA','DIRECTOR');
+        
+SELECT *
+  FROM EMPLE
+  WHERE SALARIO >= 200000
+        AND
+        SALARIO <= 300000;
+        
+SELECT * 
+FROM EMPLE
+  WHERE SALARIO BETWEEN 200000 AND 300000
+  ORDER BY SALARIO;      
+  
+ SELECT * 
+FROM EMPLE
+  WHERE SALARIO NOT  BETWEEN 200000 AND 300000
+  ORDER BY SALARIO;      
+                
+ SELECT *
+   FROM EMPLE
+   WHERE FECHA_ALT BETWEEN '1/1/1891' AND '30/6/1981';       
+   
+ SELECT *
+    FROM EMPLE
+    WHERE APELLIDO LIKE 'A%';  
+  
+  SELECT *
+    FROM EMPLE
+    WHERE APELLIDO LIKE '%A%';   
+    
+ SELECT *
+    FROM EMPLE
+    WHERE APELLIDO LIKE '%O';    
+    
+  SELECT *
+    FROM EMPLE
+    WHERE APELLIDO LIKE 'A%O';    
+    
+  SELECT *
+    FROM EMPLE
+    WHERE APELLIDO LIKE '%Y_';           

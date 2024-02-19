@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  servidorInformatica:
+    build: /servidorInformatica/Dockerfile
+    ports:
+      - 8080:80
+    networks:
+      - redInstituto
+    volumes:
+      - ./servidorInformatica/contenidoWeb:/usr/local/apache2/htdocs
+      - servidorBD:/usr/local/apache2/db
+  servidorAdministrativo:
+    build: /servidorAdministrativo/Dockerfile
+    ports:
+      - 8081:80
+    networks:
+      - redInstituto
+    volumes:
+      - ./servidorAdministrativo/contenidoWeb:/usr/local/apache2/htdocs
+      - servidorBD:/usr/local/apache2/db
+  servidorIntegracion:
+    build: /servidorIntegracion/Dockerfile
+    ports:
+      - 8082:80
+    networks:
+      - redInstituto
+    volumes:
+      - ./servidorIntegracion/contenidoWeb:/usr/local/apache2/htdocs
+      - servidorBD:/usr/local/apache2/db
+
+
+volumes:
+  - servidorBD
+networks:
+  - redInstituto

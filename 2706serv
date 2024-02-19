@@ -1,0 +1,33 @@
+alumnot@a37pc04:~$ ==========
+==========: orden no encontrada
+alumnot@a37pc04:~$ tmxu
+
+Orden «tmxu» no encontrada. Quizá quiso decir:
+
+  la orden «tmx» del paquete snap «tmx (1.2.3)»
+  la orden «tmux» del paquete snap «tmux (2.3)»
+  la orden «tmux» del paquete deb «tmux (3.0a-2ubuntu0.4)»
+
+Consulte «snap info <nombre del snap>» para ver más versiones.
+
+alumnot@a37pc04:~$ nc --help
+nc: invalid option -- '-'
+usage: nc [-46CDdFhklNnrStUuvZz] [-I length] [-i interval] [-M ttl]
+	  [-m minttl] [-O length] [-P proxy_username] [-p source_port]
+	  [-q seconds] [-s source] [-T keyword] [-V rtable] [-W recvlimit] [-w timeout]
+	  [-X proxy_protocol] [-x proxy_address[:port]] 	  [destination] [port]
+alumnot@a37pc04:~$ man nc
+alumnot@a37pc04:~$ nc -l localhost 6666
+hola
+^C
+alumnot@a37pc04:~$ nc -k -l localhost 6666
+hola
+que pasa
+^C
+alumnot@a37pc04:~$ echo "buenas tardes" | nc -k -l localhost 6666
+hola
+umnot@a37pc04:~$ date
+mié 27 sep 2023 16:22:43 CEST
+
+lanzamos el script-------
+

@@ -1,0 +1,167 @@
+lumnot@a37pc04:~$ nc --help
+nc: invalid option -- '-'
+usage: nc [-46CDdFhklNnrStUuvZz] [-I length] [-i interval] [-M ttl]
+	  [-m minttl] [-O length] [-P proxy_username] [-p source_port]
+	  [-q seconds] [-s source] [-T keyword] [-V rtable] [-W recvlimit] [-w timeout]
+	  [-X proxy_protocol] [-x proxy_address[:port]] 	  [destination] [port]
+alumnot@a37pc04:~$ man nc
+alumnot@a37pc04:~$ nc -l localhost 6666
+otra consola 
+
+alumnot@a37pc04:~$ echo "hola" | nc localhost 6666
+
+de nuevo esta
+
+hola
+
+alumnot@a37pc04:~$ nc -k -l localhost 6666
+
+
+alumnot@a37pc04:~$ echo "hola" | nc -N localhost 6666
+alumnot@a37pc04:~$ echo "que pasa" | nc -N localhost 6666
+
+
+alumnot@a37pc04:~$ echo "buenas tardes" | nc -k -l localhost 6666
+
+
+alumnot@a37pc04:~$ echo "hola" | nc -N localhost 6666
+
+
+hola
+
+
+alumnot@a37pc04:~$ echo "hola" | nc -N localhost 172.26.235.205 6666
+nc: port number invalid: 172.26.235.205
+alumnot@a37pc04:~$ echo "hola" | nc -N 172.26.235.205 6666
+Buenas tardes...
+
+buenas tardes
+
+
+alumnot@a37pc04:~/Documentos$ ./Script_servicio.sh
+systemctl cat miservicio.service
+    
+
+q
+^C
+alumnot@a37pc04:~/Documentos$ mv /Documentos/miservicio.service
+mv: falta el operando archivo de destino después de '/Documentos/miservicio.service'
+Pruebe 'mv --help' para más información.
+alumnot@a37pc04:~/Documentos$ mv --help
+Modo de empleo: mv [OPCIÓN]... ORIGEN DESTINO
+  o bien:  mv [OPCIÓN]... ORIGEN... DIRECTORIO
+  o bien:  mv [OPCIÓN]... -t DIRECTORIO ORIGEN...
+Renombra ORIGEN a DESTINO, o mueve ORIGEN(es) a DIRECTORIO.
+
+Los argumentos obligatorios para las opciones largas son también obligatorios
+para las opciones cortas.
+      --backup[=CONTROL]       crea una copia de seguridad antes de borrar
+  -b                           como --backup pero no acepta ningún argumento
+  -f, --force                  no pregunta nunca antes de sobreescribir
+  -i, --interactive            pide confirmación antes de sobreescribir
+      --strip-trailing-slashes  elimina todas las barras finales de cada
+                                  argumento ORIGEN
+  -S, --suffix=SUFIJO           reemplaza el sufijo de respaldo habitual
+  -t, --target-directory=DIRECTORIO  mueve todos los argumentos ORIGEN al
+                                       directorio DIRECTORIO
+  -T, --no-target-directory          trata DESTINO como fichero normal
+  -u, --update                       mueve solamente cuando el fichero ORIGEN
+                                       es más moderno que el fichero de destino,
+                                       o cuando falta el fichero de destino
+  -v, --verbose                      da detalles de lo que va haciendo
+  -Z, --context                establece el contexto de seguridad SELinux del fichero
+                                 de destino al tipo predeterminado
+      --help     muestra esta ayuda y finaliza
+      --version  informa de la versión y finaliza
+
+El sufijo de respaldo es '~', a menos que se establezca con --suffix o con
+SIMPLE_BACKUP_SUFFIX. El método de control de versión se puede seleccionar
+con la opción --backup o a través de la variable de entorno VERSION_CONTROL.
+Estos son los valores:
+
+  none, off       nunca realiza copias de seguridad (incluso si se da la
+                  opción --backup)
+  numbered, t     crea copias de seguridad numeradas
+  existing, nil   numeradas si existen copias de seguridad numeradas,
+                  simples en caso contrario
+  simple, never   siempre crea copias de seguridad simples
+
+ayuda en línea sobre GNU coreutils: <https://www.gnu.org/software/coreutils/>
+Report mv translation bugs to <https://translationproject.org/team/>
+Full documentation at: <https://www.gnu.org/software/coreutils/mv>
+or available locally via: info '(coreutils) mv invocation'
+alumnot@a37pc04:~/Documentos$ sudo su
+[sudo] contraseña para alumnot: 
+alumnot no está en el archivo sudoers. Se informará de este incidente.
+alumnot@a37pc04:~/Documentos$ mv miservicio.service /etc/systemd/system
+mv: no se puede crear el fichero regular '/etc/systemd/system/miservicio.service': Permiso denegado
+alumnot@a37pc04:~/Documentos$ sudo mv miservicio.service /etc/systemd/system
+[sudo] contraseña para alumnot: 
+alumnot no está en el archivo sudoers. Se informará de este incidente.
+alumnot@a37pc04:~/Documentos$ sudo -u
+sudo: la opción requiere un argumento -- 'u'
+usage: sudo -h | -K | -k | -V
+usage: sudo -v [-AknS] [-g group] [-h host] [-p prompt] [-u user]
+usage: sudo -l [-AknS] [-g group] [-h host] [-p prompt] [-U user] [-u user]
+            [command]
+usage: sudo [-AbEHknPS] [-r role] [-t type] [-C num] [-g group] [-h host] [-p
+            prompt] [-T timeout] [-u user] [VAR=value] [-i|-s] [<command>]
+usage: sudo -e [-AknS] [-r role] [-t type] [-C num] [-g group] [-h host] [-p
+            prompt] [-T timeout] [-u user] file ...
+alumnot@a37pc04:~/Documentos$ sudo -l
+[sudo] contraseña para alumnot: 
+Lo sentimos, el usuario alumnot no puede ejecutar sudo en a37pc04.
+alumnot@a37pc04:~/Documentos$ cd /Escritorio
+bash: cd: /Escritorio: No existe el archivo o el directorio
+alumnot@a37pc04:~/Documentos$ cd
+alumnot@a37pc04:~$ cd Escritorio
+alumnot@a37pc04:~/Escritorio$ systemctl cat cron.service
+# /lib/systemd/system/cron.service
+[Unit]
+Description=Regular background program processing daemon
+Documentation=man:cron(8)
+After=remote-fs.target nss-user-lookup.target
+
+[Service]
+EnvironmentFile=-/etc/default/cron
+ExecStart=/usr/sbin/cron -f $EXTRA_OPTS
+IgnoreSIGPIPE=false
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+alumnot@a37pc04:~/Escritorio$ 
+alumnot@a37pc04:~/Documentos$ nc -z localhost 6666
+alumnot@a37pc04:~/Documentos$ nc -z localhost 6666
+alumnot@a37pc04:~/Documentos$ man nc
+alumnot@a37pc04:~/Documentos$ nc -z localhost 6666
+alumnot@a37pc04:~/Documentos$ pwd --help
+pwd: pwd [-LP]
+    Muestra el nombre del directorio de trabajo actual.
+    
+    Opciones:
+      -L	muestra el valor de $PWD si nombra al directorio de
+    	trabajo actual
+      -P	muestra el directorio físico, sin enlaces simbólicos
+    
+    Por defecto, `pwd' se comporta como si se especificara `-L'.
+    
+    Estado de Salida:
+    Devuelve 0 a menos que se de una opción inválida o no se pueda leer
+    el directorio actual.
+alumnot@a37pc04:~/Documentos$ pwd -P
+/home/alumnot/Documentos
+alumnot@a37pc04:~/Documentos$ pwd
+/home/alumnot/Documentos
+------------ alumnot@a37pc04:~/Documentos$ echo "HTTP/1.1 200 OK\r\n"
+HTTP/1.1 200 OK\r\n
+******* alumnot@a37pc04:~/Documentos$ echo -e "HTTP/1.1 200 OK\r\n"
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+
+alumnot@a37pc04:~/Documentos$ echo "hola" | wc
+      1       1       5
+
+
+

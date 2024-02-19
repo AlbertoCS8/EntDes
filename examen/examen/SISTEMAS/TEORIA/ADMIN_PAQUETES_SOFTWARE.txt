@@ -1,0 +1,192 @@
+-----------------------------------------------
+ ADMINISTRACION PAQUETES SOFTWARE/REPOSITORIOS
+ ----------------------------------------------
+ en linux todo el software "oficial" se encuentra en servidores dedicados llamados repositorios
+ Estos servidores todos los paquetes de software "firman" y "encriptan" estos paquetes con
+ par de claves privada/publica GPG
+ 
+    cliente		       servidor repositorio
+  apt install xxxx ------------> Â¿ 1Âº vez q solicitas un paquete ?
+  (clave publica)<--------------  debes descargarte CLAVE PUBLICA
+  se almacena en un
+  directorio (keyring)
+  
+  		 -----------------> (paquete: xxxxx): cifra con CLAVE PRIVADA
+ (paquete xxx)	 <-----------------
+     ||
+  con la clave publica:
+    - Â¿es del repositorio? firmado por el
+    - desencriptalo   
+    
+    
+  por defecto cuando instalas el sist.op, vienen predefinidos una serie de repositorios
+  en los cuales se confia (repositorios oficiales):
+  
+  	- /etc/apt <----- sources.list <=== fichero donde cada linea define un servidor
+  					repositorio oficial
+  					
+  	- /etc/apt/sources.list.d <------ fichero_serv1.list <=== ficheros donde se definen
+  					  fichero_serv2.list	servidor repositorios de
+  					  ....			software de terceros
+  
+  
+  en estos ficheros .list el formato de las lineas: (man sources.list)
+  
+  	distro [opcion=valor opcion=valor ...] url_conexion_servidor suite(tipo_software)
+  		------------------------------
+  			\---> opciones de config. conexion al servidor
+  
+  tipo_software: indica q tipo de paquetes te puedes bajar del repositorio:
+
+  	main o stable = paquetes de software basicos oficiales de la distribucion
+  	restricted = paquetes de software q pueden estar desarrollados por terceros
+  	universe = paquetes de software oficiales de la distro mantenidos por la comunidad
+  	multiverse = paquetes de software privados desarrollados de forma particular
+  
+  
+  
+  ej:
+  	deb   http://es.archive.ubuntu.com/ubuntu/  focal main restricted
+	---   ------------------------------------  ----- ---------------
+  	 distro		url_conexion_server         suite   tipo_software
+  							|
+  						comando: lsb_release -a
+  						
+  
+  1Âº paso antes de instalar un paquete:
+  =====================================
+  apt update <---------- busca actualizaciones de los paquetes ya instalados y dependencias
+  (apt-get update -y)	entre los repos definidos y actualizaciones en los propios repos
+  
+  
+  2Âº paso: actualizacion de software y dependencias instaladas:
+  ============================================================
+  apt upgrade <--------- actualiza paquetes de software principales
+  apt full-upgrade <---- actualiza paquetes de software principales y tooodas sus dependencias
+  
+  
+  lo suyo es ejecutarlo asi:  
+  				apt update && apt upgrade -y
+  				
+  				
+  3Âº paso: instalar un paquete de software
+  ========================================
+  apt install nombre_paquete
+  (apt-get install nombre_paquete)
+  
+  
+  Â¿como buscar antes de instalar un determinado paquete?
+  ------------------------------------------------------
+  apt search patron_busqueda
+  (apt-cache patron_busqueda)
+  
+   Â¿como listar paquetes instalados?
+   ---------------------------------
+   apt list
+  
+  Â¿como desinstalo un paquete?
+  ----------------------------
+  apt purge nombre_paquete <---- desinstala paquete y sus dependencias
+  apt remove nombre_paquete <--- desinstalas solo el paquete, NO SUS DEPENDENCIAS
+  
+  
+  
+  ej:  instalando software de terceros con repo no oficial MONGODB
+  
+  	- importamos clave publica del repo:
+  	
+  	curl  https://pgp.mongodb.com/server-7.0.asc | 
+   		sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg 
+   
+  
+  
+  	- define fichero .list para repositorio externo en /etc/apt/sources.list.d: 
+  	
+  echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" >  
+  				 /etc/apt/sources.list.d/mongodb-org-7.0.list
+  
+  
+  	- actualiza soft. y repos:  apt update
+  	- instala soft:
+  				apt install -y mongodb-org
+  
+  
+  INSTALACION DE SOFTWARE CON SNAP
+  --------------------------------
+  snap tiene ventajas sobre apt:
+
+  	- cada aplicacion viene con sus dependencias en un unico "bundle" (puede ocurrir
+  	 q dupliques fich.de dependencias, cada aplicacion es individual, no comparten 
+  	 dependencias como ocurre con apt), es mas facil instalar/desinstalar, ademas
+  	 puedes tener varias versiones de una aplicacion instaladas a la vez
+  	 
+  	 - las aplic.snap corren en entornos protegidos: sandbox
+  	   por cada aplicacion: (si necesita interactuar con el sis.op lo hace con servicios)
+  	   		/snap <---- directorio por cada aplicacion
+  	   			   con todo lo q necesita para ejecutarse
+  	   			   
+  	 - aqui no hay repositorios, solo hay un repo oficial para todos los paquetes de snap
+  	  de todas las distros
+  
+  desventajas:
+  
+  	- ocupa mas espacio en disco, pq cada aplicacion tiene su propio directorio sandbox
+  	- la descarga de software tarda mas, pq te bajas todo el paquete y sus dependecias
+  	
+  	
+  
+  instalar software:
+  ------------------
+  	snap install nombre_app
+  	
+  buscar software:
+  ----------------
+  	snap search busqueda
+  	
+  paquetes snap instalados:
+  -------------------------
+  	snap list <------ si quieres actualizar todos los paquetes instalados con snap:
+  				snap refresh 
+  				
+  			  si quieres actualizar solo un paquete: snap refresh nombre_app
+  			  
+  desinstalar software:
+  ---------------------
+  	snap remove nombre_app
+  	
+  	
+  habilitar/deshabilitar apps y versiones:
+  ----------------------------------------
+  	snap enable/disable nombre_app	
+  	
+
+  
+  
+  	
+  ------------------------------------------------------------------------
+  practica:
+     - instalar docker:   https://docs.docker.com/engine/install/ubuntu/     
+  ------------------------------------------------------------------------
+  practica: script
+  		
+  			GESTION DE PAQUETES Y REPOS
+  			===========================
+  			1. AÃ±adir nuevo repo y su clave publica
+  			2. Instalar paquete software 
+  			3. Borrar paquete software instalado
+  			4. Buscar paquete por nombre
+  			5. ---- SALIR ----
+  				opcion:_
+  
+  opcion 1) pedir url descarga  clave publica del server y la descargas con curl
+  	   dentro de /etc/apt/keyrings <--- nombre.gpg
+  	   
+  	   debes generar fichero /etc/apt/sources.list.d <----- nombre.list 
+  	   para el repo
+  	   
+  opcion 2) nombre del paquete a instalar (no debe estar vacio) hacer antes update y upgrade
+  opcion 3) nombre del paquete a borrar (comprobar q esta instalado en lista) si existe, 
+  	   borrarlo
+  	   
+  opcion 4) nombre del paquete a buscar (no debe estar vacio) (buscar solo en nombre, no en
+   	 descripcion)

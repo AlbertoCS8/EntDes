@@ -1,0 +1,276 @@
+---------------------------------------
+ ADMINISTRACION DE SERVICIOS (DEMONIOS)
+ ---------------------------------------
+ un servicio es una aplicacion q se ejecuta en background (sin la interaccion
+ del usuario). Tipos de servicio:
+ 
+ 	- lanzados por apps del sistema
+ 	- lanzados por software q el usuario ha instalado
+ 	- lanzados por software creado por el usuario
+ 	
+ todos los servicios los controla SYSTEMD (system-daemon, el primer proceso
+ creado por el kernel en el arranque es este servicio inicial). 
+ Systemd busca la def. de los servicios en este directorio del sistema:
+ 
+ 	/lib/systemd/system <---- ficheros .service corresponden a servicios
+ 				  del sistema
+ 				  
+ 		cd /lib/systemd/system
+ 		ls *.service
+ 				
+ 			
+ 	/lib/systemd/user <----- ficheros .service corresponden a servicios
+ 				 del usuario
+ 				 
+ 		cd /lib/systemd/user
+ 		ls *.service
+ 	
+ 	
+ para controlar los servicios mediante systemd, esta el comando:
+ 
+ 	systemctl
+ 
+ FICHEROS DE CONFIGURACION DE LOS SERVICIOS
+ ------------------------------------------
+ si quiero ver el contenido del fichero de configuracion de un servicio:
+ 
+ 		systemctl cat nombre_servicio.service
+ 		
+ 	ej:
+ 		systemctl cat cron.service
+
+		[Unit]
+		Description=Regular background program processing daemon
+		Documentation=man:cron(8)
+		After=remote-fs.target nss-user-lookup.target
+
+		[Service]
+		EnvironmentFile=-/etc/default/cron
+		ExecStart=/usr/sbin/cron -f $EXTRA_OPTS
+		IgnoreSIGPIPE=false
+		KillMode=process
+		Restart=on-failure
+
+		[Install]
+		WantedBy=multi-user.target
+ 		
+
+estan formados por secciones:
+
+	[ seccion-1 ] 
+	variable_configuracion=valor
+	variable_configuracion=valor
+	...
+	
+	[ seccion-2 ] 
+	variable_configuracion=valor
+	variable_configuracion=valor
+	...
+secciones obligatorias: Unit, Service, Install
+	
+	- Unit: seccion q describe el servicio (lo q hace, donde puedes
+		  ver sus man-pages, ...)
+		  
+		p.e: en la variable Descripcion="...." aparece el mensaje
+		     q te muestra SYSTEMD cuando preguntas por el estado
+		     del demonio
+				systemctl status cron.service
+
+	- Service: seccion imprescindible pq indica donde esta el ejecutable
+		  del servicio para ser lanzado por systemd y sus variables
+		  del sistema para funcionar, tipo de servicio (por defecto
+		  fork)
+		  
+	  ej:  ExecStart=/usr/sbin/cron -f  $EXTRA_OPTS <-- ejecutable serv
+	       EnvironmentFile=-/etc/default/cron <----- fich.variables serv
+	       
+	       
+	 - Install: indica a systemd en que TARGET (antiguos RunLevel de
+	 init) quieres arrancar el servicio
+	 
+	 	WantedBy=nombre_target.target <--- casi siempre estan en
+ 					multi-user.target o 
+ 					graphical.target (runlevel 5)
+
+COMO VER TODOS LOS SERVICIOS CONTROLADOS POR SYSTEMD
+-----------------------------------------------------
+en cualquier estado (activos, deshabilitados,pausados,...)
+
+	systemctl list-units   --type=service
+		  ----------   --------------	
+		      |			 \---> tipos a mostrar
+		 opcion de systemctl para
+		 listar unidades q controla
+		 systemd:
+		 	- target: runlevels
+		 	- service: servicios
+		 	- socket: conexiones entre servicios
+		 	- timer : temporizadores 
+		 	- path: almacenamiento de rutas (directorios)
+		
+
+practica:
+---------
+	- mostrar el contenido del fichero de config. del servicio RSYSLOG
+	- ver que hace  y su descripcion
+	- decir ruta al ejecutable y si usa variables de entorno, cuales son
+	- comprobar su estado
+	
+ESTADOS EN UN SERVICIO. HABILITAR/DESHABILITAR SERVICIOS
+--------------------------------------------------------
+un servicio ha de estar habilitado para systemd pueda reconocerlo.
+para habilitar un servicio (tiene q estar creado su fichero de 
+configuracion):
+
+	systemctl enable nombre_servicio.service
+	
+para saber si esta un servicio habilitado:
+
+	systemctl is-enabled nombre_servicio.service
+
+o bien listas todos los servicios y buscas por el nombre y miras su estado:
+
+	systemctl list-units --type=service | grep "nombre_servicio" 
+
+
+
+	ej: Â¿esta habilitado el servicio cron?
+	
+		systemctl is-enabled cron.service
+		systemctl list-units --type=service | grep "cron.service"
+	
+	
+Para  deshabilitar un servicio existente para systemd:
+
+	sudo systemctl disable nombre_servicio.service
+
+OJO!! es posible q si el servicio se este ejecutando, systemd te diga
+q lo tengas q parar antes de deshabilitarlo.
+
+	ej: intentamos deshabilitar el servicio cron.service
+	
+		sudo systemctl disable cron.service
+		
+para comprobar si esta deshabilitado:
+
+		systemctl is-enabled cron.service
+
+su estado:
+		systemctl status cron.service
+		
+------------- PARA SERVICIOS HABILITADOS, ESTADOS: ----------------
+
+ -arrancar servicio:
+ 			systemctl start nombre_servicio.service
+ -parar servicio:
+ 			systemctl stop nombre_servicio.service
+
+
+
+	ej: parar servicio rsyslogd.service
+		
+		systemctl stop rsyslogd.service
+
+	    mirar su estado:
+	    
+		systemctl status rsyslogd.service	    
+	    
+COMO CREAR NUESTROS PROPIOS SERVICIOS
+=====================================
+1Âº paso:
+	- crear un script q va a representar el ejecutable del servicio
+	(dandole permisos de ejecucion)
+	
+2Âº paso:
+	- crearse un fichero .service q defina al servicio, meterlo
+	 dentro del directorio:
+	 	/etc/systemd/system <---- nombre_serv.service
+	 	
+	 debe de tener las secciones [Unit], [Service], [Install]
+	 
+	
+3Âº paso:
+	- recargar systemd para q lo ejecute:
+		systemctl daemon-reload
+		
+4Âº paso:
+	- habilitar el servicio:  
+		systemctl enable nombre_serv.service
+
+5Âº paso:
+	- arrancar servicio:
+		systemctl start nombre_serv.service
+				
+		
+	ej:
+		cliente				servidor
+					        servicio escuchando 6666
+		   mensaje --------------------------->
+			   <---------------------------	resp.	        
+					        
+1Âº paso: (darle permisos de ejecucion: chmod a+x /tmp/miservicio.sh)
+-------
+#!/bin/bash
+		
+while true
+do
+echo "Buenas tardes, te has conectado a: `date`" | nc -k -l localhost 6666
+done	
+
+
+2Âº paso: me creo en /etc/systemd/system <--- fichero miservicio.service
+-------
+[Unit]
+Description=Servicio creado por mi para dar bienvenida
+
+[Service]
+ExecStart=/tmp/miservicio.sh
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+3Âº paso: recargamos systemd para q reconozca el servicio:
+--------
+		systemctl  daemon-reload
+
+4Âº paso: habilito el servicio:
+--------
+		systemctl enable miservicio.service
+		
+		
+5Âº paso:  arrancamos servicio:
+--------
+		systemctl start miservicio.service
+		
+para ver si todo ha ido ok, compruebas su estado:
+
+		systemctl status miservicio.service
+
+
+======================================================================	 
+  ej: servicio web controlado por systemd usando nc
+  
+ 1Âº paso: script q escuche por puerto 9999 y generar como respuesta
+ -------  pag.web, index.html
+ 
+ 
+ #!/bin/bash
+ while true
+ do
+   { echo  -e "HTTP/1.1 200 OK\r\n"; echo -e "Content-Type:text/html\r\n"; echo -e "Content-Length: `wc -c /tmp/index.html  | awk '{print $1}'` \r\n\r\n"; cat /tmp/index.html } | nc -k -l localhost 9999 
+
+ done
+	
+	
+	
+te creas en /tmp/index.html:
+<html>
+	<head>
+		<title>bienvenido a mi servicio web...</title>
+	</head>
+	<body>
+		<h3><strong>bienvenido...</strong></h3>
+	</body>
+</html>	

@@ -1,0 +1,243 @@
+--------------------------------------
+   ADMINISTRACION PROCESOS WINDOWS
+--------------------------------------
+modulo gestion de procesos del kernel de windows:  scheduler + dispatcher
+																	---------   ---------- 
+																	   |				\---- proceso cuyos hilos estan READY usen CPU
+												encargado de relevar el acceso a la CPU
+											 de los procesos q se crean en el sistema acorde
+											a algoritmo de planificacion Round-Robin basado en prioridades
+											(intervalo de tiempo en cpu se le llama quantum difiere en los windows server
+										  a los windows escritorio)
+
+un proceso es un objeto y represnta app q el usuario/sistema va a ejecutar. El process-manager (csrss.exe) encarga
+al object-manager crear este objeto por proceso:
+
+	EPROCESS ( pid, usuario, el nombre aplicacion, KPROCESS(objeto parametros kernel: registros cpu, memoria, threads)..)
+				
+
+
+PRIORIDAD DE PROCESOS/THREADS EN WINDOWS
+----------------------------------------
+cuando se crea un proceso por el process-manager, le asigna una PRIORIDAD-BASE-PROCESO, el cual pasa como prioridad
+base al primer hilo (Thread[0]), PRIORIDAD-BASE-HILO
+
+lo q pasa a la cpu por el dispatcher son los hilos, la PRIORIDAD-BASE de los mismos cambia (es dinamica), se denomina
+PRIORIDAD-ACTUAL (valor numerico q oscila entre 1-32, los valores 15-31 reservados para op.criticas del sistema):
+ se saca asi:
+
+				PRIORIDAD-BASE-PROCESO(HILO)
+											 ------
+		Real-Time High Above-Normal Normal Below-Normal Idle
+										    ------
+Normal	24	     13	    10		    8     6 			  4 <----- se puede cambiar si cambias prioridad relativa del
+																					   thread:			valores sobre prioridad base
+																												---
+																							Time-Critical  15
+																							Highest		   +2
+																							Above-Normal   +1
+																							---
+																							Below-Normal   -1
+																							Lowest         -2
+																						   Idle				1
+
+
+				
+ESTADOS DE UN HILO/THREAD
+=========================
+el dispatcher cuando introduce/saca un thread de un proceso desde la CPU, cambia su estado.
+Estados: 
+	- Init(0): estado inicial del cual parten todos los hilos, q es el estado cuando el process-manager crea el hilo
+	- Ready(1): nada mas crearse, el hilo pasa a estar listo para q el dispatcher le meta en la cpu (el scheduler le ha planificado RR
+			y le ha asignado prioridad)
+	- Running(2): el hilo se esta ejecutando en ese momento en la CPU
+	- Stand-by(3):  cuando un hilo se esta ejecutando y requiere una operacion de larga duracion (conexion red, impresion, ...)
+			el dispatcher le saca temporalmente de la CPU y suspende su ejecucion, y en cuanto se ejecute esa operacion lo vuelve a
+			meter (sacando el hilo de otro proceso q esta en ese momento en la cpu)
+	- Deferred-Ready(7)
+	- Transititon(6)
+	- Waiting(5): como stand-by pero cuando el hilo recibe resultado de la op. de larga duracion, el dispatcher no lo mete directamente 
+			a la cpu, sino q tiene q esperar otra vez en cola de RR
+	- Terminated(4): estado q tiene un hilo cuando ha completado el conjunto de instrucciones q tiene q llevar a cabo en la cpu
+
+
+
+
+
+comandos powershell procesos/hilos
+==================================
+
+	lista de comandos: get-command -Module Microsoft.Powershell.Management -name "*process*"
+
+- obtener info de procesos:
+
+			get-process [-opciones]	<---- te devuelve la info de la lista de procesos o de un proceso determinado
+												si especificas opciones.
+
+
+											cada proceso es un objeto de la clase:
+													 System.Diagnostics.Process
+
+									para ver las props y metodos de la clase, seleccionas un objeto de tipo proceso y se lo
+									pasas al comando get-member, ej:
+
+										get-process -name powershell_ise | get-member
+
+
+- finalizar un proceso, 2 formas:
+
+	1º forma) comando cmd-let powershell:
+													stop-process [-opciones]
+
+							ej:   stop-process -name powershell_ise
+
+   2º forma) usando metodo .kill() de la clase System.Diagnostics.Process
+
+						ej:
+								$proceso=get-process -name powershell_ise
+								$proceso.kill()
+
+
+								en forma corta: (get-process -name powershell_ise).kill()
+
+
+
+
+ - para lanzar un proceso de una aplicacion:
+
+			Start-Process [-opciones]
+
+					ej:
+							start-process -filepath notepad
+
+comandos ver/establecer PRIORIDAD:
+----------------------------------
+
+si vemos props. de clase System.Diagnostics.Process:   get-process -name powershell_ise | get-member
+
+
+BasePriority               Property       int BasePriority {get;} <---prop.READONLY marca PRIORIDAD-BASE del proceso
+PriorityClass              Property       System.Diagnostics.ProcessPriorityClass PriorityClass {get;set;} 
+																																----------
+																																	|
+															pro.de lectura/escritura, y sirve para cambiar prioridad base
+														  ¿¿q tipo de valor?? tiene q ser un valor de tipo:
+																System.Diagnostics.ProcessPriorityClass
+ 
+
+ej:
+	  (get-process -name powershell_ise).BasePriority <---- 8
+	  (get-process -name powershell_ise).PriorityClass <---- Normal
+
+ cambiamos prioridad base del proceso:
+
+	(get-process -name powershell_ise).PriorityClass=[System.Diagnostics.ProcessPriorityClass]::High
+
+   al cambiarlo:
+	  (get-process -name powershell_ise).BasePriority <---- 13
+	  (get-process -name powershell_ise).PriorityClass <---- High
+
+ para volverlo a prioridad base normal:
+
+	(get-process -name powershell_ise).PriorityClass=[System.Diagnostics.ProcessPriorityClass]::Normal
+
+
+
+comandos powershell para gestionar THREADS
+------------------------------------------
+usando propiedad .Threads
+
+	ej:	(get-process -name powershell_ise).Threads <---- objeto tipo: System.diagnostics.ProcessThreadCollection
+
+para acceder a los hilos, por indice:
+
+		thread-0:  (get-process -name powershell_ise).Threads[0]
+		thread-1:  (get-process -name powershell_ise).Threads[1]
+		...
+
+cada thread es un objeto de la clase: (get-process -name powershell_ise).Threads[0] | get-member
+	System.Diagnostics.ProcessThread
+
+
+props. q hacen referencia a la prioridad:
+
+BasePriority              Property   int BasePriority {get;}  <-----prioridad base del hilo/proceso
+PriorityLevel             Property   System.Diagnostics.ThreadPriorityLevel PriorityLevel {get;set;} <----cambias 
+																							prioridad relativa del hilo
+												
+CurrentPriority           Property   int CurrentPriority {get;} <---prioridad real, prioridad base + prioridad relativa
+
+
+ej para THREAD-0:
+
+		  (get-process -name powershell_ise).Threads[0].BasePriority <------ 8
+		  (get-process -name powershell_ise).Threads[0].PriorityLevel  <--- Normal
+		  (get-process -name powershell_ise).Threads[0].CurrentPriority <--- 11
+
+
+ cambiamos prioridad relativa del hilo:
+
+	(get-process -name powershell_ise).Threads[0].PriorityLevel = [System.Diagnostics.ThreadPriorityLevel]::Higuest
+
+
+ volvemos a ejecutar:
+
+		  (get-process -name powershell_ise).Threads[0].BasePriority <------ 10
+		  (get-process -name powershell_ise).Threads[0].PriorityLevel  <--- Higuest
+		  (get-process -name powershell_ise).Threads[0].CurrentPriority <--- 14
+
+  para dejarlo en normal:
+
+	(get-process -name powershell_ise).Threads[0].PriorityLevel = [System.Diagnostics.ThreadPriorityLevel]::Normal
+
+
+
+  ESTADO HILOS:
+  ------------
+	usando propiedad .ThreadState de cada hilo nos da el estado:
+	
+		ThreadState               Property   System.Diagnostics.ThreadState ThreadState {get;} <---- solo de lectura
+
+	para cambiar estados hilos:
+
+		Stop-Process -name nombre_proceso <--------- cambias todos los hilos a estado TERMINATED
+		Wait-Process -name nombre_proceso <--------- cambias todos los hilos a estado WAIT
+		Start-Process [-opciones] <----------------- creas un proceso para una aplicacion y pones todos sus hilos en estado READY
+
+
+	ej:
+		(get-process -name powershell_ise).Threads[0].ThreadState <---- estado del hilo-0
+
+	   estdo de todos los hilos de un proceso:
+		$a=0; (get-process -name powershell_ise).Threads.ForEach({ write-host "estado hilo $a..." $_.ThreadState; $a++;  }) <---estado 
+																todos los hilos
+
+		$a=0; foreach($unhilo in (get-process -name powershell_ise).Threads){ write-host "estado hilo $a..." $unhilo.ThreadState; $a++; }
+		
+		for($a=0; $a -lt (get-process -name powershell_ise).Threads.Count; $a++){
+			write-host "estado hilo $a..." (get-process -name powershell_ise).Threads[$a].ThreadState
+		} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,61 @@
+/*
+.path-mod-assign.pagelayout-embedded{overflow:hidden;background-color:#151515;color:white}
+a{color:#5591c7}
+.path-mod-assign [data-region="grading-navigation"] [data-region="input-field"] input,
+.assignfeedback_editpdf_widget .pageheader select,
+.form-control,
+.path-mod-assign [data-region="grade-panel"] .gradingform_rubric .criterion .remark textarea,
+.path-mod-assign [data-region="grade-panel"] .comment-area textarea[cols]{background:#1c1c1c;color:white;border:1px solid #646464}
+.form-control:focus{background:#101010;color:white;border:1px solid #646464}
+.path-mod-assign [data-region="user-info"] .img-rounded{filter:invert(1) brightness(4.5)}
+.path-mod-assign [data-region="review-panel"] .pageheader{background-color:#242424}
+.assignfeedback_editpdf_widget .pageheader select,
+.assignfeedback_editpdf_widget .pageheader button{background-color:#151515}
+.assignfeedback_editpdf_widget .pageheader .navigation button button,
+.assignfeedback_editpdf_widget .pageheader .toolbar button button,
+.assignfeedback_editpdf_widget .pageheader .navigation select button,
+.assignfeedback_editpdf_widget .pageheader .toolbar select button{border-left:1px solid #666}
+.assignfeedback_editpdf_widget .pageheader .toolbar,
+.assignfeedback_editpdf_widget .pageheader .navigation-search,
+.assignfeedback_editpdf_widget .pageheader .navigation-expcol,
+.assignfeedback_editpdf_widget .pageheader .navigation{border:1px solid #666;border-bottom-color:#666}
+.assignfeedback_editpdf_widget .pageheader button.assignfeedback_editpdf_selectedbutton:hover,
+.assignfeedback_editpdf_widget .pageheader button.assignfeedback_editpdf_selectedbutton{background:#404040;background-image:none}
+.assignfeedback_editpdf_widget .pageheader button:hover{background-color:#2f2f2f;background-image:none}
+.path-mod-assign [data-region="grade-panel"]{background-color:#242424}
+.path-mod-assign [data-region="grade-panel"] .fitem.has-popout{background-color:rgb(25 25 25 / 98%);border:1px solid rgb(70 70 70)}
+.path-mod-assign .overdue,
+.path-mod-assign .overduesubmission,
+.path-mod-assign [data-region="grade-panel"] td.submissionnotgraded,
+.path-mod-assign [data-region="grade-panel"] div.submissionnotgraded{color:#ff3923}
+.path-mod-assign [data-region="grade-panel"] .gradingform_rubric .criterion .levels{background-color:#151515}
+.path-mod-assign [data-region="grade-panel"] .gradingform_rubric.evaluate .criterion .levels .level:hover{background-color:#292929}
+div.editor_atto_toolbar{background:#242424}
+div.editor_atto_toolbar div.atto_group{background:#151515;border:1px solid #666;border-bottom:1px solid #666}
+div.editor_atto_toolbar button .icon{color:#999999}
+.editor_atto_toolbar button:hover{background-image:none;background-color:#2f2f2f}
+div.editor_atto_toolbar button button,
+div.editor_atto_toolbar .menuplaceholder button{border-left:1px solid #666}
+.editor_atto_notification .atto_info{background-color:#2e2e2e}
+.path-mod-assign [data-region="review-panel"] .drawingregion{border-color:#242424}
+.assignfeedback_editpdf_widget .drawingregion{background-color:#3b3b3b}
+.path-mod-assign td.submissionstatus,
+.path-mod-assign div.submissionstatus,
+.path-mod-assign a:link.submissionstatus{color:#fff;background-color:#000000}
+.modal-dialog-scrollable .modal-content{color:black}
+a:hover{color:#76b6ee}
+.path-mod-assign [data-region="grade-panel"]::-webkit-scrollbar,
+.path-mod-assign [data-region="review-panel"] .pageheader::-webkit-scrollbar,
+.path-mod-assign [data-region="review-panel"] .drawingregion::-webkit-scrollbar,
+.gradingform_rubric .criteria::-webkit-scrollbar,
+.path-mod-assign.pagelayout-embedded::-webkit-scrollbar{width:10px;height:10px}
+.path-mod-assign [data-region="grade-panel"]::-webkit-scrollbar-track,
+.path-mod-assign [data-region="review-panel"] .pageheader::-webkit-scrollbar-track,
+.path-mod-assign [data-region="review-panel"] .drawingregion::-webkit-scrollbar-track,
+.gradingform_rubric .criteria::-webkit-scrollbar-track,
+.path-mod-assign.pagelayout-embedded::-webkit-scrollbar-track{background:#374549}
+.path-mod-assign [data-region="grade-panel"]::-webkit-scrollbar-thumb,
+.path-mod-assign [data-region="review-panel"] .pageheader::-webkit-scrollbar-thumb,
+.gradingform_rubric .criteria::-webkit-scrollbar-thumb,
+.path-mod-assign.pagelayout-embedded::-webkit-scrollbar-thumb{background-color:#c5d1d3;border-radius:15px;border:2px solid #374549}
+*/

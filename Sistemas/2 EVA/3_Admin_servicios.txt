@@ -1,0 +1,222 @@
+------------------------------------
+ ADMINISTRACION SERVICIOS WINDOWS
+------------------------------------
+El modulo encargado de la gestion de los servicios (lanzado en la fase de user-mode del arranque): SCM (Services.exe) - Service Control Manager
+
+el SCM va al registro de windows:  HKLM/SYSTEM/CurrentControlSet/Services <----- clave del registro donde estan definidos todos los servicios 
+								(una subclave por servicio). En cada subclave, estan los parametros de config.
+								 de dicho servicio:
+
+						- tipo de servicio (servicio individual, servicio shared,...): Type
+						- arranque del servicio (si es manual, automatico, deshabilitado,...): Start
+						- ruta al ejecutable del servicio: ImagePath
+							si necesita parametros, estan en subclave Parameters
+						- el nombre q se muestra al usuario en la herramienta administrativa de los servicios 
+						  (services.msc): DisplayName
+
+						- el grupo al q pertenece el servicio: Group <--- el SCM no ejecuta los servicios uno a uno
+								sino q los levanta por grupos. El orden de arranque de los grupos esta 
+								definida en una clave del registro
+
+						- dependencias del servicio: lista de servicios de los que depende para ejecutarse, si no
+								estan levantados, no puede ejecutarse: DependOnService
+
+el SCM coje el ejecutable del servicio, y le dice al process-manager q genere un EPROCESS con un thread-0 para el mismo
+y se le denomina SCP = service control program. Este va a ser el encargado de lanzar el resto de hilos necesarios para dar servicio
+al usuario:
+
+		pipe(comunicacion entre scm y el primer hilo del servicio)
+	SCM <----------> Process-manager
+			  SCP-Thread0 <-----------> thread-1 (interactua con usuario)
+					 |--------> thread-2 (interactua con usuario)
+					 |--------> thread-3 (interactua con usuario)
+					 ...
+
+
+este proceso se crea con estas creds o cuentas de usuario reservadas para servicios:
+
+	- local (S-1-2-0): cuenta usada para crear servicios locales sin acceso al exterior
+	- local-service (S-1-5-19): cuenta usada para crear servicios con servicio al exterior de acceso anonimo (sin autentificacion)
+	- network-service (S-1-5-20): cuenta usada para crear servicios con servicio al exterior q necesitan AUTENTIFICACION (credenciales)
+
+
+SHARED-SERVICES (servicios compartidos)
+---------------------------------------
+son servicios q comparten el SCP ahorrando recursos del sistema al kernel; el ejecutable de todos estos servicios en un .exe especial
+q se llama:
+		svchosts.exe <------ en el administrador de tareas aparecen un monton de procesos asociados a este ejecutable,
+				 	son hilos/procesos asociados a servicios compartidos
+
+estos se diferencia a la hora de crear sus hilos q prestan servicio por la DLL q ejecuta este .exe como parametro:
+
+	shared-service-1 <----- svchosts.exe nombre_dll_1.dll
+	shared-service-2 <----- svchosts.exe nombre_dll_2.dll
+	shared-service-3 <----- svchosts.exe nombre_dll_3.dll
+	...
+
+¿¿como detecto estos servicios??
+
+	- si buscas la prop. ImagePath del servicio siempre va a ser:  svchosts.exe
+	- la prop. ServiceType <---- Win32ShareProcess
+	- una clave del registro donde SCM guarda la info de todos estos servicios:
+
+			\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Svchost
+
+
+¿¿como recupero todos los shared-services??
+
+	
+	(get-service).foreach({ if($_.ServiceType -icontains "win32shareprocess) write-host $_.name })
+
+	get-service | ForEach-Object {
+					if($_.ServiceType -icontains "win32shareprocess) write-host $_.name 
+					}
+
+ mejor usando Where-Object asi:
+
+	get-service | Where-Object { $_.ServiceType -icontains "win32shareprocess" } | ForEach-Object { write-host $_.Name }
+
+
+
+comandos powershell/wmi administrar servicios
+=============================================
+lista de comandos:
+		get-command -name *service* -Module microsoft.powershell.management
+
+
+todos los servicios se mapean contra objetos de la clase: 	System.ServiceProcess.ServiceController
+
+- para listar servicios o detalles de un servicio:
+
+	get-service [-opciones] <---- para obtener info de un servicio:  -Name ....  -DisplayName ...
+				ej:
+					get-service -name wuauserv
+
+				si quiero saber el estado del servicio:
+
+					(get-service -name wuauserv).Status <---- prop. de solo lectura de tipo 														System.ServiceProcess.ServiceControllerStatus
+
+				si quiero ver el nombre:
+
+					(get-service -name wuauserv).ServiceName <--- prop.de lectura/escritura
+
+
+	con WMIC: 
+			Get-CimInstance -ClassName win32_service <----- para obtener info de un servicio, necesito filtrar:
+									-Filter "prop=valor"
+
+							ej:
+								Get-CimInstance -ClassName win32_service -Filter "Name='wuauserv'"
+
+
+
+
+
+
+ - para modificar props.configuracion del servicio mediante comando: <---- afecta a la clave del registro donde se almacena su info
+
+	Set-Service -name [-opciones]
+
+	
+
+
+ - parar servicio:
+
+		stop-service -name nombre_servicio 
+
+	o bien usando metodo de clase:
+
+		(get-service -name nombre_servicio).Stop()
+
+- arrancar servicio:
+
+		start-service -name nombre_servicio		
+
+- deshabilitar/suspender temp. servicio:
+
+		Suspend-Service -name nombre_servicio
+
+- habilitar servicio:
+
+		Resume-Service -name nombre_servicio
+
+
+ - crear un servicio:
+
+		New-service -Name "nombre_corto"
+			    -DisplayName "nombre_largo_services.msc"
+			    -BinaryPathName "unidad:\directorio\ejecutable_servicio[.exe,.ps1,.cmd,.bat]"
+			    -Description "descripcion_larga_hace_servicio"
+			    -Startup Boot | System | Automatic | Manual | Disabled
+			    [-DependsOn ["nombre_servicio1","nombre_servicio2", ....] ]
+
+
+	comprobar q se genera:
+				- incio ---> ejecutar: services.msc ----> buscas: TestService
+				- en registro de windows: incio ---> ejecutar: regedit
+						HKEY_LOCAL_MACHINE \ SYSTEM \ CurrentControlSet \ Services \ TestService
+				- con powershell:
+							get-service -name testservice
+
+
+
+ - borrar un servicio:
+
+		- borrar la clave del registro <----- danger!!!!
+		- COMANDO POWERSHELL como tal para borrar no hay....putadon del gordo, solucion?
+				- ¿¿ metodo de clase servicio ?? <---- no hay, dios....
+				- ¿¿ comando wmic ?? <---------------- si hay un metodo en clase win32_service, .delete()
+								wmic service where "Name='testservice'" call delete
+
+					si lo intentas ejecutar este mismo comando traducido a powershell asi:
+
+						(Get-CimInstance -Class Win32_Service -Filter "name='TestService'").delete()
+														   ---------
+															\
+							FALLO!!!! con Get-CimInstance no se pueden ejecutar metodos WMIC !!! solo acceder
+							a props. ¿¿Y CON COMANDO Invoke-CimMethod??	
+
+				- ¿¿ viejo comando del simbolo del sistema CMD ?? comando sc.exe, asi:
+
+						sc.exe delete testservice
+
+						
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

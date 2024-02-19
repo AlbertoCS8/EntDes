@@ -1,0 +1,246 @@
+-------------------------------------------
+  ADMINISTRACION EVENTOS DEL SISTEMA/APPS
+-------------------------------------------
+La administracion de los eventos en windows la realiza un servicio: EventLog
+
+	Get-Service -Name EventLog
+
+y funciona asi:
+
+	Proveedor-1	Proveedor-2	Proveedor-3 <====== fuente origen de mensajes q necesitan ser registrados
+	    |		      |			|		llamados "eventos"
+	eventos		eventos			eventos
+	   ||		   ||			 ||
+	---------------------------------------------- servicio EventLog (para cada proveedor, el servicio le asigna un controlador)
+	controlador-1	controlador-2	controlador-3		cada controlador origina una sesion donde almacena temp. los eventos
+	 sesion		 sesion		sesion			de su proveedor. Estos mensajes se destinan de forma permanente a un
+	-----------------------------------------------		un "consumidor" (disp.almacenamiento)
+	    |		   |			|
+	consumidor-1	consumidor-2		consumidor-3 <=== suelen ser ficheros localizados en:  C:\Windows\System32\WinEvt\Logs
+									con extension .evtx <=== formato BINARY-XML (no se pueden abrir
+									con un editor normal)
+
+windows ofrece una herramienta administrativa para ver estos consumidores y administrarlos a traves del servicio:
+
+		EventVwr.msc
+
+
+FORMATO FICHEROS .EVTX (consumidores de eventos)
+------------------------------------------------
+la estructura de estos ficheros, es asi un ENCABEZADO para metadatos y una serie de CHUNKS (un chunk es un bloque donde se almacenan eventos
+de forma organizada)
+
+	------------
+	FILE-HEADER <===== ocupa como max.los primeros 4kbs del fichero y aqui se almacena inf.importante del consumidor:
+				nombre, tamaño, fecha ultimo registro evento, tamaño CHUNK, nº de CHUNKS, hash integridad,...
+	-----------
+chunk-1  header-chunk (512bytes) <=== info o metadatos del chunk: num.eventos, tamaño total chunk, espacio libre disponible, ...
+	 eventos <---- el numero de eventos del chunk depende del tamaño total del mismo, cada evento ocupa 64kb
+	-----------
+chunk-2  header-chunk (512bytes)
+	 eventos
+	-----------
+ ....	
+
+la info q  se almacena en los "eventos" dentro de estos CHUNKS:
+
+	- un identificador del evento
+	- el nombre del proveedor
+	- el nivel o grado de severidad: CRITICO - ERROR - ADVERTENCIA - INFORMACION
+	- las credenciales del usuario que los registra (audita)
+	- fecha de origen del mensaje
+	- mensaje del error
+
+cuando un consumidor o almacen de datos se llena, la politica del servicio EventLog por defecto es la de SOBREESCRIBIR los eventos mas antiguos
+con los nuevos que entran, pero se puede modificar:
+
+	- se haga un backup o copia del registro lleno, se vacia y se vuelven a registrar (auditar) en el mismo eventos
+	- no se hace nada, se deja intacto lleno y hasta q no se limpie no se siguen registrando mensajes
+
+el tamaño max. de un almacen de datos (.evtx) se cree q es 4Gb
+
+
+comandos en powershell/wmic para gestion de consumidores(almacenes) y eventos
+-----------------------------------------------------------------------------
+ comandos: 
+	get-command -name *eventlog* -Module Microsoft.PowerShell.Management
+
+ comandos previos:
+
+	get-command -name *winevent* 
+
+
+ - para recuperar info de un almacen (consumidor) de eventos:
+	
+	get-eventlog -list <---------------------------------- muestra solo logs de windows tradicionales, no de apps
+
+	get-winevent -listlog [* | nombre_fichero.evtx] <------ muestra todos los detalles de un consumidor; cada consumidor es un objeto
+							   de la clase:
+
+								System.Diagnostics.Eventing.Reader.EventLogConfiguration
+
+						- prop. tamaño total del almacen total: 			MaximumSizeInBytes
+						- prop. tamaño actual del almacen: 				FileSize
+						- prop. fecha ultima modificacion (registro del ultimo evento): LastWriteTime
+						- prop. numero de eventos registrados:  			RecordCount
+						- prop. proveedores de eventos q mandan aqui mensajes: 		ProviderNames
+						- prop. ruta donde se encuentra el almacen: 			LogFilePath
+
+
+				ej:  get-winevent -listlog security | select-object -property *
+
+-----------------
+ practica:
+   hacer script q te pida el nombre de un almacen y  muestre solo las props de arriba
+   despues te tiene q preguntar si lo quieres vaciar de mensajes, si es asi vaciarlo y comprobarlo en el visor:  EventVwr.msc
+   (INTENTARLO HACER TB CON WMIC)
+
+clear-host
+write-host -BackgroundColor Red -ForegroundColor Yellow "`t`t`t LISTA DE ALMACENES"
+write-host -BackgroundColor Red -ForegroundColor Yellow "`t`t`t ------------------"
+Get-WinEvent -ListLog * | Select-Object -Property logname 
+
+[string]$nombre=read-host "nombre del almacen(consumidor).evtx __"
+
+#...buscamos si existe o no el almacen...
+[string]$busqueda=Get-WinEvent -ListLog * | Select-Object -Property logname | Where-object { $_.Logname -ieq "security" }
+
+if( $busqueda -ieq ""){
+
+    write-host "...no existe ese almacen de datos de eventos..."
+
+} else {
+
+    $log=get-winevent -ListLog $nombre
+    $log | Select-Object -Property MaximumSizeInBytes,FileSize,LastWriteTime,RecordCount,ProviderNames,LogFilePath
+
+    [string]$resp=read-host "quieres vaciar de eventos el log [s/n]? __"
+    if( $resp -ieq "s" ){
+        Clear-EventLog -LogName $nombre
+    }
+
+}
+-------- con wmic para recup. de los consumidores:  win32_NTEventLogFile 
+   (alias nteventlog: para ver def.alias: wmic alias get friendlyname,target)
+  
+
+en powershell: Get-CimInstance -ClassName win32_nteventlogfile | get-member <--- clase:
+										....CimInstance# root/cimv2/ Win32_NTEventlogFile
+												 ----------  --------------------
+												 NAMESPACE	CLASS o PATH	
+RECUPERAR EVENTOS DE LOS FICH.LOG (CONSUMIDORES)
+------------------------------------------------
+dos formas de recuperar los eventos:
+
+	Get-WinEvent -LogName nombre_log [-opciones] <=== cada evento recuperado es un objeto de la clase:
+					 -----------		System.Diagnostics.Eventing.Reader.EventLogRecord
+						|
+						\---> opciones para filtrar mensajes de ese consumidor; si no pones opciones de seleccion
+							te recupera toooooooodos los eventos registrados. Es potente pq puedes filtrar con
+							XPath
+
+							-MaxEvents num <--- recupera ese numero de eventos (mas recientes)
+							-Oldest <----------- recupera eventos mas antiguos por fecha
+							-FilterXPath "filtro xpath" <----- recupera eventos q cumple ese filtro xpath
+					ej:
+
+					Get-WinEvent -LogName Application
+-FilterXPath "*[System[Provider[@Name='Microsoft-Windows-PowerShell' or @Name='PowerShell'] and (Level=2 or Level=4 or Level=0)]]"
+
+------------------------------------------------------------------------------------------------------------------------------------------
+ practica:  simulando el eventvwr.msc, q propiedades de la clase System.Diagnostics.Eventing.Reader.EventLogRecord
+	  me muestran la info sobre cada evento:  Nivel (nivel de severidad), Fecha y hora de registro, Origen (proveedor), Id del evento
+
+	- Id del evento <--- propiedad .Id del evento mas reciente registrado en log Application
+			ej:  (Get-WinEvent -LogName Application -MaxEvents 1).Id 
+
+	- Origen o proveedor <---- propiedad .ProviderName
+			ej: (Get-WinEvent -LogName Application -MaxEvents 1).ProviderName
+
+	- Fecha y hora de registro <---- propiedad .TimeCreated
+			ej: (Get-WinEvent -LogName Application -MaxEvents 1).TimeCreated
+
+	- Nivel de serveridad <--------- propiedad Level (numerico) o .LevelDisplayName (string)
+			ej: (Get-WinEvent -LogName Application -MaxEvents 1).LevelDisplayName
+
+--------------------------------------------------------------------------------------------------------------------------------------
+practica: Me gustaria recuperar del log Aplicacion los mensajes de tipo "Error" q se hayan producido en la ultima semana
+
+1º forma) consulta XPath: <=== la mas rapida y eficiente
+
+	Get-WinEvent -LogName Application -FilterXPath "*[System[(Level=2) and TimeCreated[timediff(@SystemTime) <= 604800000]]]"
+
+
+
+2º forma) pasar a Get-WinEvent un HASH-TABLE con lo filtros q quieres hacer:
+
+	Get-WinEvent -FilterHashTable @{ 
+					LogName = 'Application'
+					Level = 2
+					StartTime = (Get-Date) - (New-TimeSpan -Days 7)
+					}	
+
+
+
+3º forma) con Where-Object haces el filtro:
+	
+	$intervaloTiempo=(Get-Date) - (New-TimeSpan -Days 7)
+	Get-WinEvent -LogName Application | Where-Object { $_.Level -eq 2 -and $_.TimeCreated -gt $intervaloTiempo }
+
+
+
+ puedes usar Group-Object -Property nombre_prop_agrupamiento
+ para agrupar eventos por una det.propiedad (estilo GROUP BY de sql). La opcion -NoElement no muestra los subgrupos que ha hecho, solo
+ muestra contador:
+
+	Get-WinEvent -LogName Application -FilterXPath "*[System[(Level=2) and TimeCreated[timediff(@SystemTime) <= 604800000]]]"
+		| Group-Object -property ProviderName -NoElement
+
+
+----------------------------------------------------------------------------
+la otra forma de recuperar eventos de un log es usando comando:
+
+	Get-EventLog -LogName nombre_consumidor [-opciones] <=== cada evento q te muestra es un objeto de la clase:
+						-----------		System.Diagnostics.EventLogEntry
+						   |
+						   \---> opciones filtrado de eventos (no tan potentes como las de get-winevent)
+
+							 -Newest numero <---- selecciona los n-eventos mas recientes
+							 -After fecha <------- selecciona eventos registrados despues de esta fecha
+							 -Before fecha <------ selecciona eventos registrados antes de esta fecha
+							
+
+=================================================================================
+practica: script q recupere inicios de sesion (Logon) y cierres sesion (Logoff) en una det.fecha a pedir y de un determinado usuario
+	 en el consumidor o logname: SECURITY
+
+	fecha inicio: ....
+	fecha fin: .....
+	eventos LOGON o LOGOFF: .... <--- eventos Id Logon: 4624   Logoff: 4647
+	nombre usuario: ....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

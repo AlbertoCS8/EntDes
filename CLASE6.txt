@@ -1,0 +1,191 @@
+SELECT APENOM
+  FROM ALUMNOS
+  WHERE DNI = (SELECT DNI 
+               FROM NOTAS
+               WHERE NOTA = 7
+               );
+               
+SELECT APENOM
+  FROM ALUMNOS
+  WHERE DNI = (SELECT DNI 
+               FROM NOTAS
+               WHERE NOTA = 6
+               );
+               
+               
+SELECT APENOM
+  FROM ALUMNOS
+  WHERE DNI IN (SELECT DNI 
+               FROM NOTAS
+               WHERE NOTA = 6
+               );         
+
+               
+SELECT APENOM
+  FROM ALUMNOS
+  WHERE DNI IN  ('12344345','4448242');
+               );              
+               
+               
+ SELECT APENOM , NOTA
+  FROM ALUMNOS AL
+   INNER JOIN NOTAS N
+    ON AL.DNI = N.DNI
+    WHERE AL.DNI IN (SELECT DNI 
+                     FROM NOTAS
+                     WHERE NOTA = 6
+                     );     
+                         
+   SELECT APENOM , NOTA
+  FROM ALUMNOS 
+   NATURAL JOIN NOTAS 
+    WHERE DNI IN (SELECT DNI 
+                     FROM NOTAS
+                     WHERE NOTA = 6
+                     );       
+    
+    
+      SELECT  DISTINCT APENOM , NOTA
+  FROM ALUMNOS 
+   NATURAL JOIN NOTAS 
+    WHERE DNI IN (SELECT DNI 
+                     FROM NOTAS
+                     WHERE NOTA = 6
+                     )
+              AND NOTA=6;          
+              
+ 
+SELECT APELLIDO
+  FROM EMPLE
+  WHERE OFICIO = (SELECT OFICIO
+                  FROM EMPLE
+                  WHERE APELLIDO='GIL')
+           AND
+        SALARIO = (SELECT SALARIO
+                   FROM EMPLE
+                   WHERE APELLIDO='GIL');
+                   
+                   
+ SELECT APELLIDO
+  FROM EMPLE
+  WHERE (SALARIO,OFICIO) = (SELECT SALARIO,OFICIO  
+                            FROM EMPLE
+                            WHERE APELLIDO='GIL'
+                            );
+   
+                                            
+SELECT * FROM NOTAS_ALUMNOS;   
+
+SELECT NOMBRE_ALUMNO, NOTA2, NOTA3
+  FROM NOTAS_ALUMNOS
+  WHERE (NOTA2,NOTA3) = (SELECT NOTA2,NOTA3
+                         FROM NOTAS_ALUMNOS
+                         WHERE NOMBRE_ALUMNO = 'Casas Martínez, Manuel');
+                                      
+ 
+
+
+SELECT APELLIDO, LOC , OFICIO
+ FROM EMPLE E
+  INNER JOIN DEPART D
+  ON E.DEPT_NO = D.DEPT_NO
+   WHERE (OFICIO,E.DEPT_NO) = ( SELECT OFICIO, DEPT_NO
+                              FROM EMPLE
+                              WHERE APELLIDO='TOVAR'
+                              );
+                              
+
+SELECT APELLIDO ,DEPT_NO
+ FROM EMPLE
+ WHERE DEPT_NO = (SELECT DEPT_NO
+                  FROM DEPART
+                  WHERE LOC = 'MADRID'
+                  )
+       OR
+       DEPT_NO = (SELECT DEPT_NO
+                  FROM DEPART
+                  WHERE LOC = 'BARCELONA'
+                  );
+                  
+                  
+                               
+
+SELECT APELLIDO ,DEPT_NO ,LOC
+ FROM EMPLE 
+  NATURAL JOIN DEPART
+ WHERE DEPT_NO = (SELECT DEPT_NO
+                  FROM DEPART
+                  WHERE LOC = 'MADRID'
+                  )
+       OR
+       DEPT_NO = (SELECT DEPT_NO
+                  FROM DEPART
+                  WHERE LOC = 'BARCELONA'
+                  );     
+                  
+                  
+                                
+
+SELECT APELLIDO ,DEPT_NO 
+ FROM EMPLE
+ WHERE DEPT_NO  IN ( SELECT DEPT_NO
+                      FROM DEPART
+                      WHERE LOC IN ('MADRID','BARCELONA')
+                    );
+                    
+                    
+                    
+  SELECT NOMBRE
+   FROM ASIGNATURAS
+   WHERE COD IN ( SELECT COD
+                  FROM NOTAS
+                  WHERE NOTA > 8
+                 );
+   
+   
+   SELECT NOMBRE , NOTA
+   FROM ASIGNATURAS
+    NATURAL JOIN NOTAS
+    WHERE COD IN ( SELECT COD
+                  FROM NOTAS
+                  WHERE NOTA > 8
+                 );                                                     
+    
+      
+    
+    
+    
+  SELECT APELLIDO, OFICIO , DEPT_NO
+  FROM EMPLE
+  WHERE DEPT_NO = 20
+        AND
+        OFICIO IN ( SELECT OFICIO
+                    FROM EMPLE
+                    WHERE DEPT_NO = (SELECT DEPT_NO
+                                     FROM DEPART
+                                     WHERE DNOMBRE = 'VENTAS'
+                                    )
+                   );
+     
+
+SELECT APENOM
+ FROM ALUMNOS
+ WHERE DNI IN (SELECT DNI
+               FROM NOTAS
+               WHERE NOTA IN (SELECT NOTA
+                              FROM NOTAS
+                              WHERE COD = (SELECT COD
+                                           FROM ASIGNATURAS
+                                           WHERE NOMBRE = 'FOL'
+                                           )
+                             )
+              );
+              
+              
+                                             
+                
+                                                             
+
+                              
+                              
+                                                                                  

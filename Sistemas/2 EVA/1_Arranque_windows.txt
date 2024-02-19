@@ -1,0 +1,91 @@
+----------------------------------------------
+  proceso de arranque de windows 
+----------------------------------------------
+cuando instalas el sistema op. en una det.particion del disco (o disco completo):
+
+ -----------------------------------------------------------------------
+  1º sector    | |							| |				 | |
+   disco:      | |windows-server-2016  | |windows-11   | |  windows-xp
+  bootmgr.efi  | |							| |				 | |
+ ------------------------------------------------------------------------
+				    |								 |					  |
+			   	winload.efi					winload.efi		  winload.exe			 
+
+bootmgr.efi = gestor de arranque de windows (problema de arranque:  bootmgr.efi missing or corrupt)
+					consulta un almacen de datos de arranque (BCD-boot center data) donde almacena:
+
+						- particiones del disco, y en que particiones del mismo hay sistemas windows q puede
+							arrancar
+						- el sistema windows q quieres arrancar por defecto (default boot system)
+
+
+					si este almacen esta dañado (corrupto) se presenta un Blue-Screen-Of-Death (BSD) como mecanismo
+				   de proteccion de daños, y el gestor de arranque no podria seguir con el proceso de arranque del
+					sistema (problema de arranque: BCD corrupt <---- se recupera asi:
+
+
+
+
+					conjuntos de comandos powershell para admin BCD:  
+							
+								Get-Command -Module Microsoft.Windows.Bcd.Cmdlets
+
+					para obtener la info del BCD:
+
+								Get-BcdStore
+
+			Cuando seleccionas un sistema windows a arrancar, bootmgr.efi carga en memoria el gestor de arranque
+			q se encuentra en el primer sector de la particion donde se encuentra el sistema:   winload.efi(.exe)
+			(problema de arranque:  winload.efi missing or corrupt) es el encargado de arrancar el sistm.windows
+			lo hace en dos fases:
+
+
+				KERNEL-MODE(ring 0): winload lo 1º q hace es cargar en memoria dos fich.fundamentales:
+
+					- el kernel del windows:  ntoskrnl.exe (problema arranque: ntoskrnl.exe missing or corrupt)
+					- una dll para comunicar el hw con el kernel y asi poder cargar despues drivers:  hal.dll
+						(problema arranque: hal.dll missing or corrupt)
+	
+
+				si todo ok, winload.efi deja el proceso de arranque en manos del kernel, y se encarga de arrancar
+				sus subsistemas:
+
+						- MEMORY-MANAGER: gestionar memoria RAM y memoria virtual
+						- PROCESS-MANAGER: gestion de procesos e hilos <---- genera proceso principal (Idle)
+						- OBJECT-MANAGER: gestion de objetos del sistema
+						- SECURE-REFERENCE-MONITOR: gestion tokens de acceso/autorizacion a objetos del sistema
+															 (genera un usuario para el kernel: SYSTEM o LOCAL-SYSTEM-ACCOUNT)
+						- CONFIGURATION-MANAGER: modulo de almacenamiento de datos del kernel (REGISTRO)
+
+				una vez cargados los susbsistemas e inicializados, el PROCESS-MANAGER atraves del usuario SYSTEM carga
+				en memoria:		SMSS.exe <----- sesion manager, encargado de lanzar 2º fase arranque, el user-mode
+														(problema de arranque:  SMSS.exe missing or corrupt)
+
+
+
+				USER-MODE(ring 3): fase de conf. del entorno del usuario
+				el SMSS.exe (sesion manager) se encarga de:
+
+					 - cargar el modulo de gestion de servicios para el usuario: SCM (SERVICE-CONTROL-MANAGER)
+						es un fichero:  SERVICES.exe
+					 - carga en memoria el LOCAL-SECURITY-AUTHORITY-SYSTEM fichero LSASS.exe, encargado de hacer el
+					proceso de recogida de credenciales del usuario y contrstarlas contra backend:
+
+
+							usuario 				   lsass.exe			backend
+								login+password -------------->	[SAM]			[AD]
+																			registro   servidor-ldap
+																			local
+
+					- se carga en memoria: WININIT.exe
+							se cargan variables de entorno del usuario, servicios del usuario...si todo ok
+						   lanza WINLOGON.exe <--- formulario inicio de sesion
+
+
+						si credenciales oK y lsass.exe te da el ok, se genera un token-acceso para el usuario
+						y lanza shell-grafica (definida en el registro):  EXPLORER.exe
+
+
+
+
+

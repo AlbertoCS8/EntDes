@@ -1,0 +1,23 @@
+#!/bin/bash
+read -p "introduce el nombre del servicio" serv
+estado=`systemctl is-enabled $serv.service` 
+test=grep running systemctl status $serv.service
+#isrunning `systemctl list-units --type=service | grep "$serv.service" | awk '{print $4}'`
+$test
+if [ "$estado" == "enabled" &&]
+	then
+	read -p "quieres pararlo?" resp1
+		if [ "$resp1" == "s" -o $resp1 == "S" ]
+			then
+			systemctl disable $serv1.service
+			exit
+		fi
+	else
+	read -p "quieres arrancarlo?" resp2
+		if [ "$resp2" == "s" -o $resp2 == "S" ]
+			then
+			systemctl enable $serv1.service
+			exit
+		fi
+fi
+

@@ -1,0 +1,659 @@
+alumnot@a37pc04:~$                                                                       
+alumnot@a37pc04:~$ echo "hoa24242" | grep -e "^[ a -z A -Z]^"
+alumnot@a37pc04:~$ cd /lib/systemd/system
+alumnot@a37pc04:/lib/systemd/system$ ls
+ accounts-daemon.service
+ acpid.path
+ acpid.service
+ acpid.socket
+ alsa-restore.service
+ alsa-state.service
+ alsa-utils.service
+ anacron.service
+ anacron.timer
+ apparmor.service
+ apport-autoreport.path
+ apport-autoreport.service
+ apport-forward@.service
+ apport-forward.socket
+ apt-daily.service
+ apt-daily.timer
+ apt-daily-upgrade.service
+ apt-daily-upgrade.timer
+ autovt@.service
+ avahi-daemon.service
+ avahi-daemon.socket
+ basic.target
+ blockdev@.target
+ bluetooth.service
+ bluetooth.target
+ bolt.service
+ boot-complete.target
+ brltty.service
+ brltty-udev.service
+ clean-mount-point@.service
+ colord.service
+ configure-printer@.service
+ console-getty.service
+ console-setup.service
+ container-getty@.service
+ cron.service
+ cryptdisks-early.service
+ cryptdisks.service
+ cryptsetup-pre.target
+ cryptsetup.target
+ ctrl-alt-del.target
+ cups-browsed.service
+ cups.path
+ cups.service
+ cups.socket
+ dbus-org.freedesktop.hostname1.service
+ dbus-org.freedesktop.locale1.service
+ dbus-org.freedesktop.login1.service
+ dbus-org.freedesktop.timedate1.service
+ dbus.service
+ dbus.socket
+ debug-shell.service
+ default.target
+ dev-hugepages.mount
+ dev-mqueue.mount
+ dmesg.service
+ e2scrub_all.service
+ e2scrub_all.timer
+ e2scrub_fail@.service
+ e2scrub_reap.service
+ e2scrub@.service
+ emergency.service
+ emergency.target
+ epoptes-client.service
+ epoptes.service
+ exit.target
+ final.target
+ fprintd.service
+ friendly-recovery.service
+ friendly-recovery.target
+ fstrim.service
+ fstrim.timer
+ fwupd-offline-update.service
+ fwupd-refresh.service
+ fwupd-refresh.timer
+ fwupd.service
+ gdm3.service
+ gdm.service
+ geoclue.service
+ getty-pre.target
+ getty@.service
+ getty-static.service
+ getty.target
+ getty.target.wants
+ gpu-manager.service
+ graphical.target
+ graphical.target.wants
+ grub-initrd-fallback.service
+ halt.target
+ halt.target.wants
+ hibernate.target
+ hwclock.service
+ hybrid-sleep.target
+ iio-sensor-proxy.service
+ initrd-cleanup.service
+ initrd-fs.target
+ initrd-parse-etc.service
+ initrd-root-device.target
+ initrd-root-fs.target
+ initrd-switch-root.service
+ initrd-switch-root.target
+ initrd-switch-root.target.wants
+ initrd.target
+ initrd-udevadm-cleanup-db.service
+ ippusbxd@.service
+ irqbalance.service
+ kerneloops.service
+ kexec.target
+ kexec.target.wants
+ keyboard-setup.service
+ kmod.service
+ kmod-static-nodes.service
+ local-fs-pre.target
+ local-fs.target
+ local-fs.target.wants
+ logrotate.service
+ logrotate.timer
+ machine.slice
+ man-db.service
+ man-db.timer
+ ModemManager.service
+ modprobe@.service
+ motd-news.service
+ motd-news.timer
+ multi-user.target
+ multi-user.target.wants
+ networkd-dispatcher.service
+ NetworkManager-dispatcher.service
+ network-manager.service
+ NetworkManager.service
+ NetworkManager-wait-online.service
+ network-online.target
+ network-pre.target
+ network.target
+ nmbd.service
+ nss-lookup.target
+ nss-user-lookup.target
+ ondemand.service
+ openvpn-client@.service
+ openvpn-server@.service
+ openvpn.service
+ openvpn@.service
+ packagekit-offline-update.service
+ packagekit.service
+ paths.target
+ plymouth-halt.service
+ plymouth-kexec.service
+ plymouth-log.service
+ plymouth-poweroff.service
+ plymouth-quit.service
+ plymouth-quit-wait.service
+ plymouth-read-write.service
+ plymouth-reboot.service
+ plymouth.service
+ plymouth-start.service
+ plymouth-switch-root.service
+ polkit.service
+ poweroff.target
+ poweroff.target.wants
+ pppd-dns.service
+ printer.target
+ procps.service
+ proc-sys-fs-binfmt_misc.automount
+ proc-sys-fs-binfmt_misc.mount
+ pulseaudio-enable-autospawn.service
+ quotaon.service
+ quotarpc.service
+ quota.service
+ rc-local.service
+ rc-local.service.d
+ rc.service
+ rcS.service
+ reboot.target
+ reboot.target.wants
+ remote-cryptsetup.target
+ remote-fs-pre.target
+ remote-fs.target
+ rescue.service
+ rescue-ssh.target
+ rescue.target
+ rescue.target.wants
+ rpcbind.target
+ rsync.service
+ rsyslog.service
+ rtkit-daemon.service
+ runlevel0.target
+ runlevel1.target
+ runlevel1.target.wants
+ runlevel2.target
+ runlevel2.target.wants
+ runlevel3.target
+ runlevel3.target.wants
+ runlevel4.target
+ runlevel4.target.wants
+ runlevel5.target
+ runlevel5.target.wants
+ runlevel6.target
+ samba-ad-dc.service
+ saned.service
+ saned@.service
+ saned.socket
+ screen-cleanup.service
+ secureboot-db.service
+ serial-getty@.service
+ setvtrgb.service
+ shutdown.target
+ sigpwr.target
+ sleep.target
+ slices.target
+ smartcard.target
+ smbd.service
+ snapd.aa-prompt-listener.service
+ snapd.apparmor.service
+ snapd.autoimport.service
+ snapd.core-fixup.service
+ snapd.failure.service
+ snapd.mounts-pre.target
+ snapd.mounts.target
+ snapd.recovery-chooser-trigger.service
+ snapd.seeded.service
+ snapd.service
+ snapd.snap-repair.service
+ snapd.snap-repair.timer
+ snapd.socket
+ snapd.system-shutdown.service
+ sockets.target
+ sockets.target.wants
+ sound.target
+ sound.target.wants
+ speech-dispatcherd.service
+ speech-dispatcher.service
+ spice-vdagentd.service
+ spice-vdagentd.socket
+ spice-vdagent.service
+ ssh.service
+ ssh@.service
+ ssh.socket
+ sudo.service
+ suspend.target
+ suspend-then-hibernate.target
+ swap.target
+ switcheroo-control.service
+ sys-fs-fuse-connections.mount
+ sysinit.target
+ sysinit.target.wants
+ sys-kernel-config.mount
+ sys-kernel-debug.mount
+ sys-kernel-tracing.mount
+ syslog.socket
+ systemd-ask-password-console.path
+ systemd-ask-password-console.service
+ systemd-ask-password-plymouth.path
+ systemd-ask-password-plymouth.service
+ systemd-ask-password-wall.path
+ systemd-ask-password-wall.service
+ systemd-backlight@.service
+ systemd-binfmt.service
+ systemd-bless-boot.service
+ systemd-boot-check-no-failures.service
+ systemd-boot-system-token.service
+ systemd-exit.service
+ systemd-fsckd.service
+ systemd-fsckd.socket
+ systemd-fsck-root.service
+ systemd-fsck@.service
+ systemd-halt.service
+ systemd-hibernate-resume@.service
+ systemd-hibernate.service
+ systemd-hostnamed.service
+ systemd-hwdb-update.service
+ systemd-hybrid-sleep.service
+ systemd-initctl.service
+ systemd-initctl.socket
+ systemd-journald-audit.socket
+ systemd-journald-dev-log.socket
+ systemd-journald.service
+ systemd-journald@.service
+ systemd-journald.socket
+ systemd-journald@.socket
+ systemd-journald-varlink@.socket
+ systemd-journal-flush.service
+ systemd-kexec.service
+ systemd-localed.service
+ systemd-logind.service
+ systemd-machine-id-commit.service
+ systemd-modules-load.service
+ systemd-networkd.service
+ systemd-networkd.socket
+ systemd-networkd-wait-online.service
+ systemd-network-generator.service
+ systemd-poweroff.service
+ systemd-pstore.service
+ systemd-quotacheck.service
+ systemd-random-seed.service
+ systemd-reboot.service
+ systemd-remount-fs.service
+ systemd-resolved.service
+ systemd-rfkill.service
+ systemd-rfkill.socket
+ systemd-suspend.service
+ systemd-suspend-then-hibernate.service
+ systemd-sysctl.service
+ systemd-sysusers.service
+ systemd-timedated.service
+ systemd-timesyncd.service
+ systemd-time-wait-sync.service
+ systemd-tmpfiles-clean.service
+ systemd-tmpfiles-clean.timer
+ systemd-tmpfiles-setup-dev.service
+ systemd-tmpfiles-setup.service
+ systemd-udevd-control.socket
+ systemd-udevd-kernel.socket
+ systemd-udevd.service
+ systemd-udev-settle.service
+ systemd-udev-trigger.service
+ systemd-update-utmp-runlevel.service
+ systemd-update-utmp.service
+ systemd-user-sessions.service
+ systemd-volatile-root.service
+'system-systemd\x2dcryptsetup.slice'
+ system-update-cleanup.service
+ system-update-pre.target
+ system-update.target
+ system-update.target.wants
+ thermald.service
+ timers.target
+ timers.target.wants
+ time-set.target
+ time-sync.target
+ ua-messaging.service
+ ua-messaging.timer
+ ua-reboot-cmds.service
+ udev.service
+ udisks2.service
+ ufw.service
+ umount.target
+ unattended-upgrades.service
+ upower.service
+ usb_modeswitch@.service
+ usbmuxd.service
+ user-runtime-dir@.service
+ user@.service
+ user@.service.d
+ user.slice
+ user-.slice.d
+ uuidd.service
+ uuidd.socket
+ vboxautostart-service.service
+ vboxballoonctrl-service.service
+ vboxdrv.service
+ vboxweb-service.service
+ wacom-inputattach@.service
+ whoopsie.service
+ winbind.service
+ wpa_supplicant-nl80211@.service
+ wpa_supplicant.service
+ wpa_supplicant@.service
+ wpa_supplicant-wired@.service
+ x11-common.service
+alumnot@a37pc04:/lib/systemd/system$ ls *.service
+accounts-daemon.service                 rtkit-daemon.service
+acpid.service                           samba-ad-dc.service
+alsa-restore.service                    saned.service
+alsa-state.service                      saned@.service
+alsa-utils.service                      screen-cleanup.service
+anacron.service                         secureboot-db.service
+apparmor.service                        serial-getty@.service
+apport-autoreport.service               setvtrgb.service
+apport-forward@.service                 smbd.service
+apt-daily.service                       snapd.aa-prompt-listener.service
+apt-daily-upgrade.service               snapd.apparmor.service
+autovt@.service                         snapd.autoimport.service
+avahi-daemon.service                    snapd.core-fixup.service
+bluetooth.service                       snapd.failure.service
+bolt.service                            snapd.recovery-chooser-trigger.service
+brltty.service                          snapd.seeded.service
+brltty-udev.service                     snapd.service
+clean-mount-point@.service              snapd.snap-repair.service
+colord.service                          snapd.system-shutdown.service
+configure-printer@.service              speech-dispatcherd.service
+console-getty.service                   speech-dispatcher.service
+console-setup.service                   spice-vdagentd.service
+container-getty@.service                spice-vdagent.service
+cron.service                            ssh.service
+cryptdisks-early.service                ssh@.service
+cryptdisks.service                      sudo.service
+cups-browsed.service                    switcheroo-control.service
+cups.service                            systemd-ask-password-console.service
+dbus-org.freedesktop.hostname1.service  systemd-ask-password-plymouth.service
+dbus-org.freedesktop.locale1.service    systemd-ask-password-wall.service
+dbus-org.freedesktop.login1.service     systemd-backlight@.service
+dbus-org.freedesktop.timedate1.service  systemd-binfmt.service
+dbus.service                            systemd-bless-boot.service
+debug-shell.service                     systemd-boot-check-no-failures.service
+dmesg.service                           systemd-boot-system-token.service
+e2scrub_all.service                     systemd-exit.service
+e2scrub_fail@.service                   systemd-fsckd.service
+e2scrub_reap.service                    systemd-fsck-root.service
+e2scrub@.service                        systemd-fsck@.service
+emergency.service                       systemd-halt.service
+epoptes-client.service                  systemd-hibernate-resume@.service
+epoptes.service                         systemd-hibernate.service
+fprintd.service                         systemd-hostnamed.service
+friendly-recovery.service               systemd-hwdb-update.service
+fstrim.service                          systemd-hybrid-sleep.service
+fwupd-offline-update.service            systemd-initctl.service
+fwupd-refresh.service                   systemd-journald.service
+fwupd.service                           systemd-journald@.service
+gdm3.service                            systemd-journal-flush.service
+gdm.service                             systemd-kexec.service
+geoclue.service                         systemd-localed.service
+getty@.service                          systemd-logind.service
+getty-static.service                    systemd-machine-id-commit.service
+gpu-manager.service                     systemd-modules-load.service
+grub-initrd-fallback.service            systemd-networkd.service
+hwclock.service                         systemd-networkd-wait-online.service
+iio-sensor-proxy.service                systemd-network-generator.service
+initrd-cleanup.service                  systemd-poweroff.service
+initrd-parse-etc.service                systemd-pstore.service
+initrd-switch-root.service              systemd-quotacheck.service
+initrd-udevadm-cleanup-db.service       systemd-random-seed.service
+ippusbxd@.service                       systemd-reboot.service
+irqbalance.service                      systemd-remount-fs.service
+kerneloops.service                      systemd-resolved.service
+keyboard-setup.service                  systemd-rfkill.service
+kmod.service                            systemd-suspend.service
+kmod-static-nodes.service               systemd-suspend-then-hibernate.service
+logrotate.service                       systemd-sysctl.service
+man-db.service                          systemd-sysusers.service
+ModemManager.service                    systemd-timedated.service
+modprobe@.service                       systemd-timesyncd.service
+motd-news.service                       systemd-time-wait-sync.service
+networkd-dispatcher.service             systemd-tmpfiles-clean.service
+NetworkManager-dispatcher.service       systemd-tmpfiles-setup-dev.service
+network-manager.service                 systemd-tmpfiles-setup.service
+NetworkManager.service                  systemd-udevd.service
+NetworkManager-wait-online.service      systemd-udev-settle.service
+nmbd.service                            systemd-udev-trigger.service
+ondemand.service                        systemd-update-utmp-runlevel.service
+openvpn-client@.service                 systemd-update-utmp.service
+openvpn-server@.service                 systemd-user-sessions.service
+openvpn.service                         systemd-volatile-root.service
+openvpn@.service                        system-update-cleanup.service
+packagekit-offline-update.service       thermald.service
+packagekit.service                      ua-messaging.service
+plymouth-halt.service                   ua-reboot-cmds.service
+plymouth-kexec.service                  udev.service
+plymouth-log.service                    udisks2.service
+plymouth-poweroff.service               ufw.service
+plymouth-quit.service                   unattended-upgrades.service
+plymouth-quit-wait.service              upower.service
+plymouth-read-write.service             usb_modeswitch@.service
+plymouth-reboot.service                 usbmuxd.service
+plymouth.service                        user-runtime-dir@.service
+plymouth-start.service                  user@.service
+plymouth-switch-root.service            uuidd.service
+polkit.service                          vboxautostart-service.service
+pppd-dns.service                        vboxballoonctrl-service.service
+procps.service                          vboxdrv.service
+pulseaudio-enable-autospawn.service     vboxweb-service.service
+quotaon.service                         wacom-inputattach@.service
+quotarpc.service                        whoopsie.service
+quota.service                           winbind.service
+rc-local.service                        wpa_supplicant-nl80211@.service
+rc.service                              wpa_supplicant.service
+rcS.service                             wpa_supplicant@.service
+rescue.service                          wpa_supplicant-wired@.service
+rsync.service                           x11-common.service
+rsyslog.service
+alumnot@a37pc04:/lib/systemd/system$ cd /lib/systemd/user
+alumnot@a37pc04:/lib/systemd/user$ ls *.service
+at-spi-dbus-bus.service                  gsd-smartcard.service
+colord-session.service                   gsd-sound.service
+dbus-org.bluez.obex.service              gsd-usb-protection.service
+dbus.service                             gsd-wacom.service
+dirmngr.service                          gsd-wwan.service
+evolution-addressbook-factory.service    gsd-xsettings.service
+evolution-calendar-factory.service       gvfs-afc-volume-monitor.service
+evolution-source-registry.service        gvfs-daemon.service
+evolution-user-prompter.service          gvfs-goa-volume-monitor.service
+gamemoded.service                        gvfs-gphoto2-volume-monitor.service
+glib-pacrunner.service                   gvfs-metadata.service
+gnome-initial-setup-copy-worker.service  gvfs-mtp-volume-monitor.service
+gnome-initial-setup-first-login.service  gvfs-udisks2-volume-monitor.service
+gnome-initial-setup.service              obex.service
+gnome-keyring.service                    org.gnome.Evince.service
+gnome-keyring-ssh.service                pk-debconf-helper.service
+gnome-session-failed.service             pulseaudio.service
+gnome-session-manager@.service           rygel.service
+gnome-session-monitor.service            session-migration.service
+gnome-session-restart-dbus.service       snapd.aa-prompt-ui.service
+gnome-session.service                    snapd.session-agent.service
+gnome-session-signal-init.service        ssh-agent.service
+gnome-shell-disable-extensions.service   systemd-exit.service
+gnome-shell-wayland.service              systemd-tmpfiles-clean.service
+gnome-shell-x11.service                  systemd-tmpfiles-setup.service
+gnome-terminal-server.service            tracker-extract.service
+gnome-welcome-tour.service               tracker-miner-fs.service
+gpg-agent.service                        tracker-store.service
+gsd-a11y-settings.service                tracker-writeback.service
+gsd-color.service                        ubuntu-report.service
+gsd-datetime.service                     unicast-local-avahi.service
+gsd-housekeeping.service                 update-notifier-crash.service
+gsd-keyboard.service                     update-notifier-livepatch.service
+gsd-media-keys.service                   update-notifier-release.service
+gsd-power.service                        vino-server.service
+gsd-print-notifications.service          xdg-desktop-portal-gtk.service
+gsd-rfkill.service                       xdg-desktop-portal.service
+gsd-screensaver-proxy.service            xdg-document-portal.service
+gsd-sharing.service                      xdg-permission-store.service
+alumnot@a37pc04:/lib/systemd/user$ 
+alumnot@a37pc04:/lib/systemd/user$ systemctl cat cron.service
+# /lib/systemd/system/cron.service
+[Unit]
+Description=Regular background program processing daemon
+Documentation=man:cron(8)
+After=remote-fs.target nss-user-lookup.target
+
+[Service]
+EnvironmentFile=-/etc/default/cron
+ExecStart=/usr/sbin/cron -f $EXTRA_OPTS
+IgnoreSIGPIPE=false
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+alumnot@a37pc04:/lib/systemd/user$ man cron
+alumnot@a37pc04:/lib/systemd/user$ systemctl status cron.service
+● cron.service - Regular background program processing daemon
+     Loaded: loaded (/lib/systemd/system/cron.service; enabled; vendor preset: >
+     Active: active (running) since Fri 2023-09-22 16:06:09 CEST; 2h 10min ago
+       Docs: man:cron(8)
+   Main PID: 842 (cron)
+      Tasks: 1 (limit: 18913)
+     Memory: 484.0K
+     CGroup: /system.slice/cron.service
+             └─842 /usr/sbin/cron -f
+
+Warning: some journal files were not opened due to insufficient permissions.
+alumnot@a37pc04:/lib/systemd/user$ man cron
+alumnot@a37pc04:/lib/systemd/user$ cat /etc/default/cron
+# This file has been deprecated. Please add custom options for cron using
+# $ systemctl edit cron.service
+# or
+# $ systemctl edit --full cron.service
+alumnot@a37pc04:/lib/systemd/user$ 
+alumnot@a37pc04:/lib/systemd/user$ WantedBy=multi-user.target
+alumnot@a37pc04:/lib/systemd/user$ systemctl list-units
+  UNIT                                                                         >
+  proc-sys-fs-binfmt_misc.automount                                            >
+  dev-fuse.device                                                              >
+  dev-loop31.device                                                            >
+  sys-devices-pci0000:00-0000:00:1b.4-0000:02:00.0-nvme-nvme0-nvme0n1-nvme0n1p1>
+  sys-devices-pci0000:00-0000:00:1b.4-0000:02:00.0-nvme-nvme0-nvme0n1-nvme0n1p2>
+  sys-devices-pci0000:00-0000:00:1b.4-0000:02:00.0-nvme-nvme0-nvme0n1-nvme0n1p3>
+  sys-devices-pci0000:00-0000:00:1b.4-0000:02:00.0-nvme-nvme0-nvme0n1-nvme0n1p4>
+  sys-devices-pci0000:00-0000:00:1b.4-0000:02:00.0-nvme-nvme0-nvme0n1.device   >
+  sys-devices-pci0000:00-0000:00:1f.3-sound-card0.device                       >
+  sys-devices-pci0000:00-0000:00:1f.6-net-eno1.device                          >
+  sys-devices-platform-serial8250-tty-ttyS1.device                             >
+  sys-devices-platform-serial8250-tty-ttyS10.device                            >
+  sys-devices-platform-serial8250-tty-ttyS11.device                            >
+  sys-devices-platform-serial8250-tty-ttyS12.device                            >
+  sys-devices-platform-serial8250-tty-ttyS13.device                            >
+  sys-devices-platform-serial8250-tty-ttyS14.device                            >
+  sys-devices-platform-serial8250-tty-ttyS15.device                            >
+  sys-devices-platform-serial8250-tty-ttyS16.device                            >
+  sys-devices-platform-serial8250-tty-ttyS17.device                            >
+  sys-devices-platform-serial8250-tty-ttyS18.device                            >
+  sys-devices-platform-serial8250-tty-ttyS19.device                            >
+  sys-devices-platform-serial8250-tty-ttyS2.device                             >
+lines 1-23
+lumnot@a37pc04:/lib/systemd/user$ systemctl list-units --type=service
+  UNIT                                                                         >
+  accounts-daemon.service                                                      >
+  acpid.service                                                                >
+  alsa-restore.service                                                         >
+  apparmor.service                                                             >
+  apport.service                                                               >
+  avahi-daemon.service                                                         >
+  bolt.service                                                                 >
+  colord.service                                                               >
+  console-setup.service                                                        >
+  cron.service                                                                 >
+  cups-browsed.service                                                         >
+  cups.service                                                                 >
+  dbus.service                                                                 >
+  epoptes-client.service                                                       >
+  epoptes.service                                                              >
+● fwupd-refresh.service                                                        >
+  gdm.service                                                                  >
+  grub-common.service                                                          >
+  irqbalance.service                                                           >
+  kerneloops.service                                                           >
+  keyboard-setup.service                                                       >
+  kmod-static-nodes.service       
+alumnot@a37pc04:/lib/systemd/user$ systemctl cat RSYLOG
+No files found for RSYLOG.service.
+alumnot@a37pc04:/lib/systemd/user$ systemctl cat RSYLOG.service
+No files found for RSYLOG.service.
+alumnot@a37pc04:/lib/systemd/user$ cd /lib/systemd/system
+alumnot@a37pc04:/lib/systemd/system$ systemctl cat RSYLOG
+No files found for RSYLOG.service.
+alumnot@a37pc04:/lib/systemd/system$ cd /lib/systemd/user
+alumnot@a37pc04:/lib/systemd/user$ systemctl cat RSYSLOG
+No files found for RSYSLOG.service.
+alumnot@a37pc04:/lib/systemd/user$ systemctl cat RSYSLOG.service
+No files found for RSYSLOG.service.
+alumnot@a37pc04:/lib/systemd/user$ cd /lib/systemd/system
+alumnot@a37pc04:/lib/systemd/system$ systemctl cat RSYSLOG.service
+No files found for RSYSLOG.service.
+alumnot@a37pc04:/lib/systemd/system$ systemctl list units --type=service
+Unknown operation list.
+alumnot@a37pc04:/lib/systemd/system$ systemctl cat rsyslog.service
+# /lib/systemd/system/rsyslog.service
+[Unit]
+Description=System Logging Service
+Requires=syslog.socket
+Documentation=man:rsyslogd(8)
+Documentation=https://www.rsyslog.com/doc/
+
+[Service]
+Type=notify
+ExecStart=/usr/sbin/rsyslogd -n -iNONE
+StandardOutput=null
+Restart=on-failure
+
+# Increase the default a bit in order to allow many simultaneous
+# files to be monitored, we might need a lot of fds.
+LimitNOFILE=16384
+
+[Install]
+WantedBy=multi-user.target
+Alias=syslog.service
+alumnot@a37pc04:/lib/systemd/system$ 
+
+
+systemctl status rsyslog.service
+alumnot@a37pc04:/lib/systemd/system$ systemctl status rsyslog.service
+● rsyslog.service - System Logging Service
+     Loaded: loaded (/lib/systemd/system/rsyslog.service; enabled; vendor prese>
+     Active: active (running) since Fri 2023-09-22 16:06:09 CEST; 3h 41min ago
+TriggeredBy: ● syslog.socket
+       Docs: man:rsyslogd(8)
+             https://www.rsyslog.com/doc/
+   Main PID: 858 (rsyslogd)
+      Tasks: 4 (limit: 18913)
+     Memory: 3.9M
+     CGroup: /system.slice/rsyslog.service
+             └─858 /usr/sbin/rsyslogd -n -iNONE
+
+Warning: some journal files were not opened due to insufficient permissions.
+lines 1-13/13 (END)
+

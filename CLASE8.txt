@@ -1,0 +1,176 @@
+SELECT MAX(SALARIO) AS "CANTIDAD MAYOR"
+   FROM EMPLE;
+SELECT MIN(SALARIO) AS "CANTIDAD MENOR"
+   FROM EMPLE; 
+SELECT MAX(SALARIO) AS "CANTIDAD MAYOR" , MIN(SALARIO) AS "MENOR",
+       ROUND (AVG(SALARIO),2) AS  MEDIA
+   FROM EMPLE;     
+   
+SELECT * FROM EMPLE;
+
+--CASCA
+SELECT APELLIDO,MAX(SALARIO)
+  FROM EMPLE;
+  
+SELECT APELLIDO , SALARIO
+   FROM EMPLE
+   WHERE SALARIO = ( SELECT MAX(SALARIO)
+                      FROM EMPLE
+                    );
+      
+SELECT MAX(SALARIO)
+  FROM EMPLE
+  WHERE DEPT_NO = 30;  
+  
+  --MAL 
+ SELECT APELLIDO,SALARIO,DEPT_NO
+    FROM EMPLE
+    WHERE SALARIO = (SELECT MAX(SALARIO)
+                     FROM EMPLE
+                     WHERE DEPT_NO= 30
+                     );
+                     
+ INSERT INTO EMPLE(EMP_NO,APELLIDO,SALARIO,DEPT_NO)
+  VALUES (3333,'TRESES',370500,20);                     
+                     
+  SELECT APELLIDO,SALARIO,DEPT_NO
+    FROM EMPLE
+    WHERE SALARIO = (SELECT MAX(SALARIO)
+                     FROM EMPLE
+                     WHERE DEPT_NO= 30
+                     )
+          AND
+          DEPT_NO=30;     
+          
+          
+ SELECT LOC
+   FROM DEPART
+   WHERE DEPT_NO IN (SELECT DEPT_NO
+                    FROM EMPLE
+                    WHERE SALARIO = (SELECT MAX(SALARIO)
+                                     FROM EMPLE
+                                     )
+                    );           
+           
+            
+SELECT APELLIDO, DNOMBRE
+   FROM EMPLE
+   NATURAL JOIN DEPART
+    WHERE SALARIO = ( SELECT MAX(SALARIO)
+                       FROM EMPLE
+                    );
+                    
+ SELECT APELLIDO, DNOMBRE
+   FROM EMPLE
+   INNER JOIN DEPART
+   ON EMPLE.DEPT_NO = DEPART.DEPT_NO
+    WHERE SALARIO = ( SELECT MAX(SALARIO)
+                       FROM EMPLE
+                    );                                        
+  SELECT COUNT(*)
+    FROM EMPLE
+    WHERE SALARIO >= (SELECT AVG(SALARIO)
+                      FROM EMPLE
+                      );
+    
+SELECT * FROM EMPLE;   
+DELETE FROM EMPLE WHERE EMP_NO= 3333;
+            
+
+SELECT LOC
+  FROM DEPART
+  WHERE DEPT_NO = ( SELECT DEPT_NO
+                    FROM EMPLE
+                    WHERE SALARIO = (SELECT MAX(SALARIO)
+                                     FROM EMPLE
+                                     WHERE DEPT_NO = 30
+                                     )
+                          AND
+                          DEPT_NO=30
+                  );
+   
+  
+SELECT APELLIDO, LOC ,SALARIO
+  FROM EMPLE 
+   NATURAL JOIN DEPART
+    WHERE SALARIO >= ( SELECT AVG(SALARIO) * 2
+                       FROM EMPLE
+                       )
+           OR
+          SALARIO <= ( SELECT AVG(SALARIO)/2
+                       FROM EMPLE
+                      );
+ SELECT APELLIDO, LOC ,SALARIO
+  FROM EMPLE 
+   INNER JOIN DEPART
+   ON EMPLE.DEPT_NO = DEPART.DEPT_NO
+    WHERE (SALARIO >= ( SELECT AVG(SALARIO) * 2
+                       FROM EMPLE
+                       )
+           OR
+          SALARIO <= ( SELECT AVG(SALARIO)/2
+                       FROM EMPLE
+                      )
+         );         
+         
+ SELECT APELLIDO, LOC ,SALARIO
+  FROM EMPLE 
+   INNER JOIN DEPART
+   ON EMPLE.DEPT_NO = DEPART.DEPT_NO
+    AND (SALARIO >= ( SELECT AVG(SALARIO) * 2
+                       FROM EMPLE
+                       )
+           OR
+          SALARIO <= ( SELECT AVG(SALARIO)/2
+                       FROM EMPLE
+                      )
+         );   
+         
+
+SELECT APELLIDO,LOC,DNOMBRE
+  FROM EMPLE
+  NATURAL JOIN DEPART
+   WHERE SALARIO = (SELECT MAX(SALARIO)
+                    FROM EMPLE
+                    )
+           OR
+         SALARIO = (SELECT MIN(SALARIO)
+                    FROM EMPLE
+                    );
+  SELECT * FROM NOTAS_ALUMNOS;
+  
+  SELECT NOTA1,NOTA2,NOTA3, 
+                     NOMBRE_ALUMNO, 
+                     GREATEST (NVL(NOTA1,0),NVL(NOTA2,0),NVL(NOTA3,0)) AS "MAYOR NOTA",
+                     LEAST (NVL(NOTA1,0),NVL(NOTA2,0),NVL(NOTA3,0)) AS "MENOR NOTA"
+         FROM NOTAS_ALUMNOS;
+         
+       SELECT ASCII ('A') FROM DUAL;
+       SELECT CHR(65) FROM DUAL;
+       
+       SELECT CHR(66) FROM DUAL;
+       
+       SELECT CONCAT ('TU NOMBRE ES: ', APELLIDO) AS "CADENA JUNTA"
+          FROM EMPLE
+          WHERE OFICIO ='VENDEDOR';
+          
+       SELECT CONCAT (APELLIDO, CONCAT(' es ', OFICIO)) AS "TODO JUNTO"
+        FROM EMPLE;
+        
+       SELECT APELLIDO || ' es ' || OFICIO AS "TODO JUNTO"
+        FROM EMPLE;    
+        
+      SELECT SYSDATE FROM DUAL;
+      SELECT 'HOY ES: ' || TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI') FROM DUAL;
+      SELECT CONCAT (
+        
+             
+         
+                         
+   
+   
+                                                                           
+                                                                                  
+                            
+                    
+                                                           

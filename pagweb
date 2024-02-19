@@ -1,0 +1,17 @@
+#!bin/bash
+while true
+do
+{ echo -e "HTTP/1.1 200 OK\r\n"; echo -e "Content-Type:text/html\r\n;
+echo -e "Content-Length: `wc -c /tmp/index.html | awk '{print $1}'`\r\n\r\n"; cat /tmp/index.html } | nc -k -l localhost 9999
+
+done
+
+tw creas en /tmp/index.html
+<html>
+<head>
+<title>bienvenido a mi servicio web</title>
+</head>
+<body>
+<h3><strong>bienvenido</strong></h3>
+</body>
+</html>

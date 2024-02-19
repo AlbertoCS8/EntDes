@@ -1,0 +1,143 @@
+SELECT *
+ FROM EMPLE;
+
+SELECT OFICIO 
+ FROM EMPLE
+ WHERE APELLIDO = 'GIL';
+ 
+SELECT APELLIDO , OFICIO
+ FROM EMPLE
+ WHERE OFICIO = 'ANALISTA'; 
+ 
+SELECT APELLIDO
+  FROM EMPLE
+  WHERE DIR = (SELECT DIR
+               FROM EMPLE
+               WHERE APELLIDO='SALA'
+               )
+        AND
+        APELLIDO <> 'SALA';
+        
+ SELECT APELLIDO
+   FROM EMPLE
+   WHERE EMP_NO = ( SELECT DIR
+                    FROM EMPLE
+                    WHERE APELLIDO = 'REY'
+                    );
+                        
+SELECT APELLIDO, SALARIO
+   FROM EMPLE
+   WHERE OFICIO = (SELECT OFICIO
+                   FROM EMPLE
+                   WHERE APELLIDO = 'SÁNCHEZ'
+                   );
+                   
+                                          
+ SELECT APELLIDO,SALARIO
+   FROM EMPLE
+   WHERE SALARIO > (SELECT SALARIO  
+                    FROM EMPLE
+                    WHERE APELLIDO = 'CEREZO'
+                    )
+   ORDER BY  SALARIO DESC;               
+ 
+SELECT APELLIDO ,OFICIO
+  FROM EMPLE
+  WHERE OFICIO <> (SELECT OFICIO
+                   FROM EMPLE
+                   WHERE APELLIDO='GIL'
+                   );
+     -- CASCA            
+SELECT APELLIDO ,DEPT_NO ,LOC
+  FROM EMPLE
+  WHERE DEPT_NO = (SELECT DEPT_NO
+                   FROM DEPART
+                   WHERE LOC = 'MADRID'
+                   );
+ 
+SELECT APELLIDO ,DEPT_NO 
+  FROM EMPLE
+  WHERE DEPT_NO = (SELECT DEPT_NO
+                   FROM DEPART
+                   WHERE LOC = 'MADRID'
+                   );
+
+
+
+SELECT APELLIDO , E.DEPT_NO , LOC , DNOMBRE
+  FROM EMPLE E
+    INNER JOIN DEPART D
+     ON E.DEPT_NO = D.DEPT_NO
+  WHERE LOC = 'MADRID';
+     
+  
+  
+        
+                     
+                                                     
+   
+   
+                
+ 
+SELECT APELLIDO, OFICIO
+ FROM EMPLE
+ WHERE OFICIO = ( SELECT OFICIO
+                  FROM EMPLE
+                  WHERE APELLIDO='GIL'
+                  )
+       AND
+       APELLIDO <> 'GIL';  
+       
+SELECT APELLIDO, FECHA_ALT
+  FROM EMPLE
+  WHERE FECHA_ALT = (SELECT FECHA_ALT
+                     FROM EMPLE
+                     WHERE APELLIDO='JIMENO'
+                     )
+        AND
+        APELLIDO <> 'JIMENO';
+        
+        
+ --CASCA       
+      
+SELECT APELLIDO ,DEPT_NO 
+  FROM EMPLE
+  WHERE DEPT_NO = (SELECT DEPT_NO
+                   FROM DEPART
+                   WHERE LOC = 'MADRID'
+                      OR LOC = 'BARCELONA'
+                   )  ;                            
+  
+  
+SELECT APELLIDO ,DEPT_NO 
+  FROM EMPLE
+  WHERE DEPT_NO IN (SELECT DEPT_NO
+                   FROM DEPART
+                   WHERE LOC = 'MADRID'
+                      OR LOC = 'BARCELONA'
+                   )  ;      
+                   
+ SELECT APELLIDO ,DEPT_NO 
+  FROM EMPLE
+  WHERE DEPT_NO IN (SELECT DEPT_NO
+                   FROM DEPART
+                   WHERE LOC IN ('MADRID','BARCELONA')
+                   )  ;        
+                   
+ SELECT APELLIDO, OFICIO
+  FROM EMPLE
+  WHERE OFICIO IN ( SELECT OFICIO
+                    FROM EMPLE
+                    WHERE DEPT_NO = 10
+                    );
+  
+  SELECT APELLIDO, OFICIO
+  FROM EMPLE
+  WHERE OFICIO IN ( 'DIRECTOR','PRESIDENTE','EMPLEADO');
+  
+ SELECT *
+  FROM NOTAS_ALUMNOS;
+   
+                                                         
+                                             
+                   

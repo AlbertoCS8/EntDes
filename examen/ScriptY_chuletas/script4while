@@ -1,0 +1,17 @@
+#!/bin/bash
+clear
+#pedir nombre de app que quieres cambiar de prioridad
+read -p "que app quieres cambiar de pri" app
+#mostrar prioridad actual
+ps -C $app -o pri,nice,cmd
+#cambiar prioridad pidiendo nuevo valor de bondad(nice,renice)
+
+read -p "que bondad quieres poner de +20 a -19" bondad
+while [ $bondad -gt 20 -o $bondad -lt -19 ] 
+do
+echo "no se puede proporcionar un valor mayor de 20ni menor de menos 19" 
+read -p "que bondad quieres poner de +20 a -19 pesao" bondad
+done
+renice -n $bondad -p `pidof $app`
+#mostrar prioridad actual cambiada del proceso
+ps -C $app -o pri,nice,cmd0

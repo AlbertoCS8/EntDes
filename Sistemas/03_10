@@ -1,0 +1,357 @@
+alumnot@a37pc04:~$ tail -f /var/log/syslog
+tail: no se puede abrir '/var/log/syslog' para lectura: Permiso denegado
+tail: no queda ningún fichero
+alumnot@a37pc04:~$ sudo tail -f /var/log/syslog
+[sudo] contraseña para alumnot: 
+collanLo sentimos, vuelva a intentarlo.
+[sudo] contraseña para alumnot: 
+alumnoLo sentimos, vuelva a intentarlo.
+[sudo] contraseña para alumnot: 
+alumnot no está en el archivo sudoers. Se informará de este incidente.
+alumnot@a37pc04:~$ crontab -l
+no crontab for alumnot
+alumnot@a37pc04:~$ crontab -l
+no crontab for alumnot
+alumnot@a37pc04:~$ cd escritorio
+bash: cd: escritorio: No existe el archivo o el directorio
+alumnot@a37pc04:~$ cd Escritorio
+alumnot@a37pc04:~/Escritorio$ cd Sistemas
+alumnot@a37pc04:~/Escritorio/Sistemas$ chmod a+x mitareaCopiar.sh
+alumnot@a37pc04:~/Escritorio/Sistemas$ ls
+mitareaCopiar  mitareaCopiar.sh  tarea
+alumnot@a37pc04:~/Escritorio/Sistemas$ ./mitareaCopiar
+bash: ./mitareaCopiar: Permiso denegado
+alumnot@a37pc04:~/Escritorio/Sistemas$ ./mitareaCopiar.sh
+cp: falta el operando archivo de destino después de '/home/alumnot/Dosumentos'
+Pruebe 'cp --help' para más información.
+cp: falta el operando archivo de destino después de '/tmp/alumnot'
+Pruebe 'cp --help' para más información.
+alumnot@a37pc04:~/Escritorio/Sistemas$ ./mitareaCopiar.sh
+cp: no se puede efectuar `stat' sobre '/home/alumnot/Dosumentos': No existe el archivo o el directorio
+alumnot@a37pc04:~/Escritorio/Sistemas$ -- cp
+--: orden no encontrada
+alumnot@a37pc04:~/Escritorio/Sistemas$ cp --
+cp: falta un archivo como argumento
+Pruebe 'cp --help' para más información.
+alumnot@a37pc04:~/Escritorio/Sistemas$ cp man
+cp: falta el operando archivo de destino después de 'man'
+Pruebe 'cp --help' para más información.
+alumnot@a37pc04:~/Escritorio/Sistemas$ man cp
+alumnot@a37pc04:~/Escritorio/Sistemas$ ./mitareaCopiar.sh
+alumnot@a37pc04:~/Escritorio/Sistemas$ tail --help
+Modo de empleo: tail [OPCIÓN]... [FICHERO]...
+Print the last 10 lines of each FILE to standard output.
+With more than one FILE, precede each with a header giving the file name.
+
+Sin FICHERO, o cuando FICHERO es -, lee la entrada estándar.
+
+Los argumentos obligatorios para las opciones largas son también obligatorios
+para las opciones cortas.
+  -c, --bytes=[+]NUM       output the last NUM bytes; or use -c +NUM to
+                             output starting with byte NUM of each file
+  -f, --follow[={name|descriptor}] muestra a medida que el fichero crece;
+                                     sin opción significa 'descriptor'
+  -F                       lo mismo que --follow=name --retry
+  -n, --lines=[+]NUM       output the last NUM lines, instead of the last 10;
+                             or use -n +NUM to output starting with line NUM
+      --max-unchanged-stats=N
+                           with --follow=name, reopen a FILE which has not
+                             changed size after N (default 5) iterations
+                             to see if it has been unlinked or renamed
+                             (this is the usual case of rotated log files);
+                             with inotify, this option is rarely useful
+      --pid=PID            con -f, termina después de que el ID del proceso,
+                             PID, muere
+  -q, --quiet, --silent    no presenta cabeceras para cada fichero
+      --retry              sigue intentando abrir el fichero si es inaccesible
+  -s, --sleep-interval=N   con -f, espera aproximadamente N segundos entre
+                             iteraciones (por omisión 1.0);
+                             con inotify y --pid=P, comprueba el proceso P al
+                             menos una vez cada N segundos
+  -v, --verbose            presenta siempre las cabeceras para cada fichero
+  -z, --zero-terminated    line delimiter is NUL, not newline
+      --help     muestra esta ayuda y finaliza
+      --version  informa de la versión y finaliza
+
+NUM may have a multiplier suffix:
+b 512, kB 1000, K 1024, MB 1000*1000, M 1024*1024,
+GB 1000*1000*1000, G 1024*1024*1024, and so on for T, P, E, Z, Y.
+
+Con --follow (-f), tail de forma predeterminada sigue al descriptor de fichero,
+lo cual quiere decir que incluso si un fichero al que se le hace tail es
+renombrado, tail continuará siguiendo su final. Este comportamiento
+predeterminado no es deseable cuando lo que de verdad quiere seguir es el
+nombre real del fichero, no el descriptor del fichero (p.ej: rotación de
+ficheros de registro). Utilice --follow=nombre en tal caso. Esto hace que tail
+siga el fichero mencionado reabriéndolo periódicamente para ver si ha sido
+borrado o recreado por algún otro programa.
+
+ayuda en línea sobre GNU coreutils: <https://www.gnu.org/software/coreutils/>
+Report tail translation bugs to <https://translationproject.org/team/>
+Full documentation at: <https://www.gnu.org/software/coreutils/tail>
+or available locally via: info '(coreutils) tail invocation'
+alumnot@a37pc04:~/Escritorio/Sistemas$ tail -l
+^X^C
+alumnot@a37pc04:~/Escritorio/Sistemas$ tail -l /var/log/syslog
+tail: no se puede abrir '/var/log/syslog' para lectura: Permiso denegado
+alumnot@a37pc04:~/Escritorio/Sistemas$ 
+alumnot@a37pc04:~/Escritorio/Sistemas$ lastlog
+Nombre           Puerto   De               Último
+root             tty3                      vie jun 25 10:06:19 +0200 2021
+daemon                                     **Nunca ha accedido**
+bin                                        **Nunca ha accedido**
+sys                                        **Nunca ha accedido**
+sync                                       **Nunca ha accedido**
+games                                      **Nunca ha accedido**
+man                                        **Nunca ha accedido**
+lp                                         **Nunca ha accedido**
+mail                                       **Nunca ha accedido**
+news                                       **Nunca ha accedido**
+uucp                                       **Nunca ha accedido**
+proxy                                      **Nunca ha accedido**
+www-data                                   **Nunca ha accedido**
+backup                                     **Nunca ha accedido**
+list                                       **Nunca ha accedido**
+irc                                        **Nunca ha accedido**
+gnats                                      **Nunca ha accedido**
+nobody                                     **Nunca ha accedido**
+systemd-network                            **Nunca ha accedido**
+systemd-resolve                            **Nunca ha accedido**
+systemd-timesync                           **Nunca ha accedido**
+messagebus                                 **Nunca ha accedido**
+syslog                                     **Nunca ha accedido**
+_apt                                       **Nunca ha accedido**
+tss                                        **Nunca ha accedido**
+uuidd                                      **Nunca ha accedido**
+tcpdump                                    **Nunca ha accedido**
+avahi-autoipd                              **Nunca ha accedido**
+usbmux                                     **Nunca ha accedido**
+rtkit                                      **Nunca ha accedido**
+dnsmasq                                    **Nunca ha accedido**
+cups-pk-helper                             **Nunca ha accedido**
+speech-dispatcher                           **Nunca ha accedido**
+avahi                                      **Nunca ha accedido**
+kernoops                                   **Nunca ha accedido**
+saned                                      **Nunca ha accedido**
+nm-openvpn                                 **Nunca ha accedido**
+hplip                                      **Nunca ha accedido**
+whoopsie                                   **Nunca ha accedido**
+colord                                     **Nunca ha accedido**
+geoclue                                    **Nunca ha accedido**
+pulse                                      **Nunca ha accedido**
+gnome-initial-setup                           **Nunca ha accedido**
+gdm                                        **Nunca ha accedido**
+profesor         pts/0    172.26.237.33    lun sep  4 13:03:43 +0200 2023
+systemd-coredump                           **Nunca ha accedido**
+sshd                                       **Nunca ha accedido**
+alumnom                                    **Nunca ha accedido**
+alumnot                                    **Nunca ha accedido**
+recovering                                 **Nunca ha accedido**
+alumnot@a37pc04:~/Escritorio/Sistemas$ lastlog -b
+lastlog: la opción requiere un argumento -- 'b'
+Modo de uso: lastlog [opciones]
+
+Opciones:
+  -b, --before DÍAS             muestra los registros de «lastlog» anteriores
+                                a DÍAS
+  -C, --clear                   clear lastlog record of an user (usable only with -u)
+  -h, --help                    muestra este mensaje de ayuda y termina
+  -R, --root CHROOT_DIR         directorio en el que hacer chroot
+  -S, --set                     set lastlog record to current time (usable only with -u)
+  -t, --time DÍAS               muestra sólo los registros de «lastlog» más
+                                recientes que DÍAS
+  -u, --user USUARIO            muestra el registro de «lastlog» del USUARIO
+
+alumnot@a37pc04:~/Escritorio/Sistemas$ lastlog -b 1
+Nombre           Puerto   De               Último
+root             tty3                      vie jun 25 10:06:19 +0200 2021
+daemon                                     **Nunca ha accedido**
+bin                                        **Nunca ha accedido**
+sys                                        **Nunca ha accedido**
+sync                                       **Nunca ha accedido**
+games                                      **Nunca ha accedido**
+man                                        **Nunca ha accedido**
+lp                                         **Nunca ha accedido**
+mail                                       **Nunca ha accedido**
+news                                       **Nunca ha accedido**
+uucp                                       **Nunca ha accedido**
+proxy                                      **Nunca ha accedido**
+www-data                                   **Nunca ha accedido**
+backup                                     **Nunca ha accedido**
+list                                       **Nunca ha accedido**
+irc                                        **Nunca ha accedido**
+gnats                                      **Nunca ha accedido**
+nobody                                     **Nunca ha accedido**
+systemd-network                            **Nunca ha accedido**
+systemd-resolve                            **Nunca ha accedido**
+systemd-timesync                           **Nunca ha accedido**
+messagebus                                 **Nunca ha accedido**
+syslog                                     **Nunca ha accedido**
+_apt                                       **Nunca ha accedido**
+tss                                        **Nunca ha accedido**
+uuidd                                      **Nunca ha accedido**
+tcpdump                                    **Nunca ha accedido**
+avahi-autoipd                              **Nunca ha accedido**
+usbmux                                     **Nunca ha accedido**
+rtkit                                      **Nunca ha accedido**
+dnsmasq                                    **Nunca ha accedido**
+cups-pk-helper                             **Nunca ha accedido**
+speech-dispatcher                           **Nunca ha accedido**
+avahi                                      **Nunca ha accedido**
+kernoops                                   **Nunca ha accedido**
+saned                                      **Nunca ha accedido**
+nm-openvpn                                 **Nunca ha accedido**
+hplip                                      **Nunca ha accedido**
+whoopsie                                   **Nunca ha accedido**
+colord                                     **Nunca ha accedido**
+geoclue                                    **Nunca ha accedido**
+pulse                                      **Nunca ha accedido**
+gnome-initial-setup                           **Nunca ha accedido**
+gdm                                        **Nunca ha accedido**
+profesor         pts/0    172.26.237.33    lun sep  4 13:03:43 +0200 2023
+systemd-coredump                           **Nunca ha accedido**
+sshd                                       **Nunca ha accedido**
+alumnom                                    **Nunca ha accedido**
+alumnot                                    **Nunca ha accedido**
+recovering                                 **Nunca ha accedido**
+alumnot@a37pc04:~/Escritorio/Sistemas$ lastlog grep -v
+lastlog: opción incorrecta -- «v»
+Modo de uso: lastlog [opciones]
+
+Opciones:
+  -b, --before DÍAS             muestra los registros de «lastlog» anteriores
+                                a DÍAS
+  -C, --clear                   clear lastlog record of an user (usable only with -u)
+  -h, --help                    muestra este mensaje de ayuda y termina
+  -R, --root CHROOT_DIR         directorio en el que hacer chroot
+  -S, --set                     set lastlog record to current time (usable only with -u)
+  -t, --time DÍAS               muestra sólo los registros de «lastlog» más
+                                recientes que DÍAS
+  -u, --user USUARIO            muestra el registro de «lastlog» del USUARIO
+
+alumnot@a37pc04:~/Escritorio/Sistemas$ grep --help
+Usage: grep [OPTION]... PATTERNS [FILE]...
+Search for PATTERNS in each FILE.
+Example: grep -i 'hello world' menu.h main.c
+PATTERNS can contain multiple patterns separated by newlines.
+
+Pattern selection and interpretation:
+  -E, --extended-regexp     PATTERNS are extended regular expressions
+  -F, --fixed-strings       PATTERNS are strings
+  -G, --basic-regexp        PATTERNS are basic regular expressions
+  -P, --perl-regexp         PATTERNS are Perl regular expressions
+  -e, --regexp=PATTERNS     use PATTERNS for matching
+  -f, --file=FILE           take PATTERNS from FILE
+  -i, --ignore-case         ignore case distinctions in patterns and data
+      --no-ignore-case      do not ignore case distinctions (default)
+  -w, --word-regexp         match only whole words
+  -x, --line-regexp         match only whole lines
+  -z, --null-data           a data line ends in 0 byte, not newline
+
+Variadas:
+  -s, --no-messages         suprime los mensajes de error
+  -v, --invert-match        selecciona las líneas que no coinciden
+  -V, --version             muestra la versión y finaliza
+      --help                muestra este texto de ayuda y finaliza
+
+Control de salida:
+  -m, --max-count=NUM       detener después de NUM lineas seleccionadas
+  -b, --byte-offset         imprimir el desplazamiento de byte con las líneas de salida
+  -n, --line-number         imprimir el número de linea con las líneas de salida
+      --line-buffered       descargar la salida en cada línea
+  -H, --with-filename       imprimir el nombre de archivo con las líneas de salida
+  -h, --no-filename         omitir el prefijo del nombre de archivo en la salida
+      --label=ETIQUETA         usar ETIQUETA como el prefijo del nombre de archivo de entrada estándar
+  -o, --only-matching       show only nonempty parts of lines that match
+  -q, --quiet, --silent     suppress all normal output
+      --binary-files=TYPE   assume that binary files are TYPE;
+                            TYPE is 'binary', 'text', or 'without-match'
+  -a, --text                equivalent to --binary-files=text
+  -I                        equivalente a --binary-files=without-match
+  -d, --directories=ACCIÓN  especifica cómo manejar los directorios
+                            ACCIÓN es 'read', 'recurse', o 'skip'
+  -D, --devices=ACCIÓN      especifica cómo manejar dispositivos, FIFOs y
+                            `sockets', puede ser 'read' o 'skip'
+  -r, --recursive           equivalente a --directories=recurse
+  -R, --dereference-recursive  similar, pero sigue todos los enlaces simbólicos
+      --include=GLOB        search only files that match GLOB (a file pattern)
+      --exclude=GLOB        skip files that match GLOB
+      --exclude-from=FILE   skip files that match any file pattern from FILE
+      --exclude-dir=GLOB    skip directories that match GLOB
+  -L, --files-without-match  imprimir solo nombres de ARCHIVOs sin líneas seleccionadas
+  -l, --files-with-matches  imprimir solo nombres de ARCHIVOs con líneas seleccionadas
+  -c, --count               imprimir solo un número de líneas seleccionadas por ARCHIVO
+  -T, --initial-tab         alinear las pestañas (si fuese necesario)
+  -Z, --null                imprimir 0 byte después del nombre de ARCHIVO
+
+Control del contexto:
+  -B, --before-context=NÚM  muestra NÚM líneas de contexto anterior
+  -A, --after-context=NÚM   muestra NÚM líneas de contexto posterior
+  -C, --context=NÚM         muestra NÚM líneas de contexto
+  -NUM                      igual a --context=NUM
+      --color[=CUANDO],
+      --colour[=CUANDO]       usar marcadores para destacar las cadenas coincidentes;
+                            CUANDO es «always», «never», o «auto»
+  -U, --binary              no despojar caracteres CR (retorno de carro) en el fin de línea (MSDOS/Windows)
+
+When FILE is '-', read standard input.  With no FILE, read '.' if
+recursive, '-' otherwise.  With fewer than two FILEs, assume -h.
+Exit status is 0 if any line (or file if -L) is selected, 1 otherwise;
+if any error occurs and -q is not given, the exit status is 2.
+
+Report bugs to: bug-grep@gnu.org
+Página inicial de GNU grep: <http://www.gnu.org/software/grep/>
+General help using GNU software: <https://www.gnu.org/gethelp/>
+alumnot@a37pc04:~/Escritorio/Sistemas$ lastlog grep -v nunca
+lastlog: opción incorrecta -- «v»
+Modo de uso: lastlog [opciones]
+
+Opciones:
+  -b, --before DÍAS             muestra los registros de «lastlog» anteriores
+                                a DÍAS
+  -C, --clear                   clear lastlog record of an user (usable only with -u)
+  -h, --help                    muestra este mensaje de ayuda y termina
+  -R, --root CHROOT_DIR         directorio en el que hacer chroot
+  -S, --set                     set lastlog record to current time (usable only with -u)
+  -t, --time DÍAS               muestra sólo los registros de «lastlog» más
+                                recientes que DÍAS
+  -u, --user USUARIO            muestra el registro de «lastlog» del USUARIO
+
+alumnot@a37pc04:~/Escritorio/Sistemas$ grep -v lastlog
+grep -v Nunca lastlog
+grep -v "Nunca" lastlog
+lastlog grep -v "Nunca"        
+grep -v lastlog
+man grep
+man grep
+^C
+alumnot@a37pc04:~/Escritorio/Sistemas$ lastlog | grep -v "Nunca"
+Nombre           Puerto   De               Último
+root             tty3                      vie jun 25 10:06:19 +0200 2021
+profesor         pts/0    172.26.237.33    lun sep  4 13:03:43 +0200 2023
+alumnot@a37pc04:~/Escritorio/Sistemas$ cd /etc/logrotate
+bash: cd: /etc/logrotate: No existe el archivo o el directorio
+alumnot@a37pc04:~/Escritorio/Sistemas$ cd /etc/logrotate.d
+alumnot@a37pc04:/etc/logrotate.d$ ls
+alternatives  btmp         rsyslog                 ufw
+apport        cups-daemon  samba                   unattended-upgrades
+apt           dpkg         speech-dispatcher       winbind
+bootlog       ppp          ubuntu-advantage-tools  wtmp
+alumnot@a37pc04:/etc/logrotate.d$ cat wtmp
+# no packages own wtmp -- we'll rotate it here
+/var/log/wtmp {
+    missingok
+    monthly
+    create 0664 root utmp
+    minsize 1M
+    rotate 1
+}
+alumnot@a37pc04:/etc/logrotate.d$ cat /etc/cron.allow
+cat: /etc/cron.allow: No existe el archivo o el directorio
+alumnot@a37pc04:/etc/logrotate.d$ cd
+alumnot@a37pc04:~$ cat /etc/cron.deny
+cat: /etc/cron.deny: No existe el archivo o el directorio
+alumnot@a37pc04:~$ 
+
+0 * */2 10 mon-fri lastlog | grep -v "Nunca" > /tmp/USUARIOS_LOGGIN.txt && logg> --
+del segundo ejercicio

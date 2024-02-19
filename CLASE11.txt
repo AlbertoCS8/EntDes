@@ -1,0 +1,78 @@
+SELECT LPAD(APELLIDO,20) FROM EMPLE;
+SELECT RPAD (APELLIDO,20) FROM EMPLE;
+
+SELECT RPAD (APELLIDO,20,'*-') AS CABECERA FROM EMPLE;
+
+SELECT APELLIDO, LOC, TO_CHAR(FECHA_ALT,'MONTH') AS "MES DE ALTA"
+  FROM EMPLE E
+   INNER JOIN DEPART D
+    ON E.DEPT_NO = D.DEPT_NO
+    WHERE 
+      EXTRACT (MONTH FROM FECHA_ALT) = (SELECT EXTRACT (MONTH FROM FECHA_ALT)
+                                         FROM EMPLE
+                                         WHERE SALARIO = ( SELECT MIN(SALARIO)
+                                                           FROM EMPLE
+                                                          )
+                                        );
+                                        
+SELECT APELLIDO,OFICIO, DECODE (OFICIO,
+                                      'PRESIDENTE',1,
+                                      'VENDEDOR',2,
+                                      'EMPLEADO',3,
+                                      100
+                                      ) AS "OFICIO DECODIFICADO"
+                                      , FECHA_ALT
+       FROM EMPLE;
+       
+                                      
+ SELECT APELLIDO,OFICIO, DECODE (OFICIO,
+                                      'PRESIDENTE','UNO',
+                                      'VENDEDOR','DOS',
+                                      'EMPLEADO','TRES',
+                                      'CIEN'
+                                      ) AS "OFICIO DECODIFICADO"
+                                      , FECHA_ALT
+       FROM EMPLE;                                       
+SELECT * FROM LIBRERIA;                                                           
+
+SELECT TEMA, DECODE (RTRIM(TEMA),
+                                'Dibujo','DISEÑO',
+                                'Labores','TRABAJOS',
+                                TEMA
+                    ) AS DECODIFICADO
+       FROM LIBRERIA;                          
+  
+                      
+SELECT OFICIO,APELLIDO, CASE OFICIO
+                             WHEN 'PRESIDENTE' THEN 1
+                             WHEN 'VENDEDOR' THEN 2
+                             WHEN 'EMPLEADO' THEN 3
+                               ELSE 100
+                        END AS DECODIFICADO
+                        , SALARIO
+       FROM EMPLE;                             
+
+
+
+SELECT TEMA, CASE RTRIM(TEMA)
+                  WHEN 'Dibujo' then 'DISEÑO'
+                  WHEN 'Labores' THEN 'TRABAJOS'
+                    ELSE
+                      TEMA
+             END AS DECODIFICADO
+   FROM LIBRERIA;       
+   
+   
+SELECT CASE ROUND(AVG( (EXTRACT (MONTH FROM FECHA_ALT) )) ) 
+       WHEN 1 THEN 'ENERO'
+       WHEN 2 THEN 'FEBRERO'
+       WHEN 8 THEN 'AGOSTO'
+       END AS "MES MEDIO"
+ FROM EMPLE;
+                           
+    
+SELECT APELLIDO,ROWNUM
+   FROM EMPLE
+   WHERE DEPT_NO = 20;
+   
+          

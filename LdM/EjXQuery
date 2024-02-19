@@ -1,0 +1,78 @@
+1.	<losbailes>
+	{
+	  for $b in //bailes
+	  return //baile/nombre
+	}
+	</losbailes>
+2.
+	<losbailes>
+	{
+	  for $b in //baile
+	  return <losbailes>
+	  {$b/nombre/text()} ({$b/plazas/text()})
+	  </losbailes>
+	}
+	</losbailes>
+3.
+	
+  for $baile in //baile
+where $baile/precio > 30 
+return $baile/nombre
+4.
+  for $baile in //baile
+where $baile/precio > 30 and $baile/precio/@moneda = 'euro'
+return $baile/nombre
+5.
+for $baile in //baile
+where contains ($baile/comienzo,"/1/")
+return string-join(($baile/nombre/text(),$baile/comienzo/text()),("-"))
+6.
+for $profe in //baile
+order by $profe/sala
+return string-join(($profe/profesor/text(),$profe/sala/text()),("-"))
+7.
+for $profe in distinct-values(//profesor)
+let $salas := //baile[profesor=$profe]/sala
+order by $profe
+return string-join(($profe,$salas/text()),("-"))
+8.
+let $precio := (//baile/precio/number())
+let $media := avg($precio)
+return $media
+(:AQUI NO HACE FALTA EL FOR!!:)
+9.
+let $sum := sum(//baile/precio/number())
+where //baile/sala="1"
+return $sum
+----------------
+let $baile:=//baile[sala="1"]
+let $sum := sum($baile/precio/number())
+return $sum
+(:IGUAL,NO HACE FALTA EL BUCLE FOR:)
+10.
+let $sum := sum(//baile/plazas/number())
+where //baile/profesor="Jesus Lozano"
+return $sum
+11.
+let $ninero:=//baile[profesor="Laura Mendiola"]
+let $sum := (($ninero/precio/number()) * ($ninero/plazas/number()))
+return $sum
+12.
+for $baile in //baile[profesor="Jesus Lozano"]
+let $sum := (($baile/precio/number()) * ($baile/plazas/number()))
+return $sum
+(:AQUI ME DA ERROR PUESTO QUE JESUS TIENE MAS DE UN BAILE:)
+13.
+for $ninero in //baile
+where contains($ninero/profesor/text(),"Laura")
+let $sum := (($ninero/precio/number()) * ($ninero/plazas/number()))
+return $sum
+14.
+for $baile in //baile
+let $desc := ($baile/precio/number()*0.85)
+return string-join(($baile/nombre/text(),$baile/precio/text(),$desc,("--")))
+15.
+for $baile in //baile
+return $baile/*except $baile/comienzo except $baile/fin
+16.
+

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<!-- TIPOS SIMPLES-->
+<xs:simpleType name="longMax50">
+    <xs:restriction base="xs:string">
+        <xs:maxLength value="50"></xs:maxLength>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="tipoCP">
+    <xs:restriction base="xs:string">
+        <xs:pattern value="[0-9]{5}"></xs:pattern>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="tipoTelefono">
+    <xs:restriction base="xs:string">
+        <xs:pattern value="[0-9]{9}"></xs:pattern>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="tipoEmail">
+    <xs:restriction base="xs:string">
+        <xs:pattern value="[^@]+@[^@]+\.[a-zA-Z]{2,3}"></xs:pattern><!-- Expresión regular para validar email cualquier caracter menos arroba-->
+    </xs:restriction><!-- el + para 1 o n veces-->
+</xs:simpleType>
+
+<xs:simpleType name="tipoDNI">
+    <xs:restriction base="xs:string">
+        <xs:pattern value="[0-9]{8}[A-Z]"></xs:pattern>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="tipomodeloRepresentacion">
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="Familiar"></xs:enumeration>
+        <xs:enumeration value="Legal"></xs:enumeration>
+        <xs:enumeration value="Otro"></xs:enumeration>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="tipomodelorepre2">
+    <xs:restriction base="xs:string">
+        <xs:pattern value="Legal|Familiar|Otro"></xs:pattern>
+    </xs:restriction>
+</xs:simpleType>
+
+<!-- TIPOS COMPLEJOS REUTILIZABLES-->
+<xs:complexType name="tipoDatosSolicitante">
+   <xs:group ref="grupoDatos"></xs:group>
+</xs:complexType>
+<xs:complexType name="tipoDatosRepresentante">
+    <xs:sequence>
+        <xs:group ref="grupoDatos"></xs:group>
+        <xs:element name="modeloRepresentacion" type="tipomodeloRepresentacion" default="Legal"/>
+    </xs:sequence>
+</xs:complexType>
+    <xs:complexType name="tipoFormulario">
+        <xs:sequence>
+            <xs:element name="datos_solicitante" type="tipoDatosSolicitante">
+            </xs:element>
+            <xs:element name="datos_representante" type="tipoDatosRepresentante" minOccurs="0"> <!--Es opcional -->
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- GRUPOS-->
+    <xs:group name="grupoDatos">
+    <xs:sequence> <!-- No se puede juntar un sequence con un all-->
+        <xs:element name="nombre_completo" type="longMax50" />
+        <xs:element name="dni" type="tipoDNI" /> <!-- Hacer DNI UNico en casa-->
+        <xs:element name="domicilio" type="longMax50" />
+        <xs:element name="municipio" type="longMax50" />
+        <xs:element name="provincia" type="longMax50"/>
+        <xs:element name="CP" type="tipoCP" />
+        <xs:choice>
+        <xs:element name="telefono" type="tipoTelefono" />
+        <xs:element name="movil" type="tipoTelefono" />
+        </xs:choice>
+        <xs:element name="email" type="tipoEmail" />
+        <xs:element name="fax" type="tipoTelefono" minOccurs="0"/>
+    </xs:sequence>
+</xs:group>
+    <xs:element name="formulario" type="tipoFormulario"/>
+</xs:schema>

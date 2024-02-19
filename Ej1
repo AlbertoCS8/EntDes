@@ -1,0 +1,5 @@
+#!/bin/bash
+##leemos los grupos del fichero ## asumimos que el fichero se encuentra en la misma direccion de la del script
+##ccomprobamos que tenemos derechos de root
+sudo bash
+grep -e "^.*:" GRUPOS_USUARIOS_NUEVOS.txt >/dev/null || { echo -e "\t\t\t...no existe el grupo, lo creamos..."; sudo groupadd $grupo; }

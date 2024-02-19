@@ -1,0 +1,1628 @@
+
+
+
+
+SELECT * FROM NOMBRES;
+
+SELECT * FROM MISTEXTOS;
+
+SELECT * FROM LIBROS;
+
+SELECT * FROM NACIMIENTOS;
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT 'E' FROM DUAL;
+
+SELECT 6 FROM DUAL;
+
+SELECT 6/4 "DIVISION" FROM DUAL;
+
+
+
+SELECT SALARIO,ABS(SALARIO-500000),SALARIO-500000 
+
+                FROM EMPLE;
+
+
+
+SELECT FLOOR(4.9),CEIL(4.1)
+
+                FROM DUAL;
+
+
+
+SELECT 20/3,MOD(20.1,3) FROM DUAL;
+
+
+
+SELECT NOMBRE,NVL(NOMBRE,'VACIO'),EDAD FROM NOMBRES;
+
+
+
+
+
+
+
+
+
+
+
+SELECT APELLIDO,SALARIO,COMISION,
+
+     SALARIO+COMISION "MAL TOTAL",
+
+        NVL(COMISION,0)+SALARIO "BUEN TOTAL",NVL(COMISION+SALARIO,0) "OTRO MAL"
+
+          FROM EMPLE;
+
+
+
+SELECT 20/3,ROUND (20/3), TRUNC(20/3) FROM  DUAL;
+
+
+
+SELECT NOMBRE_ALUMNO, ROUND((NVL(NOTA1,0)+NVL(NOTA2,0)+NVL(NOTA3,0))/3,1) "MEDIA",
+
+                     TRUNC((NVL(NOTA1,0)+NVL(NOTA2,0)+NVL(NOTA3,0))/3,1)
+
+         FROM NOTAS_ALUMNOS;
+
+
+
+
+
+-- SI EL PRIMER PARAMETRO ES NULO SE USA EL SEGUNDO Y SI ESTE TB ES NULO EL TERCERO
+
+
+
+insert into emple(apellido,emp_no,dept_no) values ('NUEVO',1,10);
+
+SELECT * FROM EMPLE;
+
+
+
+SELECT APELLIDO, COMISION, SALARIO,COALESCE(COMISION+SALARIO,SALARIO,0)
+
+  FROM EMPLE;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT POWER(4,2) FROM DUAL;
+
+------------------------------------------FUNCIONES DE GRUPO
+
+
+
+SELECT AVG(EDAD) FROM NOMBRES;
+
+
+
+SELECT TRUNC(AVG(EDAD),2) FROM NOMBRES;
+
+
+
+SELECT ROUND(AVG(EDAD),2) FROM NOMBRES;
+
+
+
+
+
+SELECT AVG(SALARIO) FROM EMPLE 
+
+             WHERE DEPT_NO=10;
+
+             
+
+
+
+SELECT COUNT(*) FROM EMPLE;
+
+SELECT COUNT(COMISION) FROM EMPLE;
+
+SELECT COUNT(*) - COUNT (COMISION) FROM EMPLE;
+
+SELECT COUNT(*) FROM EMPLE WHERE COMISION IS  NULL;
+
+
+
+SELECT COUNT(DISTINCT DEPT_NO) FROM EMPLE;
+
+
+
+SELECT COUNT(COMISION) FROM EMPLE;
+
+SELECT COUNT(SALARIO) FROM EMPLE;
+
+
+
+
+
+SELECT SUM(SALARIO) FROM EMPLE WHERE DEPT_NO=10;
+
+SELECT COUNT(*) FROM EMPLE WHERE DEPT_NO=10;
+
+SELECT SUM(SALARIO)/3 FROM EMPLE WHERE DEPT_NO=10;
+
+SELECT AVG(SALARIO) FROM EMPLE WHERE DEPT_NO=10;
+
+
+
+SELECT MAX(SALARIO) FROM EMPLE;
+
+SELECT MAX(SALARIO) FROM EMPLE WHERE DEPT_NO=30;
+
+
+
+--ESTO DE ERROR
+
+
+
+SELECT APELLIDO,MAX(SALARIO)
+
+      FROM EMPLE;
+
+
+
+      
+
+      
+
+--EL Q MAS GANA 
+
+SELECT APELLIDO,SALARIO
+
+    FROM EMPLE 
+
+     WHERE SALARIO =(SELECT MAX(SALARIO) FROM EMPLE);      
+
+
+
+-- CALCULAR EL APELLIDO DEL QUE GANA MAS DEL DEPARTAMENTO 3--OJO DOBLE CONDICION CON DEPT_NO=30
+
+--PROBAR CON 
+
+--INSERT INTO EMPLE(EMP_NO,APELLIDO,SALARIO,DEPT_NO) VALUES (33,'EL33',370500,10);
+
+DELETE FROM EMPLE WHERE APELLIDO='EL33';
+
+
+
+SELECT APELLIDO,SALARIO,DEPT_NO
+
+        FROM EMPLE
+
+        WHERE SALARIO=(SELECT MAX(SALARIO)
+
+                       FROM EMPLESS
+
+                       WHERE DEPT_NO=30)
+
+        and dept_no=30;   
+
+                    
+
+                   
+
+--LOCALIDAD DEL TRABAJADOR QUE MAS GANA
+
+SELECT LOC
+
+  FROM DEPART
+
+  WHERE DEPT_NO IN (SELECT DEPT_NO
+
+                    FROM EMPLE
+
+                    WHERE SALARIO=(SELECT MAX(SALARIO)
+
+                                   FROM EMPLE)
+
+                    );
+
+
+
+--APELLIDO Y NOMBRE DEPARTAMENTO DEL QUE MÁS GANA
+
+
+
+SELECT APELLIDO,DNOMBRE
+
+       FROM EMPLE E,DEPART D
+
+       WHERE E.DEPT_NO=D.DEPT_NO
+
+       AND SALARIO=(SELECT MAX(SALARIO) FROM EMPLE);
+
+       
+
+ SELECT APELLIDO,DNOMBRE
+
+       FROM EMPLE E
+
+        INNER JOIN DEPART D
+
+        ON E.DEPT_NO = D.DEPT_NO
+
+        WHERE SALARIO = (SELECT MAX(SALARIO) FROM EMPLE);      
+
+    
+
+       
+
+ SELECT APELLIDO,DNOMBRE
+
+       FROM EMPLE 
+
+        NATURAL JOIN DEPART 
+
+        WHERE SALARIO = (SELECT MAX(SALARIO) FROM EMPLE);       
+
+
+
+
+
+--CUANTO TRABAJADORES GANAN MAS DE LA MEDIA SALARIOS
+
+S
+
+SELECT COUNT(*) FROM EMPLE
+
+       WHERE SALARIO > (SELECT AVG(SALARIO) FROM EMPLE);
+
+
+
+--LOCALIDAD DEL TRABAJADOR QUE MAS GANA DEL 30
+
+SELECT LOC
+
+  FROM DEPART
+
+  WHERE DEPT_NO = (SELECT DEPT_NO
+
+                    FROM EMPLE
+
+                    WHERE SALARIO=(SELECT MAX(SALARIO)
+
+                                   FROM EMPLE WHERE DEPT_NO=30)
+
+                          AND 
+
+                          DEPT_NO=30         
+
+                    );
+
+
+
+--APELLIDO Y SALARIO DE LOS TRABAJADORES QUE GANAS MAS DE LA MEDIA SALARIOS
+
+SELECT APELLIDO,SALARIO FROM EMPLE
+
+        WHERE SALARIO > (SELECT AVG(SALARIO)FROM EMPLE);
+
+
+
+--APELLIDO Y LOCALIDAD DE LOS QUE GANAN MAS DEL DOBLE DE LA MEDIA
+
+-- O MENOS DE LA MITAD DE LA MEDIA DE LOS SALARIOS
+
+SELECT APELLIDO,LOC
+
+      FROM EMPLE,DEPART
+
+      WHERE (SALARIO > (SELECT AVG(SALARIO)*2 FROM EMPLE)
+
+             OR
+
+            SALARIO < (SELECT AVG(SALARIO)/2 FROM EMPLE)
+
+            )
+
+         AND EMPLE.DEPT_NO=DEPART.DEPT_NO;
+
+         
+
+         
+
+ SELECT APELLIDO,LOC
+
+      FROM EMPLE 
+
+      INNER JOIN DEPART
+
+      ON EMPLE.DEPT_NO = DEPART.DEPT_NO
+
+      WHERE (SALARIO > (SELECT AVG(SALARIO)*2 FROM EMPLE)
+
+             OR
+
+            SALARIO < (SELECT AVG(SALARIO)/2 FROM EMPLE)
+
+            )
+
+         AND EMPLE.DEPT_NO=DEPART.DEPT_NO;        
+
+         
+
+         
+
+         
+
+
+
+--APELLIDO, LOCALIDAD Y NOMBRE DEPARTAMENTO DE LOS QUE GANAN MAS O MENOS
+
+SELECT APELLIDO,LOC,DNOMBRE
+
+       FROM EMPLE E,DEPART D
+
+       WHERE E.DEPT_NO =D.DEPT_NO
+
+          AND 
+
+          (
+
+          SALARIO IN (SELECT MAX(SALARIO) FROM EMPLE)
+
+           OR
+
+          SALARIO IN (SELECT MIN(SALARIO) FROM EMPLE
+
+           )
+
+    );
+
+    
+
+    
+
+    
+
+ SELECT APELLIDO,LOC,DNOMBRE
+
+     FROM EMPLE E
+
+     INNER JOIN DEPART D
+
+     ON E.DEPT_NO=D.DEPT_NO
+
+     WHERE(
+
+          SALARIO IN (SELECT MAX(SALARIO) FROM EMPLE)
+
+           OR
+
+          SALARIO IN (SELECT MIN(SALARIO) FROM EMPLE
+
+           )
+
+     );  
+
+
+
+
+
+--NOMBRE ALUMNOS NOTA MAYOR Y NOTA MENOR DE NOTAS ALUMNOS
+
+
+
+SELECT NOMBRE_ALUMNO,GREATEST(NVL(NOTA1,0),NVL(NOTA2,0),NVL(NOTA3,0)) MAYOR,
+
+                     LEAST(NOTA1,NOTA2,NOTA3) MENOR 
+
+                     FROM NOTAS_ALUMNOS;
+
+
+
+*********************** FUNCIONES DE CADENA***************************;
+
+SELECT CHR(65),CHR(66),CHR(97) FROM DUAL;
+
+
+
+SELECT ASCII('A') FROM DUAL;
+
+
+
+SELECT CONCAT('TU APELLIDO ES: ',APELLIDO) FROM EMPLE;
+
+SELECT CONCAT('SALARIO MAXIMO: ',MAX(SALARIO)),
+
+       CONCAT ('SALARIO MINIMO: ',MIN(SALARIO))
+
+        FROM EMPLE;  
+
+SELECT 'SALARIO MAXIMO: ' ||MAX(SALARIO),
+
+       'SALARIO MINIMO: ' ||MIN(SALARIO)
+
+        FROM EMPLE;     
+
+
+
+
+
+SELECT CONCAT(APELLIDO,CONCAT(' ES ',OFICIO)) FROM EMPLE;
+
+SELECT CONCAT(APELLIDO,CONCAT(' ES ',NVL(OFICIO,' NO CONOCIDO'))) FROM EMPLE;
+
+
+
+SELECT APELLIDO || ' ES ' || OFICIO FROM EMPLE;
+
+SELECT APELLIDO || ' ES ' || NVL(OFICIO,' NO CONOCIDO') FROM EMPLE;
+
+
+
+SELECT LOWER(APELLIDO) FROM EMPLE;
+
+SELECT UPPER ('hola') FROM DUAL;
+
+
+
+SELECT SALARIO FROM EMPLE WHERE UPPER(APELLIDO)='GIL';
+
+SELECT SALARIO FROM EMPLE WHERE APELLIDO=UPPER('gil');
+
+
+
+SELECT INITCAP('EL DIA QUE SUPERE ORACLE PENTIUM CUATRO AL PROFESOR') 
+
+     FROM DUAL; 
+
+SELECT INITCAP(APELLIDO) FROM EMPLE;
+
+
+
+SELECT LPAD(APELLIDO,20),LPAD(APELLIDO,20,'*') FROM EMPLE;
+
+SELECT RPAD(APELLIDO,20),RPAD(APELLIDO,20,'*') FROM EMPLE;
+
+
+
+SELECT LTRIM ('   VEAMOS ESTO'),RTRIM(' Y ESTO OTRO    ') FROM DUAL;
+
+SELECT LTRIM ('---SOLO-','-') FROM DUAL;
+
+SELECT * FROM MISTEXTOS;
+
+SELECT RTRIM(TITULO,'."') FROM MISTEXTOS;
+
+SELECT LTRIM(TITULO,'"') FROM MISTEXTOS;
+
+
+
+SELECT LTRIM(RTRIM(TITULO,'."'),'"') FROM MISTEXTOS;
+
+SELECT REPLACE('BANCO Y NEGRO','O','A') FROM DUAL;
+
+SELECT REPLACE('BANCO Y NEGRO','O','AS') FROM DUAL;
+
+SELECT REPLACE('BANCO Y NEGRO','O') FROM DUAL;
+
+SELECT REPLACE('SQLPLUS','SQL',123) FROM DUAl;
+
+SELECT TRANSLATE('SQLPLUS','SQL',123) FROM DUAL;
+
+SELECT TRANSLATE(TITULO,'S."','S') FROM MISTEXTOS;
+
+
+
+
+
+SELECT APELLIDO,LOWER(SUBSTR(APELLIDO,1,1)) FROM EMPLE;
+
+SELECT APELLIDO,LOWER(SUBSTR(APELLIDO,2)) FROM EMPLE;
+
+
+
+SELECT ASCII('A'),ASCII('a') FROM DUAL;
+
+SELECT INSTR('VUELTA CICLISTA A TALAMANCA','TA') FROM DUAL;
+
+SELECT INSTR('VUELTA CICLISTA A TALAMANCA','TA',1,1) FROM DUAL;
+
+SELECT INSTR('VUELTA CICLISTA A TALAMANCA','TA',1,2) FROM DUAL;
+
+SELECT INSTR('VUELTA CICLISTA A TALAMANCA','TA',8,1) FROM DUAL;
+
+SELECT APELLIDO,INSTR(APELLIDO,'A') FROM EMPLE;
+
+SELECT APELLIDO,LENGTH(APELLIDO) FROM EMPLE;
+
+DESC LIBRERIA;
+
+
+
+SELECT TEMA,LENGTH(TEMA) "MAL",LENGTH(RTRIM(TEMA)) "bien" FROM LIBRERIA;
+
+SELECT TEMA,INSTR(TEMA,' ')-1 FROM LIBRERIA;
+
+
+
+--************************ conversiones automaticas operadores comparacion 
+
+--  ********************* o con parámetros de funciones o datos  de fecha**************************
+
+select fecha_alt,fecha_alt+3 from emple;
+
+select '12/2/2004' + 3 from dual; --esto casca
+
+select apellido,fecha_alt from emple
+
+         where fecha_alt > '6/12/1981';
+
+         
+
+select sysdate from dual;
+
+
+
+--FECHA DE ANTTES DE AYUER
+
+SELECT CONCAT('ANTES DE AYER', SYSDATE-2) FROM DUAL;
+
+SELECT 'AYER' || SYSDATE - 1 FROM DUAL; --casca
+
+SELECT 'AYER' || (SYSDATE - 1) FROM DUAL; 
+
+
+
+select fecha_alt,add_months(fecha_alt,12) from emple;
+
+select '12/2/2004',add_months('12/2/2004',2) from dual;
+
+select fecha_alt,add_months(fecha_alt,-11) from emple;
+
+
+
+select last_day(sysdate) from dual;
+
+select last_day(fecha_alt) from emple;
+
+SELECT LAST_DAY('12/2/2020') FROM DUAL;
+
+select months_between(add_months(sysdate,1),sysdate-31) from dual;
+
+select fecha_alt,apellido,months_between(sysdate,fecha_alt) from emple;
+
+
+
+-- calcular la edad
+
+
+
+ select trunc(months_between(sysdate,'21/5/1964')/12) from dual;
+
+
+
+-- MES DE NACIMIENTO
+
+ 
+
+SELECT TO_CHAR(TO_DATE('21/5/1964'),'MONTH') FROM DUAL;
+
+
+
+-- DIA DE NACIMIENTO
+
+
+
+SELECT TO_CHAR(TO_DATE('21/5/1964'),'DAY') FROM DUAL;
+
+ select 'trienios de ' || APELLIDO ||'--->' ||
+
+             trunc(months_between(sysdate,fecha_alt)/(12*3)) AS trienios
+
+             from emple;
+
+             
+
+             
+
+ ALTER SESSION SET NLS_DATE_LANGUAGE=spanish;      
+
+      
+
+ select next_day(sysdate,'lunes') FROM DUAL;
+
+ SELECT  EXTRACT(YEAR FROM to_date('12-12-2000')) AS "AÑO" 
+
+  FROM dual;
+
+
+
+ SELECT APELLIDO,FECHA_ALT, EXTRACT(YEAR FROM FECHA_ALT) AS "AÑO" 
+
+  FROM EMPLE;   
+
+  
+
+  SELECT APELLIDO,FECHA_ALT, EXTRACT(MONTH FROM FECHA_ALT) AS "MES" 
+
+  FROM EMPLE;
+
+  
+
+  SELECT APELLIDO,FECHA_ALT, EXTRACT(DAY FROM FECHA_ALT) AS "DIA" 
+
+  FROM EMPLE; 
+
+  
+
+    
+
+; 
+
+  
+
+  
+
+ -- EL MES MEDIO DE ALTA EN LA EMPRESA
+
+
+
+  SELECT ROUND(AVG(EXTRACT(MONTH FROM FECHA_ALT))) AS "MEDIA ALTA EN MES..." 
+
+  FROM EMPLE;  
+
+
+
+
+
+   
+
+  -- QUIENES SE DIERON DE ALTA EN EL MES MEDIO
+
+  
+
+  SELECT APELLIDO, EXTRACT(MONTH FROM FECHA_ALT) AS "MES DE ALTA"
+
+  FROM EMPLE
+
+   WHERE EXTRACT(MONTH FROM FECHA_ALT) = (
+
+                                         SELECT
+
+                                         ROUND(AVG(EXTRACT(MONTH FROM FECHA_ALT)))
+
+                                         FROM EMPLE
+
+                                         );
+
+SELECT TO_CHAR(SYSDATE,'hh24:mi:ss') FROM DUAL;
+
+SELECT TO_CHAR(to_date('12-2-2021'),'hh24:mi:ss') FROM DUAL;
+
+SELECT TO_CHAR(sysdate,'dd-mm-yy hh24:mi:ss') FROM DUAL;
+
+select sysdate from dual;
+
+
+
+-- QUIENES SE DIERON DE ALTA UN MES DESPUES DEL MES MEDIO DE ALTA PONER TB EL NOMBRE DEL MES
+
+
+
+  SELECT APELLIDO, EXTRACT(MONTH FROM FECHA_ALT) AS "MES DE ALTA"
+
+  FROM EMPLE
+
+   WHERE EXTRACT(MONTH FROM FECHA_ALT)  = (
+
+                                         SELECT
+
+                                         ROUND(AVG(EXTRACT(MONTH FROM FECHA_ALT))) + 1
+
+                                         FROM EMPLE
+
+                                          );
+
+-- QUIENES SE DIERON DE ALTA DOS MESES ANTES, PONER EL NOMBRE DEL MES
+
+
+
+  SELECT APELLIDO, TO_CHAR(TO_DATE(EXTRACT(MONTH FROM FECHA_ALT),'MM'),'MONTH') AS "MES DE ALTA"
+
+  FROM EMPLE
+
+   WHERE EXTRACT(MONTH FROM FECHA_ALT)  = (
+
+                       SELECT
+
+                       ROUND(AVG(EXTRACT(MONTH FROM FECHA_ALT))) - 2
+
+                       FROM EMPLE
+
+   );
+
+   
+
+   
+
+  SELECT APELLIDO, TO_CHAR(FECHA_ALT,'MONTH')
+
+  FROM EMPLE
+
+   WHERE EXTRACT(MONTH FROM FECHA_ALT)  = (
+
+                       SELECT
+
+                       ROUND(AVG(EXTRACT(MONTH FROM FECHA_ALT))) - 2
+
+                       FROM EMPLE
+
+   );
+
+   
+
+   
+
+   
+
+ -- NOMBRE DEL / DE LOS DEPARTAMENTOS QUE POSEAN EMPLEADOS QUE SE DIERAN DE ALTA CUATRO MESES DEPUES DEL MES MEDIO DE ALTA
+
+ 
+
+ SELECT DNOMBRE
+
+     FROM DEPART 
+
+     WHERE DEPT_NO IN ( SELECT DEPT_NO 
+
+                        FROM EMPLE
+
+                        WHERE EXTRACT(MONTH FROM FECHA_ALT)  = (
+
+                                                               SELECT
+
+                                                                ROUND(AVG(EXTRACT(MONTH FROM FECHA_ALT))) + 4
+
+                                                                FROM EMPLE
+
+                                                                )
+
+                       );                                         
+
+  
+
+ -- APELLIDOS Y LOCALIDADES DE EMPLEADOS QUE SE DIEREN DE ALTA ALGUN DIA 23 DE CUALQUIER MES/AÑO
+
+ 
+
+ SELECT APELLIDO,LOC
+
+   FROM EMPLE E, DEPART D
+
+   WHERE 
+
+       E.DEPT_NO = D.DEPT_NO
+
+       AND
+
+       EXTRACT ( DAY FROM FECHA_ALT ) = 23;
+
+       
+
+ SELECT APELLIDO,LOC
+
+   FROM EMPLE E
+
+    INNER JOIN DEPART D
+
+     ON E.DEPT_NO = D.DEPT_NO
+
+      AND 
+
+       EXTRACT ( DAY FROM FECHA_ALT) = 23;   
+
+ 
+
+ -- APELLIDOS Y LOCALIDADES DE LOS EMPLEADOS QUE SE DIERON DE ALTA EN EL MISMO AÑO QUE REY
+
+ 
+
+ SELECT APELLIDO, LOC,EXTRACT (YEAR FROM FECHA_ALT)
+
+   FROM EMPLE E, DEPART D
+
+   WHERE
+
+       E.DEPT_NO = D.DEPT_NO
+
+       AND
+
+       EXTRACT (YEAR FROM FECHA_ALT) = ( SELECT EXTRACT (YEAR FROM FECHA_ALT)
+
+                                         FROM EMPLE
+
+                                         WHERE APELLIDO = 'REY'
+
+                                         );
+
+ 
+
+  SELECT APELLIDO, LOC, EXTRACT (YEAR FROM FECHA_ALT)
+
+    FROM EMPLE E
+
+      NATURAL JOIN DEPART D
+
+      WHERE EXTRACT (YEAR FROM FECHA_ALT) = ( SELECT EXTRACT (YEAR FROM FECHA_ALT)
+
+                                              FROM EMPLE
+
+                                              WHERE APELLIDO='REY'
+
+                                              );
+
+ 
+
+ -- APELLIDO, LOCALIDAD Y NOMBRE DEL MES, DE LOS QUE SE DIERON DE ALTA EL MISMO MES  DE ALTA DEL QUE MENOS GANA EN LA EMPRESA
+
+ 
+
+ SELECT APELLIDO,LOC,  TO_CHAR(TO_DATE( EXTRACT (MONTH FROM FECHA_ALT), 'MM'), 'MONTH ')
+
+    FROM EMPLE E, DEPART D
+
+    WHERE
+
+       E.DEPT_NO = D.DEPT_NO
+
+       AND 
+
+        EXTRACT (MONTH FROM FECHA_ALT) IN ( SELECT EXTRACT (MONTH FROM FECHA_ALT)
+
+                                            FROM EMPLE
+
+                                            WHERE SALARIO = (SELECT MIN (SALARIO) 
+
+                                                             FROM EMPLE )
+
+                                          );                   
+
+       
+
+  SELECT APELLIDO,LOC,  TO_CHAR(TO_DATE( EXTRACT (MONTH FROM FECHA_ALT), 'MM'), 'MONTH ')
+
+    FROM EMPLE E
+
+     INNER JOIN DEPART D
+
+    ON E.DEPT_NO = D.DEPT_NO
+
+       AND 
+
+        EXTRACT (MONTH FROM FECHA_ALT) IN ( SELECT EXTRACT (MONTH FROM FECHA_ALT)
+
+                                            FROM EMPLE
+
+                                            WHERE SALARIO = (SELECT MIN (SALARIO) 
+
+                                                             FROM EMPLE )
+
+                                          );  
+
+                                                               
+
+    SELECT APELLIDO,LOC,  TO_CHAR(FECHA_ALT,'MONTH')
+
+    FROM EMPLE E, DEPART D
+
+    WHERE
+
+       E.DEPT_NO = D.DEPT_NO
+
+       AND 
+
+        EXTRACT (MONTH FROM FECHA_ALT) IN ( SELECT EXTRACT (MONTH FROM FECHA_ALT)
+
+                                            FROM EMPLE
+
+                                            WHERE SALARIO = (SELECT MIN (SALARIO) 
+
+                                                             FROM EMPLE )
+
+                                          );      
+
+
+
+
+
+
+
+
+
+ -- PARA HACERLO EN ESPAÑOL  ALTER SESSION SET NLS_DATE_LANGUAGE=SPANISH
+
+ ALTER SESSION SET NLS_DATE_LANGUAGE=SPANISH;
+
+ select next_day(sysdate,'VIERNES') FROM DUAL;
+
+ -- OJO CON LA Ñ QUE CASCA EN TORA PERO NO EN SQL-PLUS
+
+ SELECT 'AYER FUE '|| SYSDATE -1 FROM DUAL;
+
+ SELECT 'AYUER FUE' || TO_CHAR(SYSDATE-1) FROM DUAL;
+
+ 
+
+ 
+
+ SELECT FECHA_ALT,TO_CHAR(FECHA_ALT,'dd, Month yyyy'),
+
+        'DIA DEL ANO ' ||TO_CHAR(FECHA_ALT,'ddd')
+
+        FROM EMPLE;
+
+ 
+
+ SELECT FECHA_ALT,TO_CHAR(FECHA_ALT,'dd day, Month yyyy'),
+
+        'DIA DEL ANO ' ||TO_CHAR(FECHA_ALT,'ddd')
+
+        FROM EMPLE;
+
+
+
+ SELECT FECHA_ALT,TO_CHAR(FECHA_ALT,'dd day, Month " de " yyyy'),
+
+        'DIA DEL ANO ' ||TO_CHAR(FECHA_ALT,'ddd')
+
+        FROM EMPLE;
+
+ SELECT SALARIO,TO_CHAR(SALARIO,'999G999G999') FROM EMPLE;
+
+ SELECT SALARIO,TO_CHAR(SALARIO,'999G999G999S') FROM EMPLE;
+
+ ALTER SESSION SET NLS_TERRITORY=SPAIN;
+
+ SELECT SALARIO,TO_CHAR(SALARIO,'999G999D09') FROM EMPLE;
+
+SELECT TO_NUMBER('123') + 4 FROM DUAL;
+
+SELECT TO_DATE('12/3/2005') + 2 FROM DUAL;
+
+SELECT TO_DATE('12 Enero 2005','dd MONTH YY')+2 FROM DUAL;
+
+-- NOMBRE DEL MES DE LAS FECHAS DE ALTA
+
+ SELECT TO_CHAR(FECHA_ALT,'MONTH') FROM EMPLE;
+
+-- NOMBRE DEL MES DE VUESTRO CUMPLEAÑOS Y DIA
+
+ SELECT TO_CHAR(TO_DATE('21/5/1964'),'MONTH " Y " DAY') FROM DUAL;
+
+
+
+SELECT USER FROM DUAL; 
+
+SELECT UID FROM DUAL;
+
+
+
+SELECT APELLIDO,OFICIO,DECODE(OFICIO,'PRESIDENTE',1,
+
+                                      'EMPLEADO',2,
+
+                                       5) FROM EMPLE;
+
+
+
+ SELECT TEMA,DECODE(RTRIM(TEMA),'Dibujo','DISEÑO',
+
+                                'Labores','HOGAR',
+
+                                TEMA) FROM LIBRERIA;
+
+
+
+
+
+--CON CASE
+
+
+
+ SELECT APELLIDO, OFICIO,
+
+        CASE OFICIO
+
+          WHEN 'PRESIDENTE' THEN 1
+
+          WHEN 'EMPLEADO' THEN 2
+
+          ELSE 5
+
+        END
+
+        , COMISION
+
+   FROM EMPLE;  
+
+   
+
+SELECT * FROM EMPLE;
+
+
+
+SELECT APELLIDO, DEPT_NO , CASE DEPT_NO
+
+                             WHEN 10 THEN 100
+
+                             WHEN 20 THEN 200
+
+                             ELSE 999 END 
+
+                               AS DECODIFICADO
+
+   FROM EMPLE;                            
+
+
+
+
+
+SELECT APELLIDO, DEPT_NO , CASE DEPT_NO
+
+                             WHEN 10 THEN 'DIEZ'
+
+                             WHEN 20 THEN 'VEINTE'
+
+                             ELSE 'RESTO' END
+
+                               AS DECODIFICADO
+
+   FROM EMPLE; 
+
+
+
+
+
+  SELECT TEMA, CASE RTRIM(TEMA)  
+
+                WHEN 'Dibujo' THEN 'DISEÑO'
+
+                WHEN 'Labores' THEN 'HOGAR'
+
+                ELSE TEMA 
+
+                END "LA CODIFICACION"
+
+ FROM LIBRERIA; 
+
+
+
+--mes medio con texto
+
+
+
+SELECT  CASE ROUND(AVG(EXTRACT(MONTH FROM FECHA_ALT)))
+
+            WHEN 1 THEN 'ENERO'
+
+            WHEN 2 THEN 'FEBRERO'
+
+            WHEN 3 THEN 'MARZO'
+
+            WHEN 4 THEN 'ABRIL'
+
+            WHEN 5 THEN 'MAYO'
+
+            WHEN 6 THEN 'JUNIO'
+
+            WHEN 7 THEN 'JULIO'
+
+            WHEN 8 THEN 'AGOSTO'
+
+            WHEN 9 THEN 'SEPTIEMPBRE'
+
+            WHEN 10 THEN 'OCTUBRE'
+
+            WHEN 11 THEN 'NOVIEMBRE'
+
+            WHEN 12 THEN 'DICIEMPBRE'
+
+           END AS "MEDIA ALTA EN MES..." 
+
+   FROM EMPLE;  
+
+
+
+--mes medio con texto
+
+SELECT  TO_CHAR ( TO_DATE( (ROUND(AVG(EXTRACT(MONTH FROM FECHA_ALT)))) ,'MM'),'MONTH')
+
+FROM EMPLE;
+
+
+
+
+
+
+
+--mes medio con texto
+
+SELECT DECODE ( ROUND(AVG(EXTRACT(MONTH FROM FECHA_ALT))),
+
+                 1,'ENERO',
+
+                 2,'FEBRERO',
+
+                 3,'MARZO',
+
+                 4,'ABRIL',
+
+                 5,'MAYO',
+
+                 6,'JUNIO',
+
+                 7,'JULIO',
+
+                 8,'AGOSTO',
+
+                 9,'SEPTIEMBRE',
+
+                 10,'OCTUBRE',
+
+                 11,'NOVIEMBRE',
+
+                 12,'DICIEMBRE', 'ERROR') AS DECODIFICADO
+
+                 
+
+            FROM EMPLE;     
+
+            
+
+ -- QUE DIA DE SEMANA ES HOY           
+
+
+
+SELECT TO_CHAR (SYSDATE,'DAY') FROM DUAL; 
+
+
+
+--dia DE LA SEMLANA DE DIA DEL MES medio de alta en la empresaa
+
+
+
+SELECT  TO_CHAR ( TO_DATE( (ROUND(AVG(EXTRACT(DAY FROM FECHA_ALT)))) ,'DD'),'DAY')
+
+FROM EMPLE;
+
+
+
+-- SACAR CUANTOS EMPLEADOS SE DIERON  DE ALTA EN EL DÍA DE SEMANA DE DIA DEL MES MEDIO DE ALTA
+
+
+
+SELECT COUNT(*) 
+
+      FROM EMPLE
+
+      WHERE TO_CHAR (FECHA_ALT,'DAY') = ( SELECT  TO_CHAR ( TO_DATE( (ROUND(AVG(EXTRACT(DAY FROM FECHA_ALT) ) )) ,'DD'),'DAY')
+
+                                        FROM EMPLE);
+
+                                        Ž
+
+
+
+
+
+-- DATOS DE LOS Q SE DIEREON DE ALTA EN EL MES EN QUE SE DIO DE ALTA EL O LOS Q MENOS GANAN DE LA EMPRESA
+
+
+
+ SELECT APELLIDO,LOC,  TO_CHAR(TO_DATE( EXTRACT (MONTH FROM FECHA_ALT), 'MM'), 'MONTH '), SALARIO
+
+    FROM EMPLE E
+
+     INNER JOIN DEPART D
+
+    ON E.DEPT_NO = D.DEPT_NO
+
+       AND 
+
+        EXTRACT (MONTH FROM FECHA_ALT) IN ( SELECT EXTRACT (MONTH FROM FECHA_ALT)
+
+                                            FROM EMPLE
+
+                                            WHERE SALARIO = (SELECT MIN (SALARIO) 
+
+                                                             FROM EMPLE )
+
+                                          );  
+
+  -- IGUAL Q EL ANTERIOR
+
+                                                               
+
+    SELECT APELLIDO,LOC,  TO_CHAR(FECHA_ALT,'MONTH')
+
+    FROM EMPLE E, DEPART D
+
+    WHERE
+
+       E.DEPT_NO = D.DEPT_NO
+
+       AND 
+
+        EXTRACT (MONTH FROM FECHA_ALT) IN ( SELECT EXTRACT (MONTH FROM FECHA_ALT)
+
+                                            FROM EMPLE
+
+                                            WHERE SALARIO = (SELECT MIN (SALARIO) 
+
+                                                             FROM EMPLE )
+
+                                          );      
+
+
+
+
+
+                                        
+
+--CUANTOS SE DIERON DE ALTA EN EL DÍA (NUMERO DE DIA) MEDIO DE ALTA
+
+  
+
+SELECT COUNT(*)
+
+  FROM EMPLE
+
+  WHERE EXTRACT (DAY FROM FECHA_ALT) = (SELECT ROUND (AVG (EXTRACT (DAY FROM FECHA_ALT)))
+
+                                        FROM EMPLE
+
+                                        );
+
+                              
+
+SELECT * FROM EMPLE;
+
+
+
+-- DIA DEL MES (NUMERO DE DIA MEDIO DE ALTA
+
+
+
+SELECT ROUND ( AVG (EXTRACT (DAY FROM  FECHA_ALT))) FROM EMPLE;    
+
+
+
+
+
+
+
+SELECT APELLIDO, ROWNUM , ROWID FROM EMPLE;
+
+
+
+SELECT USER, UID FROM DUAL;
+
+
+
+
+
+
+
+
+
+       
+
+*****************************EXPRESIONES REGULARES////////////////////////////////
+
+
+
+PAGINA   http://www.oracle.com/technetwork/es/articles/sql/expresiones-regulares-base-de-datos-1569340-esa.html
+
+
+
+
+
+
+
+select texto from expresion;
+
+SELECT * FROM EXPRESION;
+
+
+
+SELECT TEXTO
+
+ FROM EXPRESION
+
+ WHERE REGEXP_LIKE (TEXTO,'[ ][ ][ ]*');
+
+
+
+UPDATE EXPRESION
+
+ SET TEXTO = REGEXP_REPLACE (TEXTO,'[ ][ ][ ]*', ' ')
+
+  WHERE REGEXP_COUNT (TEXTO,'[ ][ ][ ]*') > 0;
+
+  
+
+ SELECT TEXTO,CODIGO
+
+ FROM EXPRESION
+
+ WHERE REGEXP_LIKE (CODIGO,'[1-9]{2}-[12345]{5}-..');
+
+ SELECT * FROM EXPRESION; 
+
+ 
+
+  SELECT TEXTO,CODIGO
+
+ FROM EXPRESION
+
+ WHERE REGEXP_LIKE (CODIGO,'[1-9]*-[12345]{5}-..');
+
+ 
+
+  SELECT TEXTO,CODIGO
+
+ FROM EXPRESION
+
+ WHERE REGEXP_LIKE (CODIGO,'[1-9]?-[12345]{5}-..');
+
+ 
+
+  SELECT TEXTO,CODIGO
+
+ FROM EXPRESION
+
+ WHERE REGEXP_LIKE (CODIGO,'[1-9]+-[12345]{5}-..');
+
+ 
+
+  SELECT TEXTO,CODIGO
+
+ FROM EXPRESION
+
+ WHERE REGEXP_LIKE (CODIGO,'[1-9]*-[3-6]*-..');
+
+ 
+
+  SELECT TEXTO,CODIGO
+
+ FROM EXPRESION
+
+ WHERE REGEXP_LIKE (TEXTO,'PEREZ.*');
+
+ 
+
+ SELECT TEXTO,CODIGO
+
+ FROM EXPRESION
+
+ WHERE REGEXP_LIKE (TEXTO,'PEREZ[ ]*GARCIA');
+
+ 
+
+ 
+
+ SELECT * FROM EXPRESION; 
+
+ 
+
+ 
+
+SELECT TEXTO
+
+FROM EXPRESION
+
+  WHERE REGEXP_COUNT (TEXTO,'[ ][ ][ ]*') > 0; 
+
+
+
+SELECT  texto,codigo,REGEXP_COUNT (TEXTO,'[ ][ ][ ]*')
+
+FROM EXPRESION;
+
+
+
+
+
+
+
+
+--MEJOR EN SQL
+SELECT CONCAT (' CIUDAD : ', LOC) AS SITIO , DNOMBRE 
+ FROM DEPART;
+ 
+ -- MEJOR EN PL
+SELECT 'CIUDAD : ' || LOC AS SITIO , DNOMBRE
+ FROM DEPART;
+ 
+SELECT CONCAT (CONCAT (APELLIDO,' ES '),  OFICIO) AS SALIDA
+ FROM EMPLE;
+ 
+SELECT APELLIDO || ' ES ' || OFICIO AS SALIDA
+ FROM EMPLE; 
+ 
+SELECT UPPER('pepe'), upper ('Pepe') from dual;
+SELECT LOWER ('PEPE') FROM DUAL;
+
+SELECT OFICIO, APELLIDO
+ FROM EMPLE
+ WHERE APELLIDO = UPPER('gil');
+ 
+SELECT INITCAP('padre nuestro que estas en el cielo and so on..............')
+           FROM DUAL;
+           
+SELECT LOC, LENGTH(LOC) AS LETRAS
+  FROM DEPART;
+  
+SELECT * FROM LIBRERIA;  
+
+--DE MOMENTO NO CHUTA
+SELECT TEMA, LENGTH(TEMA) AS LETRAS
+  FROM LIBRERIA;
+  
+SELECT '             NO SE Q PONER          ',
+LTRIM ('             NO SE Q PONER          ') AS NOSE 
+  FROM DUAL;  
+  
+SELECT '             NO SE Q PONER          ',
+LTRIM ('             NO SE Q PONER          ',' ') AS NOSE 
+  FROM DUAL;    
+  
+SELECT '++++NO SE Q PONER          ',
+LTRIM ('++++NO SE Q PONER          ','+') AS NOSE 
+  FROM DUAL;    
+  
+SELECT '             NO SE Q PONER          ',
+RTRIM ('             NO SE Q PONER          ') AS NOSE 
+  FROM DUAL;    
+             
+SELECT '             NO SE Q PONER++++',
+RTRIM ('             NO SE Q PONER++++','+') AS NOSE 
+  FROM DUAL;      
+  
+ 
+SELECT TEMA, LENGTH(RTRIM(TEMA,' ')) AS LETRAS
+  FROM LIBRERIA; 
+  
+SELECT 'VUELTA Y VUELTA A TALAMANCA',
+       INSTR ('VUELTA Y VUELTA A TALAMANCA','TA') AS "POSICION DE TA"
+      FROM DUAL;
+  
+SELECT 'VUELTA Y VUELTA A TALAMANCA',
+       INSTR ('VUELTA Y VUELTA A TALAMANCA','TA',1,1) AS "POSICION DE TA"
+      FROM DUAL;  
+      
+SELECT 'VUELTA Y VUELTA A TALAMANCA',
+       INSTR ('VUELTA Y VUELTA A TALAMANCA','TA',1,2) AS "POSICION DE LA 2 TA"
+      FROM DUAL;  
+      
+SELECT 'VUELTA Y VUELTA A TALAMANCA',
+       INSTR ('VUELTA Y VUELTA A TALAMANCA','TA',6,1) AS "POSICION DE TA"
+      FROM DUAL;
+      
+SELECT OFICIO, SUBSTR (OFICIO,1,2) AS MIRA
+  FROM EMPLE;      
+
+SELECT OFICIO, SUBSTR (OFICIO,4,2) AS MIRA
+  FROM EMPLE;  
+
+SELECT OFICIO, SUBSTR (OFICIO,2) AS MIRA
+  FROM EMPLE;  
+  
+  SELECT OFICIO, SUBSTR (OFICIO,2, LENGTH(OFICIO)) AS MIRA,
+                  SUBSTR (OFICIO,2, LENGTH(OFICIO)-1) AS MIRA
+  FROM EMPLE; 
+SELECT TEMA, SUBSTR(RTRIM(TEMA), 2) AS TOTAL FROM LIBRERIA;   
+
+
+SELECT TEMA, INSTR(TEMA,' ')-1 AS LETRAS
+  FROM LIBRERIA;
+  
+SELECT REPLACE ('BLANCO Y  NEGRO','O','A') 
+   FROM DUAL;  
+   
+SELECT REPLACE ('BLANCO Y  NEGRO','O','AS') 
+   FROM DUAL;     
+   
+SELECT REPLACE ('BLANCO Y  NEGRO','O') 
+   FROM DUAL; 
+   
+SELECT 'SQLPLUS', REPLACE ('SQLPLUS','SQL',123) FROM DUAL;    
+
+SELECT 'SQLPLUS', TRANSLATE ('SQLPLUS','SQL',123),
+                  REPLACE ('SQLPLUS','SQL',123) FROM DUAL;   
+                  
+
+SELECT 'SQLPLUS', TRANSLATE ('SQLPLUS','SQL',12),
+                  REPLACE ('SQLPLUS','SQL',123) FROM DUAL;                     
+
+
+SELECT 'SQLPLUS', TRANSLATE ('SQLPLUS','SQL',123),
+                  REPLACE ('SQLPLUS','SQL',123) FROM DUAL;   
+
+SELECT SYSDATE FROM DUAL;
+SELECT USER FROM DUAL;
+SELECT UID FROM DUAL;
+SELECT ROWID,APELLIDO FROM EMPLE;
+
+SELECT * FROM USER_USERS;
+
+SELECT ROWNUM , APELLIDO FROM EMPLE;
+
+SELECT USER,UID, ' HOY ES: ' || SYSDATE FROM DUAL;
+
+SELECT SYSDATE + 1 FROM DUAL;
+--CASCA
+SELECT '25/10/2022' + 1 FROM DUAL;
+SELECT TO_DATE ('25/10/2022') + 1 FROM DUAL;
+
+SELECT APELLIDO,FECHA_ALT
+  FROM EMPLE
+  WHERE FECHA_ALT > '12/12/1981';
+
+SELECT ABS(MONTHS_BETWEEN ('12/11/2000','14/12/2000') )
+  FROM DUAL;
+
+SELECT TRUNC ( MONTHS_BETWEEN (SYSDATE,'21/05/1964')/12) AS EDAD
+  FROM DUAL;
+  
+SELECT APELLIDO, TRUNC ( MONTHS_BETWEEN (SYSDATE,FECHA_ALT)/(12 * 3)) AS TRIENIOS
+  FROM EMPLE;
+
+SELECT SYSDATE FROM DUAL;
+SELECT TO_CHAR(SYSDATE,'dd-mm-yy') from dual;
+SELECT TO_CHAR(SYSDATE,'mm') from dual;
+SELECT TO_CHAR(SYSDATE,'dd') from dual;
+SELECT TO_CHAR(SYSDATE,'ddd') from dual;
+SELECT TO_CHAR(SYSDATE,'yyddd') from dual;
+SELECT TO_CHAR(to_date('22300','yyddd'),'yyddd') from dual;
+SELECT TO_CHAR(SYSDATE,'day') from dual;
+SELECT TO_CHAR(SYSDATE,'DAY') from dual;
+SELECT TO_CHAR(SYSDATE,'Day') from dual;
+SELECT TO_CHAR(SYSDATE,'month') from dual;
+SELECT TO_CHAR(SYSDATE,'dd month yyyy, day') from dual;
+SELECT TO_CHAR(SYSDATE,'dd " de " month " del " yyyy') from dual;
+SELECT TO_CHAR(SYSDATE,'q') from dual;
+SELECT TO_CHAR(SYSDATE,'dd-mm-yy') from dual;
+SELECT TO_CHAR(TO_DATE('12/1/2000'),'Q') from dual;
+  
+    
+  
+
+
+
+
+
+
+
+
+
+
+
+

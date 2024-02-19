@@ -1,0 +1,39 @@
+alumnot@a37pc04:~$ systemctl is-enabled cron.service
+enabled
+alumnot@a37pc04:~$ systemctl list-units --type=service | grep "cron.service"
+  cron.service                                                                              loaded active running Regular background program processing daemon                               
+alumnot@a37pc04:~$ systemctl list-units --type=service | grep "cron.service" | awk '{print $3}'
+active
+alumnot@a37pc04:~$ systemctl list-units --type=service | grep "cron.service" | awk '{print 3}' >/dev/null
+alumnot@a37pc04:~$ systemctl list-units --type=service | grep "cron.service" | awk '{print 3}' >/dev/null && echo "enabled" || echo "disabled"
+enabled
+alumnot@a37pc04:~$ systemctl disable_cron.service
+Unknown operation disable_cron.service.
+alumnot@a37pc04:~$ systemctl disable cron.service
+Synchronizing state of cron.service with SysV service script with /lib/systemd/systemd-sysv-install.
+Executing: /lib/systemd/systemd-sysv-install disable cron
+Failed to reload daemon: Access denied
+update-rc.d: error: Permission denied
+alumnot@a37pc04:~$ systemctl is-disabled cron.service
+Unknown operation is-disabled.
+alumnot@a37pc04:~$ systemctl is-disable cron.service
+Unknown operation is-disable.
+alumnot@a37pc04:~$ systemctl status cron.service
+● cron.service - Regular background program processing daemon
+     Loaded: loaded (/lib/systemd/system/cron.service; enabled; vendor preset: >
+     Active: active (running) since Tue 2023-09-26 15:58:45 CEST; 23min ago
+       Docs: man:cron(8)
+   Main PID: 844 (cron)
+      Tasks: 1 (limit: 18913)
+     Memory: 488.0K
+     CGroup: /system.slice/cron.service
+             └─844 /usr/sbin/cron -f
+
+alumnot@a37pc04:~$ systemctl stop rsyslogd.service
+Failed to stop rsyslogd.service: Access denied
+See system logs and 'systemctl status rsyslogd.service' for details.
+alumnot@a37pc04:~$ sudo systemctl stop rsyslogd.service
+[sudo] contraseña para alumnot: 
+alumnot no está en el archivo sudoers. Se informará de este incidente.
+
+

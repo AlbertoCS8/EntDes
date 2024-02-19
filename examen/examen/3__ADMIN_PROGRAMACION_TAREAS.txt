@@ -1,0 +1,154 @@
+----------------------------------------
+	administracion
+  programacion de tareas automaticas
+----------------------------------------
+una tarea automatica es un programa/script q se ejecutan o bien puntualmente
+en una fecha/hora determinada, o bien de forma periodica.
+
+ - Las tareas automaticas puntuales: at(d).service
+ - las tareas ciclicas:  	     cron.service, anacron.service
+ 
+ 
+ TAREAS CRON
+ -----------
+ estan controladas por el servicio cron.service, si este servicio se para
+ obviamente dejan de ejecutarse:
+ 
+ 	el estado servicio:	systemctl status cron.service
+ 	
+ 	el ejecutable q lanza 
+ 	el servicio:		/usr/sbin/cron  
+ 	
+ 	para verlo, en seccion [Service] <--- ExecStart
+ 	del servicio lo indica:  systemctl  cat cron.service
+ 	
+ 	
+ ¿como funciona el servicio? cada minuto chequea los ficheros crontab
+ (ficheros donde se definen las tareas con su programacion) y en funcion
+ del hh:mm dia/mes dia de la semana va comprobando una a una si las tiene
+ q ejecutar:
+ 			ficheros crontabs
+ cron.service ------>   ------------------ 
+ 		||	crontab-1:  prog-1  comando
+ 	   cada min		    prog-2  comando
+ hh:mm dia/mes dia de la semana	    ...
+ 				    
+ 		        crontab-2:  prog-1  comando
+ 		        	    prog-2  comando
+ 	
+ los ficheros crontab (man 5 crontab) son ficheros de texto plano
+ donde al principio del fichero se pueden definir variables de entorno
+ para las tareas (son opcionales) y despues viene la prog. de cada tarea
+ y tiene este formato:
+ 
+  minuto  hora  diames  mes  diasemana	[usuario]	programa_a_ejecutar
+ 					---------
+ 					  \--> solo aparece en fich.crontab
+ 					  	del sistema
+en cada campo:
+	     puedes poner lista de valores: valor1,valor2,...
+  	     puedes poner rangos:  	    valor1-valorN 		  	       puedes poner saltos:    	    rango/salto		  	
+ 					  	
+  en minuto: valor de 0-59 q significa en q minuto de la hora quieres q
+  	     se ejecute la tarea. 
+ 
+  en hora: valor de 0-23 significa a q hora quieres ejecutar la tarea
+  diames: valores de 1 al 31, significa en q dia del mes ejecutas la tarea
+  mes: valores del 1 al 12, en q mes del año quieres ejecutar la tarea
+  disemana: valores del 0 al 6, 0 y 7 son domingo, 1 Lunes, 2 martes,...
+  
+  
+  0,15,30  15   1,15,30  *  1,5     /ruta/script_backup_ficheros.sh
+  */15	   */2   *       9   *	    /ruta/mensaje_bienvenida_usuarios.sh
+  
+
+ ficheros crontab pueden ser:
+ 	- fichero crontab del sistema, solo lo puede modificar el root
+ 	   /etc/crontab:
+ 	   
+ 	   	cat /etc/crontab 
+ 
+ 
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+17 * * * *	root    cd / && run-parts --report /etc/cron.hourly
+				-----------------------------------
+					\ tarea del sistema q ejecuta
+					todos los programas/scripts situados
+					en el directorio /etc/cron.hourly
+					cada hora a 17min
+ 
+25 6	* * *	root	test -x /usr/sbin/anacron ||
+			 ( cd / && run-parts --report /etc/cron.daily ) 
+ 			 ----------------------------------------------
+ 			 	\tarea del sistema q ejecuta todos los
+ 			 	programas/scripts situados en el directorio
+ 			 	/etc/cron.daily cada dia a las 6h 25min
+ 			SIEMPRE Y CUANDO el fichero /usr/sbin/anacron
+ 			no este en el sistema o no tenga permisos de 
+ 			ejecucion
+ 			
+ 			
+ 47 6	* * 7	root	test -x /usr/sbin/anacron || 
+		( cd / && run-parts --report /etc/cron.weekly )
+ 			 ----------------------------------------------
+ 			 	\tarea del sistema q ejecuta todos los
+ 			 	programas/scripts situados en el directorio
+ 			 	/etc/cron.weekly cada semana a las 6h 47min
+ 			SIEMPRE Y CUANDO el fichero /usr/sbin/anacron
+ 			no este en el sistema o no tenga permisos de 
+ 			ejecucion
+ 
+ 52 6	1 * *	root	test -x /usr/sbin/anacron ||
+ 			 ( cd / && run-parts --report /etc/cron.monthly )
+ 			 ----------------------------------------------
+ 			 	\tarea del sistema q ejecuta todos los
+ 			 	programas/scripts situados en el directorio
+ 			 	/etc/cron.monthly el 1 de cada mes a las
+ 			 	 6h 52min
+ 			SIEMPRE Y CUANDO el fichero /usr/sbin/anacron
+ 			no este en el sistema o no tenga permisos de 
+ 			ejecucion
+
+ 
+ 	- ficheros crontab de los usuarios:
+ 	   son ficheros de tareas q crean cada usuario particular
+ 	   Para crearlos:
+ 	   
+ 	   	crontab -e 
+ 	   	
+ 	   para ver si se ha creado bien:
+ 	   
+ 	   	crontab -l
+ 	   	
+ 	   pq se almacenan en un directorio q solo tiene acceso el root
+ 	   donde estan todos los crontabs de todos los usuarios
+ 	   
+ 	   	/var/spool/cron/crontabs/ nombre_usuario <----- fich.crontab
+ 	   
+ 	   
+ 	   para borrar fichero crontab:
+ 	   
+ 	   	crontab -r
+ 	   	
+ 	   	
+ 	   	
+ 	   	
+ 	   
+ 	   
+ 	   
+ 	   
+ 	   
+ 	
+ 	
+ 	
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

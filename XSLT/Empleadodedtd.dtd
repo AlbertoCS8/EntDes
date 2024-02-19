@@ -1,7 +1,0 @@
-<!ELEMENT empleados (empleado)>
-<!ELEMENT empleado (nombre,apellidos,movil,direcciones)>
-<!ELEMENT nombre (#PCDATA)>
-<!ELEMENT apellidos (#PCDATA)>
-<!ELEMENT movil (#PCDATA)>
-<!ELEMENT direcciones (direccion+)>
-<!ELEMENT direccion (#PCDATA)>

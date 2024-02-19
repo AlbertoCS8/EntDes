@@ -1,0 +1,31 @@
+------------------
+programar una tarea para que se ejecute de lunes a viernes,todos los dias del mes, y meses
+del año, cada 15 min que copie el contenico del cirectorio /home/<bombre_usuario/Documentos
+y en /tmp/<nombre_usuario> a la vrx mandar al log syslog con comando logger asi: "se ha copiado tus documentos en /tmp a las <hora y dia>"
+ayuda : comando para copiar : cp (si hay directorios opcion -r)
+	comando para mandar al log.... logger "mensaje"
+	
+	
+	
+	----------------
+practica 
+-el comando lastlog te muestra los inicios de sesion de todos los usuarios del sistema
+(fecha y hora) si no han iniciado sesion te muestra mensaje "nunca se ha accedido"
+programar una tarea que seleccione (filtre) de ese comando las lineas que no tengan "nunca" (usuarios que han iniciado sesion) y las guarde en un fichero en /tmp/usuarios_loggin.txt // comprobar que se ha ejecutado la tarea : se ha generado el fichero /tmp/usuarios_loggin. txt a las `date`
+de lunes a viernes,solo este mes, cada dos dias en el mes,cada hora en punto
+
+ayuda 
+-para filtrar lineas... grep(ver opcion -v)
+-para mandar lineas de la salida de un comando a un fichero.... redireccion salida  comando >
+/ruta/fichero
+
+0 * */2 10 mon-fri lastlog | grep -v "Nunca" > /tmp/USUARIOS_LOGGIN.txt && logg>
+
+
+
+
+
+
+
+-----------------------------
+DENEGAR 

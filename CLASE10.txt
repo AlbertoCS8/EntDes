@@ -1,0 +1,149 @@
+
+SELECT SYSDATE FROM DUAL;
+SELECT TO_CHAR(SYSDATE,'dd-mm-yy') from dual;
+SELECT TO_CHAR(SYSDATE,'mm') from dual;
+SELECT TO_CHAR(SYSDATE,'dd') from dual;
+SELECT TO_CHAR(SYSDATE,'ddd') from dual;
+SELECT TO_CHAR(SYSDATE,'yyddd') from dual;
+SELECT TO_CHAR(to_date('22300','yyddd'),'yyddd') from dual;
+SELECT TO_CHAR(SYSDATE,'day') from dual;
+SELECT TO_CHAR(SYSDATE,'DAY') from dual;
+SELECT TO_CHAR(SYSDATE,'Day') from dual;
+SELECT TO_CHAR(SYSDATE,'month') from dual;
+SELECT TO_CHAR(SYSDATE,'dd month yyyy, day') from dual;
+SELECT TO_CHAR(SYSDATE,'dd " de " month " del " yyyy') from dual;
+SELECT TO_CHAR(SYSDATE,'q') from dual;
+SELECT TO_CHAR(SYSDATE,'dd-mm-yy') from dual;
+SELECT TO_CHAR(TO_DATE('12/5/2000'),'Day') from dual;
+SELECT TO_CHAR(SYSDATE,'Q') FROM DUAL;
+SELECT TO_CHAR(TO_DATE('12/5/2000'),'dy') from dual;
+SELECT TO_CHAR(SYSDATE,'DY') FROM DUAL;
+SELECT TO_CHAR(TO_DATE('12/5/2000'),'MONTH') from dual;
+SELECT TO_CHAR(SYSDATE,'MON') FROM DUAL;
+SELECT TO_CHAR(SYSDATE,'WW') FROM DUAL;
+SELECT TO_CHAR(TO_DATE('5/1/2000'),'ww') from dual;
+SELECT TO_CHAR(SYSDATE,'Q') FROM DUAL;
+SELECT TO_CHAR(TO_DATE('12/5/2000'),'day') from dual;
+SELECT TO_CHAR(SYSDATE+1,'w') FROM DUAL;
+SELECT TO_CHAR(SYSDATE,' "Hoy es " dd " de " Month " del año " yyyy ') FROM DUAL;
+SELECT 'HOY ES ' ||  TO_CHAR(SYSDATE,' dd " de "Month"') || 'DEL AÑO ' 
+                 ||  TO_CHAR (SYSDATE,'YYYY') FROM DUAL;
+SELECT TO_CHAR(SYSDATE,'J') FROM DUAL;  
+SELECT TO_CHAR(SYSDATE-365,'J') FROM DUAL;      
+SELECT TO_CHAR(SYSDATE,'YYDDD') - TO_CHAR(SYSDATE- 365,'YYDDD') FROM DUAL;                            
+SELECT TO_CHAR(SYSDATE,'J') - TO_CHAR(SYSDATE - 365,'J')  FROM DUAL;  
+
+SELECT TO_CHAR(SYSDATE,'HH24:MI:SS') FROM DUAL;
+SELECT TO_CHAR(SYSDATE,'HH24') FROM DUAL;
+SELECT 'HOY ES: ' || TO_CHAR(SYSDATE,'DD / MM / YYYY "HORA: " HH24:MI:SS') FROM DUAL;
+SELECT TO_CHAR(SYSDATE,'SSSSS') FROM DUAL;
+SELECT TO_CHAR(TO_DATE('26-10-2022 00:00:05','DD-MM-YYYY HH24:MI:SS'),'SSSSS') FROM DUAL;
+
+SELECT SYSDATE, EXTRACT (YEAR FROM SYSDATE) AS "AÑO ACTUAL"
+   FROM DUAL;
+   
+SELECT SYSDATE, TO_NUMBER(TO_CHAR(SYSDATE,'YYYY')) FROM DUAL;   
+SELECT SYSDATE, TO_CHAR(SYSDATE,'YYYY') + 1 FROM DUAL;   
+
+SELECT SYSDATE, EXTRACT (MONTH FROM SYSDATE) AS "AÑO ACTUAL"
+   FROM DUAL;
+SELECT SYSDATE, EXTRACT (DAY FROM SYSDATE) AS "AÑO ACTUAL"
+   FROM DUAL;
+   
+SELECT EXTRACT (DAY FROM SYSDATE) || '-' ||
+       EXTRACT (MONTH FROM SYSDATE) || '-' ||
+       EXTRACT (YEAR FROM SYSDATE) 
+       FROM DUAL;
+       
+SELECT EXTRACT (DAY FROM TO_DATE('12/12/2000')) || '-' ||
+       EXTRACT (MONTH FROM TO_DATE('12/12/2000')) || '-' ||
+       EXTRACT (YEAR FROM TO_DATE('12/12/2000') )
+       FROM DUAL;  
+       
+SELECT APELLIDO || ' de dió de alta un ' || TO_CHAR(FECHA_ALT,'DAY') AS RESULTADO
+       FROM EMPLE
+       WHERE DEPT_NO=20;
+       
+SELECT NEXT_DAY (SYSDATE,'LUNES') FROM DUAL;    
+ALTER SESSION SET NLS_DATE_LANGUAGE=english;
+SELECT NEXT_DAY (SYSDATE,'monday') FROM DUAL;     
+ALTER SESSION SET NLS_DATE_LANGUAGE=spanish;   
+
+SELECT LAST_DAY (SYSDATE) FROM DUAL;
+SELECT LAST_DAY (TO_DATE('12/2/2001')-1) FROM DUAL;
+
+
+ SELECT ROUND( AVG ( EXTRACT (MONTH FROM FECHA_ALT) ) ) AS "MES MEDIO DE ALTA"
+   FROM EMPLE;
+ SELECT ROUND ( AVG (TO_NUMBER (TO_CHAR(FECHA_ALT,'MM')) )) AS "MES MEDIO DE ALTA"
+   FROM EMPLE;  
+ SELECT ROUND ( AVG (TO_CHAR(FECHA_ALT,'MM')) ) AS "MES MEDIO DE ALTA"
+   FROM EMPLE;   
+   
+   
+   
+SELECT APELLIDO , TO_CHAR(FECHA_ALT,'MM') AS "MES DE ALTA"
+  FROM EMPLE
+  WHERE EXTRACT (MONTH FROM FECHA_ALT)
+                =
+                (
+                SELECT ROUND ( AVG (TO_CHAR(FECHA_ALT,'MM')) ) AS "MES MEDIO DE ALTA"
+                FROM EMPLE  
+                );   
+                
+                
+SELECT APELLIDO , TO_CHAR(FECHA_ALT,'MM') AS "MES DE ALTA"
+  FROM EMPLE
+  WHERE EXTRACT (MONTH FROM FECHA_ALT)
+                =
+                (
+                SELECT ROUND ( AVG (TO_CHAR(FECHA_ALT,'MM')) ) - 2 AS "MES MEDIO DE ALTA"
+                FROM EMPLE  
+                );   
+                
+                  
+SELECT APELLIDO , TO_CHAR(FECHA_ALT,'MONTH') AS "MES DE ALTA"
+  FROM EMPLE
+  WHERE EXTRACT (MONTH FROM FECHA_ALT)
+                =
+                (
+                SELECT ROUND ( AVG (TO_CHAR(FECHA_ALT,'MM')) ) - 2 AS "MES MEDIO DE ALTA"
+                FROM EMPLE  
+                );   
+                     
+   
+                   
+SELECT APELLIDO ,TO_CHAR(FECHA_ALT,'MONTH') AS "MES DE ALTA"
+  FROM EMPLE
+  WHERE EXTRACT (MONTH FROM FECHA_ALT)
+                =
+                (
+                SELECT ROUND ( AVG (TO_CHAR(FECHA_ALT,'MM')) ) - 2 AS "MES MEDIO DE ALTA"
+                FROM EMPLE  
+                ); 
+
+  
+SELECT DNOMBRE
+  FROM DEPART
+  WHERE DEPT_NO IN ( SELECT DEPT_NO
+                     FROM EMPLE
+                      WHERE EXTRACT (MONTH FROM FECHA_ALT)
+                   
+                    =
+                    (
+                      SELECT ROUND ( AVG (TO_CHAR(FECHA_ALT,'MM')) ) + 4 AS "MES MEDIO DE ALTA"
+                       FROM EMPLE  
+                     )); 
+                     
+               
+ SELECT APELLIDO, LOC, TO_CHAR (FECHA_ALT,'DD') AS DIA
+ FROM EMPLE E
+   INNER JOIN DEPART D
+    ON E.DEPT_NO = D.DEPT_NO
+    WHERE EXTRACT (DAY FROM FECHA_ALT) = 23;              
+                 
+                 
+
+
+
+

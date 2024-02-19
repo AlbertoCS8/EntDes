@@ -1,4 +1,0 @@
-<!ELEMENT vuelos (vuelo+)>
-<!ELEMENT vuelo ((origen,destino) | (destino,origen))>
-<!ELEMENT origen (#PCDATA)>
-<!ELEMENT destino (#PCDATA)>

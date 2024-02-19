@@ -1,0 +1,221 @@
+SELECT APELLIDO,SALARIO,DEPT_NO
+  FROM EMPLE E
+   WHERE SALARIO > (SELECT AVG(SALARIO)
+                    FROM EMPLE
+                    WHERE E.DEPT_NO = DEPT_NO
+                    );
+                    
+SELECT APELLIDO,SALARIO,DEPT_NO
+  FROM EMPLE E
+   WHERE SALARIO > ANY (SELECT AVG(SALARIO)
+                    FROM EMPLE
+                    WHERE E.DEPT_NO = DEPT_NO
+                    );
+SELECT APELLIDO,SALARIO,DEPT_NO
+  FROM EMPLE E
+   WHERE SALARIO > SOME (SELECT AVG(SALARIO)
+                    FROM EMPLE
+                    WHERE E.DEPT_NO = DEPT_NO
+                    );    
+                    
+
+SELECT APELLIDO, SALARIO, DEPT_NO
+  FROM EMPLE E
+    WHERE SALARIO IN ( SELECT MAX(SALARIO)
+                       FROM EMPLE
+                       WHERE E.DEPT_NO = DEPT_NO
+                       );
+                       
+SELECT -------------
+FROM ---------------
+[WHERE -----------------]
+[GROUP BY ----------------]
+       [HAVING -------------]
+[ORDER BY --------------];
+;
+
+SELECT DEPT_NO, ROUND(AVG(SALARIO),2) AS MEDIA
+  FROM EMPLE
+  GROUP BY DEPT_NO
+  ORDER BY "MEDIA";
+  
+SELECT DEPT_NO, COUNT(*)
+   FROM EMPLE
+   GROUP BY DEPT_NO;
+   
+   -- CASCA
+SELECT APELLIDO,DEPT_NO, COUNT(*)
+   FROM EMPLE
+   GROUP BY DEPT_NO;   
+   
+   
+ SELECT 'DEPARTAMENTO ' , DEPT_NO, COUNT(*)
+   FROM EMPLE
+   GROUP BY DEPT_NO;     
+   
+ SELECT 'DEPARTAMENTO ' ||  DEPT_NO, COUNT(*)
+   FROM EMPLE
+   GROUP BY DEPT_NO;       
+   
+  SELECT USER , DEPT_NO, COUNT(*)
+   FROM EMPLE
+   GROUP BY DEPT_NO;      
+   
+  SELECT SYSDATE, DEPT_NO, COUNT(*)
+   FROM EMPLE
+   GROUP BY DEPT_NO;  
+          
+ SELECT DEPT_NO, MAX(SALARIO) AS MAYOR, MIN(SALARIO) AS  MIN, ROUND(AVG(SALARIO),2) AS MEDIA
+   FROM EMPLE
+   GROUP BY DEPT_NO;
+   
+ SELECT DEPT_NO, 'MAXIMO: ' || MAX(SALARIO) AS MAYOR, 
+                 'MINIMO: ' || MIN(SALARIO) AS  MIN, 
+                 'MEDIA: ' || ROUND(AVG(SALARIO),2) AS MEDIA
+   FROM EMPLE
+   GROUP BY DEPT_NO;   
+       
+  
+SELECT APELLIDO,SALARIO,DEPT_NO
+  FROM EMPLE
+  WHERE (SALARIO,DEPT_NO) IN ( SELECT MAX(SALARIO),DEPT_NO
+                     FROM EMPLE
+                     GROUP BY DEPT_NO);                     
+COMMIT WORK;
+
+INSERT INTO EMPLE(EMP_NO,APELLIDO,SALARIO,DEPT_NO) VALUES(2222,'EL DOS',370500,10);     
+DELETE FROM EMPLE WHERE EMP_NO=2222;
+SELECT * FROM EMPLE;  
+
+SELECT LOC
+  FROM DEPART
+  WHERE DEPT_NO IN ( SELECT DEPT_NO
+                     FROM EMPLE
+                     WHERE SALARIO iN (SELECT MIN (SALARIO)
+                                       FROM EMPLE
+                                       WHERE OFICIO='EMPLEADO'
+                                       )
+                           AND
+                           OFICIO = 'EMPLEADO'
+                    );
+
+SELECT OFICIO, COUNT(*)
+ FROM EMPLE
+ GROUP BY OFICIO
+ ORDER BY COUNT(*) DESC;
+                     
+           
+SELECT OFICIO, COUNT(*)
+  FROM EMPLE
+  WHERE DEPT_NO IN (10,20)
+  GROUP BY OFICIO;    
+  
+SELECT OFICIO, COUNT(*)
+  FROM EMPLE
+  GROUP BY OFICIO
+  HAVING OFIC IN (10,20);                                                                                                      
+SELECT DEPT_NO, COUNT(*)
+  FROM EMPLE
+  GROUP BY DEPT_NO;    
+  
+SELECT DEPT_NO, COUNT(*)
+  FROM EMPLE
+  WHERE DEPT_NO IN (10,20)
+  GROUP BY DEPT_NO;   
+   
+  --ESTE MAS LENTA
+SELECT DEPT_NO, COUNT(*)
+  FROM EMPLE
+  GROUP BY DEPT_NO
+  HAVING DEPT_NO IN (10,20); 
+  
+          
+ SELECT DEPT_NO, COUNT(*)
+  FROM EMPLE
+  WHERE DEPT_NO IN (10,20)
+  GROUP BY DEPT_NO
+  HAVING COUNT(*) > 4;
+  
+  SELECT DEPT_NO, COUNT(*)
+  FROM EMPLE
+  WHERE COUNT(*) > 4
+  GROUP BY DEPT_NO
+   HAVING DEPT_NO IN (10,20);
+   
+ 
+ SELECT APELLIDO, LOC, SALARIO, E.DEPT_NO
+   FROM EMPLE E
+    INNER JOIN DEPART D
+     ON E.DEPT_NO = D.DEPT_NO
+     WHERE 
+        (SALARIO,E.DEPT_NO) IN (SELECT MAX(SALARIO),DEPT_NO
+                              FROM EMPLE
+                              GROUP BY DEPT_NO
+                              )  
+         OR
+        (SALARIO,E.DEPT_NO) IN (SELECT MIN(SALARIO),DEPT_NO
+                              FROM EMPLE
+                              GROUP BY DEPT_NO
+                     )
+                     
+    ORDER BY DEPT_NO;   
+    
+    
+SELECT COUNT(*), DEPT_NO
+ FROM EMPLE 
+ GROUP BY DEPT_NO
+   HAVING COUNT(*) > 5;   
+      
+   --CASCA
+   
+SELECT COUNT(*), DEPT_NO
+ FROM EMPLE 
+ WHERE COUNT(*) > 5   
+ GROUP BY DEPT_NO;
+               
+ SELECT OFICIO, COUNT(*)
+  FROM EMPLE
+  GROUP BY OFICIO
+  HAVING COUNT(*) > 3;
+  
+ SELECT DEPT_NO, COUNT(*)
+  FROM EMPLE
+  WHERE SALARIO > 200000
+  GROUP BY DEPT_NO;
+
+  
+ SELECT DEPT_NO, COUNT(*)
+  FROM EMPLE
+  WHERE SALARIO > 200000
+     AND
+        OFICIO IN ('VENDEDOR','ANALISTA')
+  GROUP BY DEPT_NO;
+  
+SELECT OFICIO, COUNT(*)
+  FROM EMPLE
+  WHERE SALARIO > 200000
+    AND
+        DEPT_NO = ( SELECT DEPT_NO
+                    FROM DEPART
+                    WHERE LOC = 'BARCELONA'
+                  )
+  GROUP BY OFICIO;
+ 
+
+ SELECT APELLIDO,LOC, SALARIO, E.DEPT_NO
+   FROM EMPLE E
+    INNER JOIN DEPART D
+     ON E.DEPT_NO=D.DEPT_NO
+     WHERE (E.DEPT_NO, SALARIO) IN ( SELECT DEPT_NO, MAX(SALARIO)
+                                     FROM EMPLE
+                                     GROUP BY DEPT_NO
+                                   );
+                                   
+                                                         
+
+   
+  
+    
+                       
+                     
+              

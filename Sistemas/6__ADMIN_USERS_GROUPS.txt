@@ -1,0 +1,520 @@
+-----------------------------
+  ADMINISTRACION DE USUARIOS
+    	Y GRUPOS
+-----------------------------
+hay un servicio:   systemd-logind.service <----- servicio arrancado por systemd
+						se encarga de hacer la autentificacion
+						de los usuarios
+			||			
+		  basandose modulos PAM ("pluggable authentication-authorization modules)
+		  /etc/pam.d <---- login (fichero de modulos PAM del kernel para el serv)
+		  consulta modulos pam de: auth (authentication) dentro de ese fichero
+		  y dentro de los ficheros de modulos pam comunes a todos los servicios:
+		  	common-auth
+		  	common-password
+		  	
+		  en el modulo pam_unix.so se especifica donde se almacenan las cuentas
+		  de usuario, grupo y passwords
+		  
+		  fichero de cuentas usuarios:    /etc/passwd
+		  fichero de hashes de passwords: /etc/shadow
+		  
+		  fichero de grupos de usuarios: 	     /etc/group
+		  fichero de hashes de passwords de grupos:  /etc/gshadow
+		  
+		  
+		  		  systemd-logind.service
+	usuario  -------------->	||
+	 login: ....		  verifica modulo por modulo pam
+	 password: ...	  	   hashea passwod en sha512
+	 				1º) /etc/passwd ¿existe login?
+	 					| si
+	 				2º) coincide el hash de la password con el 
+	 				almacenado en /etc/shadow para el login?
+	 					| si
+	 				3º) invoca a servicio para crear una sesion
+	 				  del usuario:
+	 				  
+	 				  	systemd-user-sessions.service
+	 				  		|
+	 				  		| por cada usuario...
+	 				  ---------------------------------------
+	 				  |			|		|
+	 				 user@ID.slice	   session-ID.scope user@ID.service
+	 				  	||		||		||
+	 				 recursos HW	 ambito procesos  servicio encargad
+	 				 q necesita	 del usuario	  de ejecutar resto
+	 				 el usuario	dentro de la	  de servicios del
+	 				  		sesion		  usuario
+	 				  
+con el comando loginctl manejas el servicio systemd-logind.service (listas usuarios, sesiones,...)
+
+ADMIN DE USUARIOS/PASSWORDS
+---------------------------
+ - para modificar un usuario existente:
+ 
+ 		usermod [-opciones] nombre_usuario
+ 			-----------
+ 				\---> mismas opciones q useradd		
+ - para borrar un usuario:
+ 
+ 		userdel [-opciones] nombre_usuario
+ 			 ---------
+ 			   |
+ 			   -r = borra su directorio personal
+ 			   -f = fuerza borrado de ficheros en directorio del usuario aunque
+ 			   	no le pertenezcan
+ - para crear un usuario:
+ 
+ 		useradd [-opciones] nombre_usuario
+ 			-----------
+ 			   |
+ 			-d /ruta/directorio_personal <--- si no lo pones /home/nombre_user
+ 							debe existir antes
+ 			-m = crea el directorio personal si no lo has creado antes
+ 			-c = comentarios cuenta (nombre,apellidos, tlfno,...)
+ 			-e fecha = fecha expiracion cuenta (pasada la cual se bloquea)
+ 			-p hash_sha512_password = hash de la password asociada a la cuenta
+ 			-g gid o nombre_grupo = grupo principal al q pertenece el usuario
+ 						(si no lo pones crea un grupo con el mismo
+ 						nombre del usuario creado)
+ 			-G gid1,gid2, ... grupo1,grupo2 = grupos secundarios
+ 			-s /ruta/shell = shell del usuario, por defecto /bin/sh
+ 			- u UID = especificas el UID PARA LA CUENTA
+ 					OJO!!! debe ser superior a 1000
+ 					(los uid <1000 reservados para cuentas del sistema)
+ 					
+   cuando ejecutas este comando, el servicio mete una linea en el fichero /etc/passwd
+   con este formato:
+   
+   	nombre_usuario: x|! : UID : GID : comentarios : directorio personal : shell
+ 	
+ para cambiar passwords usuarios:
+ 
+ 	- de forma interactiva:    passwd  nombre_usuario
+ 	- de forma no interactiva,para scripts (no pregunta): 
+ 			echo "nombre_usuario:password" |  chpasswd	
+ 	
+ -----------------------------------------------------------------------------		
+ practica: crear 10 usuarios llamados sistemasXX con passwords coincidan con login
+  directorio personal:  /tmp/users/sistemasXX
+  comentario:	---cuenta de prueba---
+ 			
+ 			ej:  
+ 			
+ 			para el usuario login:   sistemas01 
+ 				       password: sistemas01
+ 				    dir.personal: /tmp/users/sistemas01
+ 	
+ #!/bin/bash
+ clear
+ for ((a=1; a<=10; a++))
+ do
+ 	[ $a -lt 10 ] && nombre="sistemas0$a" || nombre="sistemas$a"
+ 	echo "...creando usuario $nombre..."
+ 	
+ 	useradd -c "---cuenta de prueba---" -m -d /tmp/users/$nombre $nombre
+ 	echo "$nombre:$nombre" | chpasswd
+ 	
+ done	
+ 		
+ 		
+ casos de prueba
+ ---------------		    
+  a   nombre		... resultado...
+  --------------------------------------
+  1   sistemas01     ...creando usuario sistemas01....
+		useradd -c "---cuenta de prueba---" -m -d /tmp/users/sistemas01 sistemas01 			echo "sistemas01:sistemas01" | chpasswd
+
+  2   sistemas02  ...
+  ...
+  9   sistemas09  ...
+ 10   sistemas10
+-------------------------------------------------------------------------------------- 	COMANDOS ADMINISTRACION DE GRUPOS:
+
+ - groupadd
+ - groupmod
+ - groupdel
+ - gpasswd
+ - groups			    
+ ------------------------------------------------------------------
+ SU y SUDO (fichero /etc/sudoers)
+ ------------------------------------------------------------------
+ inicios de sesion con diferentes usuarios con SU
+ 
+ 	su [-opciones][nombre_usuario]
+ 	   ----------  ---------------
+ 		 |     	 \---> si no pones usuario, es como si pusieras:  su root	
+ 	 -m o -p = conserva variables de entorno de tu usuario (no las cambia a las 
+ 	 		q tiene el usuario con el q quieres iniciar sesion)
+ 	 -s /ruta/shell = cambias a esa shell cuando inicias sesion
+ 	 
+ 	 		ej:		su -s /bin/zsh  pablo	
+ 	 - g gid o grupo = inicias sesion con ese usuario perteneciendo a ese grupo
+ 	 		   (siempre q el usuario pertenezca a ese grupo)	
+ 
+ 	 -c /ruta/comando(s) = inicia sesion ejecutando ese comando(s)
+ 	 
+ 	 		ej:	su -c /tmp/backups.sh  root
+ 
+ 
+ ejecutar COMANDOS EN NOMBRE DE OTRO USUARIO: sudo
+ (siempre y cuando se te permita ejecutar comandos en nombre de ese usuario, especificado
+ en fichero de reglas /etc/sudoers)
+ 
+ 	sudo [-opciones] comando_a_ejecutar
+ 	      ----------
+ 	          |
+ 	       -u nombre_usuario (si no pones nada, -u root)
+ 	       		ej:
+ 	       			sudo su <-- lanzar comando su root como si fueses el root
+ 	       				   pero te pide TU PASSWORD no la del root
+ 	       	-l = te lista que comandos puedes ejecutar via sudo para tu usuario
+ 	       		(si pones  -l -l te lo muestra mas detallado)
+ 	       	-k = limpia la marca de tiempo para recordar la password
+ 		-p prompt = mensaje q muestra sudo para pedir la password de tu usuario
+ 			ej:
+ 			
+ 				sudo -p "hola, buenos tardes mete la pass...." /bin/bash
+ 		
+ 
+ --------------------------------------
+ practica: cual es la diferencia entre:
+ 
+ 		sudo su <------ inicia sesion como si fueras root (abrir aplicaciones como
+ 				root, ..)
+ 		sudo bash <----- solo ejecutas ese comando como root, la shell
+ --------------------------------------
+ 		
+ reglas de control ejecucion de comandos via sudo:  fichero /etc/sudoers		
+ 	
+ 1º seccion) definicion de variables globales a la hora de configurar y ejecutar
+ comandos con sudo, las variables se definen en: man sudoers
+ 
+ 	Defaults  nombre_variable=valor
+ 	Defaults  nombre_variable=valor
+ 	Defaults  nombre_variable=valor
+	... 			
+ 
+ ej:
+	Defaults        env_reset <---------- limpia variables de entorno cuando ejecutas
+						comando via sudo
+						
+	Defaults        mail_badpass <------- manda correo al root si ha habido fallo 
+						a la hora de ejecutar el comando via sudo
+						por un usuario
+						
+	Defaults        secure_path="/usr/local/sbin:/usr/local/bin:....." <---- lista de
+					directorios donde sudo busca para ver si el ejecu-
+					table q intentas lanzar existe o no
+					
+					
+buscar opcion para:
+
+	- definir un prompt personalizado:
+	
+		Defaults passprompt_override
+		Defaults passprompt="buenas tardes, introduce tu password...."
+		
+	- cambiar el tiempo de almacenamiento de la password del usuario en la cache
+	  a 1 minuto (por defecto esta a 15 min)
+	  
+		Defaults timestamp_timeout=1
+		
+	
+	
+2º seccion) reglas de acceso para poder ejecutar comandos con sudo:
+(cada linea es una regla)
+
+
+ nombre_usuario[, ...]	equipo(s)=(nombre_usuario:grupo) | (nombre_usuario)   [!]comando(s)
+ %nombre_grupo[,...]		
+	
+	
+  ej:
+  	pablo		a37pcprofesor=(root) 	/bin/bash, /sbin/useradd, /sbin/usermod..
+  	%sudoers	ALL=(ALL:ALL)		ALL
+  	santi		a37pcprofesor=(profesor)  ALL
+  	...
+  	
+  	
+  como usuario pablo intento:	  sudo su <--------------------- permiso denegado...
+  				  sudo -u santi /bin/bash <----- permiso denegado, solo
+  				  				puedes ejecutar /bin/bash
+  				  				como root
+  					  				
+  el root mete al usuario pablo en grupo sudoers:
+  
+  				  sudo su <----- ok,ahora si...	
+  
+	
+reglas por defecto en /etc/sudoers:
+
+	root    ALL=(ALL:ALL) ALL
+	%admin ALL=(ALL) ALL
+	%sudo   ALL=(ALL:ALL) ALL
+
+
+
+puedo definir alias para usuarios, maquinas y comandos (ahorrar codigo en las reglas)
+ej:
+     # User alias specification
+
+     User_Alias      FULLTIMERS = millert, mikef, dowdy
+     User_Alias      PARTTIMERS = bostley, jwfox, crawl
+     User_Alias      WEBMASTERS = will, wendy, wim
+
+
+     # Host alias specification
+     Host_Alias      SPARC = bigtime, eclipse, moet, anchor :\
+                     SGI = grolsch, dandelion, black :\
+                     ALPHA = widget, thalamus, foobar :\
+                     HPPA = boa, nag, python
+     Host_Alias      CUNETS = 128.138.0.0/255.255.0.0
+     Host_Alias      CSNETS = 128.138.243.0, 128.138.204.0/24, 128.138.242.0
+     Host_Alias      SERVERS = master, mail, www, ns
+     Host_Alias      CDROM = orion, perseus, hercules
+
+     # Cmnd alias specification
+     Cmnd_Alias      DUMPS = /usr/bin/mt, /usr/sbin/dump, /usr/sbin/rdump,\
+                             /usr/sbin/restore, /usr/sbin/rrestore,\
+                             sha224:0GomF8mNN3wlDt1HD9XldjJ3SNgpFdbjO1+NsQ== \
+                             /home/operator/bin/start_backups
+     Cmnd_Alias      KILL = /usr/bin/kill
+     Cmnd_Alias      PRINTING = /usr/sbin/lpc, /usr/bin/lprm
+     Cmnd_Alias      SHUTDOWN = /usr/sbin/shutdown
+     Cmnd_Alias      HALT = /usr/sbin/halt
+     Cmnd_Alias      REBOOT = /usr/sbin/reboot
+     Cmnd_Alias      SHELLS = /usr/bin/sh, /usr/bin/csh, /usr/bin/ksh,\
+                              /usr/local/bin/tcsh, /usr/bin/rsh,\
+                              /usr/local/bin/zsh
+     Cmnd_Alias      SU = /usr/bin/su
+     Cmnd_Alias      PAGERS = /usr/bin/more, /usr/bin/pg, /usr/bin/less
+
+
+     #----------------reglas ------------
+     FULLTIMERS      SPARC = NOPASSWD: PRINTING
+     ----------	     -----		-------> comandos impresion definidos en ese alias
+        |		\--> maquinas donde puede ejecutar sudo
+   usuarios: millert, mikef, dowdy	
+
+
+-----------------------------------------------------------------------------------
+ - hacer backup de /etc/sudoers  (cp /etc/sudoers /etc/sudoers.back)
+ - crear 3 usuarios del grupo 1daw (1dawUser1, 1dawUser2, 1dawUser3)
+   crear 3 usuarios del grupo 1asir (1asirUser1, 1asirUser2, 1asirUser3)
+   
+ - configurar sudo para que:
+ 
+ 	- usuarios grupo 1daw puedan ejecutar comandos de creacion de usuarios y grupos
+ 	  como si fueran el root
+ 	  
+ 	  para probarlo:  intentar como usuario 1dawUser1 borrar via sudo el usuario 
+ 	  		   1asirUser1 <=== debe dejar
+ 	  		   
+ 	  		   intentar como usuario 1asirUser1 borrar via sudo el usuario
+ 	  		   1dawUser1 <===== nooooops
+
+	- usuarios grupo 1asir solo pueden cambiar sus contraseñas via sudo como el root,
+			 nada mas
+			 intentar como usuario 1asirUser2 cambiar la contraseña de otro
+			 usuario, como 1dawUser1 <===== debe dejar
+			 
+			 intentar como usuario 1dawUser2 cambiar la contraseña de otro
+			 usuario, como 1asirUser2 <===== noooooooops
+
+
+
+	para probarlo: intentar como usuario 1asirUser2 cambiar tu contraseña via sudo
+-----------------------------------------------------------------------------------------	
+
+for ciclo in 1ASIR 1DAW
+do
+	sudo groupadd $ciclo
+	
+	for contador in {1..3}
+	do
+		echo "creando alumno en: $ciclo ... con nombre: ${ciclo}User$contador"
+		sudo useradd -g $ciclo ${ciclo}User$contador
+		echo "${ciclo}User$contador:${ciclo}User$contador" | sudo chpasswd
+	done
+done
+---------
+modificamos fichero /etc/sudoers y añadimos reglas:
+
+	Cmnd_Alias	GESTIONUG=/usr/sbin/useradd, /usr/sbin/userdel, \
+				  /usr/sbin/usermod, /usr/sbin/groupadd, \
+				  /usr/sbin/groupdel, /usr/sbin/groupmod
+
+
+	%1DAW 	ALL=(root) NOPASSWD: GESIONUG
+
+	%1ASIR  ALL=(root) NOPASSWD: /usr/bin/passwd
+
+
+
+
+
+para limpiar:
+-------------
+for ciclo in 1ASIR 1DAW
+do
+	for contador in {1..3}
+	do
+		echo "borrando alumno en: $ciclo ... con nombre: ${ciclo}User$contador"
+		sudo userdel  ${ciclo}User$contador
+	done
+	
+	sudo groupdel $ciclo
+done
+
+---------------------------------------------------------
+practica: script gestion usuarios
+
+			GESTION USUARIOS
+			----------------
+			1. crear nuevo usuario 
+			2. borrar usuario
+			3. cambiar password usuario
+			4. añadir a nuevo grupo a un usuario
+			5. --salir--
+				opcion:_
+
+
+ - en opcion 1: pedir nombre usuario <--- no permitir q este en blanco
+ 		       password <---- no permitir q este en blanco
+ 		       el nombre del grupo principal al cual pertenece 
+ 		       	(si no existe el nombre, le creas)
+ 		       detalles cuenta (nombre,apellidos,tlfno)
+
+  - en opcion 2: pedir nombre usuario <---- no permitir q este en blanco
+  		comprobar si existe, y si existe lanzar pregunta
+  		"¿ ESTAS REALMENTE SEGURO DE BORRARLO [S/N] ?" 
+
+
+  - en opcion 3: pedir nombre usuario <----- no permitir q este en blanco,
+  		comprobar q existe, si existe te pide nueva password y cambiarla
+  		
+  - en opcion 4: pedir nombre usuario <----- no permitir q este en blanco,
+  		comprobar q existe, si existe pedir el nombre del grupo al que quieres
+  		añadirlo, comprobar q existe el grupo y añadirlo
+  			
+  			
+  			
+  			
+  			
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+	
+	
+	
+	
+					
+					
+					
+					
+					
+					
+					
+
+ 		
+ 		
+ 		
+ 		
+ 		
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 				    
+ 				    
+ 				    
+ 				    
+ 				    
+ 				    
+ 				    
+ 			
+ 			
+ 			
+ 			
+ 			
+ 			
+ 			
+ 			
+ 			
+ 			 				  
+
+
+
+
+
+
+
+
+
+
+
+
+
+			  
+	 					
+	 					
+	 					
+	 					
+	 					
+	 					
+	 					
+	 					
+	 					
+		  
+		  

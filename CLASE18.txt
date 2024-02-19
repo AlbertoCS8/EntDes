@@ -1,0 +1,810 @@
+SELECT (SELECT ----------) AS DFDFDFD, 
+       (SELECT ------------------),
+        EXPRE1 ,
+        (SELECT  ---------------------)
+FROM -------------
+WHERE---------------
+----------
+;
+
+
+SELECT -------------------
+------------------------
+FROM
+WHERE ( SELECT ---------
+          FROM ----------
+          ----------
+      )
+      OPERADOR 
+      (SELECT -----------
+          FROM ------------
+          -------
+      )
+----------------------
+----------------------
+-------------------;
+
+              
+
+
+
+SELECT  (SELECT OFICIO FROM EMPLE
+         WHERE APELLIDO='GIL'
+         ) AS "OFICIO DE GIL", 
+        (SELECT DEPT_NO FROM EMPLE
+          WHERE APELLIDO='SÁNCHEZ'
+        ) AS "DEPARTAMENTO DE SÁNCHEZ",
+        TO_CHAR (SYSDATE,'DAY')
+FROM DUAL;
+    
+
+
+SELECT  DISTINCT (SELECT OFICIO FROM EMPLE
+         WHERE APELLIDO='GIL'
+         ) AS "OFICIO DE GIL", 
+        (SELECT DEPT_NO FROM EMPLE
+          WHERE APELLIDO='SÁNCHEZ'
+        ) AS "DEPARTAMENTO DE SÁNCHEZ",
+        TO_CHAR (SYSDATE,'DAY')
+FROM EMPLE;   
+
+
+
+ SELECT  (SELECT OFICIO FROM EMPLE
+         WHERE APELLIDO='GIL'
+         )
+        || '=========='||
+        (SELECT DEPT_NO FROM EMPLE
+          WHERE APELLIDO='SÁNCHEZ'
+        )
+        || '===========' ||
+        TO_CHAR (SYSDATE,'DAY') AS "TODO COMPLETO"
+FROM DUAL;
+
+
+SELECT  (SELECT USER FROM DUAL),
+        (SELECT UID FROM DUAL)
+FROM DUAL;
+
+SELECT USER, UID FROM DUAL;
+
+SELECT MAX(SALARIO) , MIN(SALARIO) FROM EMPLE;
+
+SELECT (SELECT MAX(SALARIO)
+        FROM EMPLE
+        )
+        ,
+        (SELECT MIN(SALARIO)
+        FROM EMPLE
+        )
+ FROM DUAL;
+ 
+ 
+SELECT   (SELECT DEPT_NO
+          FROM EMPLE
+          GROUP BY DEPT_NO
+          HAVING COUNT(*) = (SELECT MAX(COUNT(*))
+                             FROM EMPLE
+                             GROUP BY DEPT_NO
+                            )
+          ) AS MAYOR
+          ,
+          (SELECT DEPT_NO
+          FROM EMPLE
+          GROUP BY DEPT_NO
+          HAVING  COUNT(*) = (SELECT MIN(COUNT(*))
+                             FROM EMPLE
+                             GROUP BY DEPT_NO
+                            )
+          ) AS MENOR         
+  FROM DUAL;                            
+        
+
+  SELECT ( SELECT COUNT(*)
+           FROM EMPLE
+           WHERE DEPT_NO = ( SELECT DEPT_NO
+                             FROM DEPART
+                             WHERE LOC='BARCELONA'
+                           )
+          ) AS BARCELONA
+          ,
+          ( SELECT COUNT(*)
+           FROM EMPLE
+           WHERE DEPT_NO = ( SELECT DEPT_NO
+                             FROM DEPART
+                             WHERE LOC='MADRID'
+                           )
+          ) AS MADRID
+  FROM DUAL;         
+                                   
+  
+                     
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT (SELECT USER FROM DUAL), (SELECT UID FROM DUAL) FROM DUAL;
+
+SELECT 'USUARIO; ' || (SELECT USER FROM DUAL) || 'IDENTIFICADOR: ' ||(SELECT UID FROM DUAL) FROM DUAL;
+
+
+
+
+
+SELECT ( SELECT TO_CHAR (SYSDATE, ' "HOY ES : " month')FROM DUAL) AS HOY,
+
+         (SELECT USER FROM DUAL) AS ERES FROM DUAL;
+
+         
+
+         
+
+         
+
+SELECT (SELECT MAX(SALARIO) FROM EMPLE ) AS MAXIMO, (SELECT MIN(SALARIO) FROM EMPLE) AS MINIMO
+
+ FROM DUAL;     
+
+ 
+
+ SELECT MAX(SALARIO) ||' -- ' || MIN (SALARIO) AS "MAXIMO Y MINIMO" FROM EMPLE; 
+
+ 
+
+ SELECT MAX(SALARIO) AS MAXIMO, MIN(SALARIO) AS MINIMO FROM EMPLE;
+
+ 
+
+ 
+
+SELECT (SELECT DEPT_NO 
+
+        FROM EMPLE
+
+        GROUP BY DEPT_NO
+
+        HAVING COUNT(*) = ( SELECT MAX(COUNT(*))
+
+                            FROM EMPLE
+
+                            GROUP BY DEPT_NO
+
+                            ) 
+
+        ) AS MAXIMO ,
+
+        (SELECT DEPT_NO
+
+        FROM EMPLE
+
+        GROUP BY DEPT_NO
+
+        HAVING COUNT(*) = ( SELECT MIN(COUNT(*))
+
+                            FROM EMPLE
+
+                            GROUP BY DEPT_NO
+
+                            ) 
+
+        ) AS MINIMO
+
+        FROM DUAL;
+
+                            
+
+                
+
+ 
+
+
+
+SELECT DEPT_NO 
+
+ FROM EMPLE
+
+ GROUP BY DEPT_NO
+
+ HAVING COUNT(*) = ( SELECT MAX(COUNT(*)) 
+
+                     FROM EMPLE
+
+                     GROUP BY DEPT_NO
+
+                     )
+
+                     OR
+
+        COUNT(*) =   ( SELECT MIN(COUNT(*)) 
+
+                     FROM EMPLE
+
+                     GROUP BY DEPT_NO
+
+                     )   ;        
+
+ 
+
+    
+
+
+
+-- CUANTOS EMPLEADOS HAY DE BARCELONA Y DE MADRID
+
+
+
+SELECT ( SELECT COUNT(*) FROM EMPLE
+
+          WHERE DEPT_NO =( SELECT DEPT_NO
+
+                           FROM DEPART
+
+                           WHERE LOC='BARCELONA') ) AS BARCELONA,
+
+          ( SELECT COUNT(*) FROM EMPLE
+
+          WHERE DEPT_NO =  ( SELECT DEPT_NO
+
+                           FROM DEPART
+
+                           WHERE LOC='MADRID') ) AS MADRID    
+
+                           
+
+        FROM DUAL;      
+
+        
+
+-- OFICIO CON MAS SUMA DE SALARIOS Y DEPARTAMENTO CON MAS SUMA DE SALARIOS
+
+
+
+SELECT ( SELECT OFICIO
+         FROM EMPLE
+         GROUP BY OFICIO
+         HAVING SUM(SALARIO) = (SELECT MAX(SUM(SALARIO))
+                            FROM EMPLE
+                            GROUP BY OFICIO
+                            )
+        ) AS OFICIO ,
+       ( SELECT DEPT_NO
+         FROM EMPLE
+         GROUP BY DEPT_NO
+         HAVING SUM(SALARIO) = (SELECT MAX(SUM(SALARIO))
+                            FROM EMPLE
+                            GROUP BY DEPT_NO
+                            )
+        ) AS DEPARTAMENTO       
+        FROM DUAL;                   
+
+      
+
+                               
+
+
+
+ -- OFICIO DE REY Y SALARIO DE GIL
+
+ 
+
+ SELECT (SELECT OFICIO FROM EMPLE WHERE APELLIDO='REY') AS "OFICIO DE REY",
+
+        (SELECT SALARIO FROM EMPLE WHERE APELLIDO='GIL') AS "SALARIO DE GIL"
+
+  FROM DUAL;
+
+
+
+--SALARIO DE GIL, OFICIO DE TOVAR Y LOCALIDAD DEL DEPARTAMENTO 20
+
+
+
+SELECT (SELECT SALARIO
+        FROM EMPLE
+        WHERE APELLIDO LIKE 'GIL'
+        ) AS SALARIO
+        , 
+        (SELECT OFICIO
+        FROM EMPLE
+        WHERE APELLIDO LIKE 'TOVAR'
+        ) AS COMISION
+        ,
+        (SELECT LOC
+         FROM DEPART
+         WHERE DEPT_NO=20
+         ) AS LOCALIDAD       
+   FROM DUAL;      
+
+   
+
+   --JEFE DE GIL, Y FECHA 
+ 
+
+SELECT ( SELECT APELLIDO
+         FROM EMPLE
+         WHERE EMP_NO = ( SELECT DIR
+                          FROM EMPLE
+                           WHERE APELLIDO='GIL')
+        ) AS JEFE
+        ,
+        SYSDATE
+        FROM DUAL;            
+
+        
+
+ -- MEDIA SALARIAL Y TOTAL DE DEPARTAMENTOS DE LA EMPRESA              
+
+            
+
+SELECT ( SELECT ROUND ( AVG( SALARIO ) )
+
+         FROM EMPLE   
+
+        ) AS "MEDIA SALARIAL",
+
+        (SELECT COUNT (*) 
+
+         FROM DEPART
+
+         ) AS "TOTAL DEPARTAMENTOS"
+
+         
+
+FROM DUAL;    
+
+
+
+
+
+--OFICIO CON MAYOR MASA SALARIAL, DEPARTAMEWNTO CON MAYOR MASA SALARIAL, Y FECHA DE CALCULO
+
+
+
+SELECT  ( SELECT OFICIO
+
+          FROM EMPLE
+
+          GROUP BY OFICIO
+
+          HAVING SUM(SALARIO) = (SELECT MAX(SUM(SALARIO))
+
+                             FROM EMPLE
+
+                             GROUP BY OFICIO
+
+                             )
+
+         ) AS "OFICIO MAS RETRIBUIDO"
+
+         ,
+
+         ( SELECT DEPT_NO
+
+           FROM EMPLE
+
+           GROUP BY DEPT_NO
+
+           HAVING SUM(SALARIO) = (SELECT MAX (SUM(SALARIO))
+
+                             FROM EMPLE
+
+                             GROUP BY DEPT_NO
+
+                             )
+
+          ) AS "DEPARTAMENTO MAS RETRIBUIDO"
+
+          ,
+
+          TO_CHAR(SYSDATE, 'DD " de " month " del " yyyy ') as "DIA DE PROCESO"
+
+          
+
+          FROM DUAL;              
+
+          
+
+          
+
+ 
+
+            
+
+                  
+
+               
+
+                   
+
+                                   
+
+
+
+SELECT 'DEPARTAMENTO: ' || (SELECT DEPT_NO
+
+                           FROM DEPART
+
+                           WHERE LOC='MADRID')
+
+                       || 
+
+        'NOMBRE: '  ||  (SELECT DNOMBRE
+
+                           FROM DEPART
+
+                           WHERE LOC='MADRID')   AS "RESULTADO CONSULTA"
+
+ FROM DUAL;                               
+
+          
+
+          
+
+
+
+---- PARA COMPROBAR
+
+
+
+SELECT LPAD(APELLIDO,LENGTH(APELLIDO)+ 6*LEVEL) AS TRABAJADORES ,OFICIO,LEVEL, DEPT_NO, SALARIO, COMISION , SALARIO+NVL(COMISION,0)
+
+  FROM EMPLE
+
+  CONNECT BY  PRIOR EMP_NO=DIR
+
+  START WITH APELLIDO='REY'; 
+
+  
+
+  
+
+  
+
+  --¿TIENEN SALA Y TOVAR EL MISMO OFICIO? 
+
+  
+
+  SELECT  'SI TIENEN' AS RESPUESTA
+  FROM DUAL
+  WHERE (SELECT OFICIO
+         FROM EMPLE
+         WHERE APELLIDO = 'REY')
+         =
+        (SELECT OFICIO
+         FROM EMPLE
+         WHERE APELLIDO='TOVAR'
+         );      
+
+ 
+
+  SELECT  'SI Y SON ' AS RESPUESTA , OFICIO 
+
+  FROM EMPLE
+
+  WHERE APELLIDO ='SALA'
+
+  AND
+
+   (SELECT OFICIO
+
+         FROM EMPLE
+
+         WHERE APELLIDO = 'SALA')
+         =
+
+         (SELECT OFICIO
+
+         FROM EMPLE
+
+         WHERE APELLIDO='TOVAR'
+
+         );            
+
+         
+
+ --TB ASI
+
+ 
+
+   SELECT 'SI' AS RESPUESTA
+
+  FROM DUAL
+
+  WHERE (SELECT OFICIO
+
+         FROM EMPLE
+
+         WHERE APELLIDO = 'SALA')
+
+         =
+
+         
+
+         (SELECT OFICIO
+
+         FROM EMPLE
+
+         WHERE APELLIDO='TOVAR'
+
+         );     
+
+      
+
+ --¿TRABAJAN SÁNCHEZ Y GIL EN EL MISMO DEPARTAMENTO?
+
+  SELECT  1 AS RESPUESTA
+  FROM DUAL
+  WHERE (SELECT DEPT_NO
+         FROM EMPLE
+         WHERE APELLIDO = 'GIL')
+         =
+        (SELECT DEPT_NO
+         FROM EMPLE
+         WHERE APELLIDO='SÁNCHEZ'
+         );     
+
+
+
+
+
+ SELECT  'SI EN EL DEPARTAMENTO: ' || DEPT_NO  AS RESPUESTA
+
+  FROM EMPLE
+
+  WHERE APELLIDO='GIL'
+
+        AND
+
+        (SELECT DEPT_NO
+
+         FROM EMPLE
+
+         WHERE APELLIDO = 'CEREZO')
+
+         =
+
+         
+
+         (SELECT DEPT_NO
+
+         FROM EMPLE
+
+         WHERE APELLIDO='MUÑOZ'
+
+         );   
+
+         
+
+
+
+                   
+
+  SELECT DISTINCT 1  AS RESPUESTA
+
+  FROM EMPLE
+
+  WHERE (SELECT DEPT_NO
+
+         FROM EMPLE
+
+         WHERE APELLIDO = 'CEREZO')
+
+         =
+
+         
+
+         (SELECT DEPT_NO
+
+         FROM EMPLE
+
+         WHERE APELLIDO='MUÑOZ'
+
+         );      
+
+       --TIENEN GIL Y FERNANDEZ LA MISMA RETRIBUCION TOTAL ?
+      
+
+  SELECT  1  AS RESPUESTA
+
+  FROM DUAL
+
+  WHERE (SELECT NVL(SALARIO,0) + NVL(COMISION,0)
+
+         FROM EMPLE
+
+         WHERE APELLIDO = 'GIL')
+
+         =      
+
+         (SELECT NVL(SALARIO,0) + NVL(COMISION,0)
+
+         FROM EMPLE
+
+         WHERE APELLIDO='FERNÁNDEZ'
+
+         );
+
+   
+  ---NUMERO DE DEPARTAMENTO DE TRABAJO DE GIL Y ALONSO SIEMPRE QUE ÁMBOS TRABAEN EL MISMO DEPARTAMENTO
+
+  
+
+  SELECT DEPT_NO
+   FROM EMPLE
+   WHERE  ( 
+           SELECT DEPT_NO
+           FROM EMPLE
+           WHERE APELLIDO = 'GIL')
+            =
+          (
+           SELECT DEPT_NO
+            FROM EMPLE
+             WHERE APELLIDO='ALONSO'
+          )
+       AND
+       APELLIDO = 'GIL';   
+
+       
+
+       
+
+   --LOCALIDAD DE TRABAJO DE GIL Y ALONSO SI TRABJAN EN EL MISMO DEPARTAMENTO
+
+   
+
+   SELECT LOC 
+   FROM DEPART
+   WHERE DEPT_NO = (    
+                    SELECT DEPT_NO
+                    FROM EMPLE
+                   WHERE  ( 
+                           SELECT DEPT_NO
+
+                           FROM EMPLE
+
+                           WHERE APELLIDO = 'MARTÍN')
+
+                            =
+
+                          (
+
+                           SELECT DEPT_NO
+
+                            FROM EMPLE
+
+                             WHERE APELLIDO='TOVAR'
+
+                          )
+
+                       AND
+
+                       APELLIDO = 'TOVAR'
+
+                       );  
+
+                           
+
+
+ --¿TRABAJAN SALA Y SÁNCHEZ EN EL MISMO ESCALAFÓN?
+
+ 
+
+ SELECT  1 AS RESPUESTA
+ FROM DUAL
+ WHERE  ( SELECT  LEVEL 
+                            FROM EMPLE
+                            WHERE APELLIDO = 'SÁNCHEZ'
+                            CONNECT BY PRIOR EMP_NO=DIR
+                            START WITH APELLIDO='REY'
+                            )
+                   =
+        ( SELECT  LEVEL 
+                            FROM EMPLE
+                            WHERE APELLIDO = 'ALONSO'
+                            CONNECT BY PRIOR EMP_NO=DIR
+                            START WITH APELLIDO='REY'
+        );                    
+ 
+
+ -- LO MISMO PARA TOVAR Y JIMENO
+
+  SELECT DISTINCT 1 AS RESPUESTA
+
+ FROM EMPLE
+
+ WHERE  ( SELECT  LEVEL 
+
+                            FROM EMPLE
+
+                            WHERE APELLIDO = 'TOVAR'
+
+                            CONNECT BY PRIOR EMP_NO=DIR
+
+                            START WITH APELLIDO='REY'
+
+                            )
+
+                   =
+
+        ( SELECT  LEVEL 
+
+                            FROM EMPLE
+
+                            WHERE APELLIDO = 'JIMENO'
+
+                            CONNECT BY PRIOR EMP_NO=DIR
+
+                            START WITH APELLIDO='REY'
+
+                            ) 
+
+                                             
+
+ CONNECT BY PRIOR EMP_NO = DIR
+
+ START WITH APELLIDO='REY';         
+
+ 
+
+ --TB SI
+
+  -- LO MISMO PARA TOVAR Y JIMENO
+
+  SELECT  'SI' AS RESPUESTA
+
+ FROM EMPLE
+
+ WHERE  ( SELECT  LEVEL 
+
+                            FROM EMPLE
+
+                            WHERE APELLIDO = 'TOVAR'
+
+                            CONNECT BY PRIOR EMP_NO=DIR
+
+                            START WITH APELLIDO='REY'
+
+                            )
+
+                   =
+
+        ( SELECT  LEVEL 
+
+                            FROM EMPLE
+
+                            WHERE APELLIDO = 'JIMENO'
+
+                            CONNECT BY PRIOR EMP_NO=DIR
+
+                            START WITH APELLIDO='REY'
+
+                            ) 
+
+         AND APELLIDO='TOVAR'                   
+
+                                             
+
+ CONNECT BY PRIOR EMP_NO = DIR
+
+ START WITH APELLIDO='REY';         
+
+         ´
+
+
+
+
+
+
+
+
+
+
+

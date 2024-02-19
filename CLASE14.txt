@@ -1,0 +1,279 @@
+
+  SELECT E.DEPT_NO,DNOMBRE,COUNT(*)  "EL MAS NUMEROSO"
+   FROM EMPLE E,DEPART D
+   WHERE E.DEPT_NO=D.DEPT_NO
+   GROUP BY E.DEPT_NO,DNOMBRE
+   HAVING COUNT(*) = (SELECT MAX(COUNT(*)) FROM EMPLE
+                       GROUP BY DEPT_NO); 
+
+                       
+
+   SELECT E.DEPT_NO,DNOMBRE,COUNT(*)  "EL MAS NUMEROSO"
+   FROM EMPLE E
+   INNER JOIN DEPART D
+   ON E.DEPT_NO=D.DEPT_NO
+   GROUP BY E.DEPT_NO,DNOMBRE
+   HAVING COUNT(*) = (SELECT MAX(COUNT(*)) FROM EMPLE
+                       GROUP BY DEPT_NO); 
+
+                       
+
+
+
+ --OFICIO CON MAS TRABAJADORES QUE NO SEAN NI
+--  EMPLEADO NI VENDEDOR  
+
+         
+
+SELECT OFICIO,COUNT(*)
+    FROM EMPLE
+    WHERE OFICIO NOT IN('EMPLEADO','VENDEDOR')
+    GROUP BY OFICIO
+    HAVING COUNT(*) = (SELECT MAX(COUNT(*)) 
+                       FROM EMPLE
+                       WHERE OFICIO NOT IN('EMPLEADO','VENDEDOR')
+                       GROUP BY OFICIO
+                       );
+
+
+
+ 
+
+--  EL DEPT_NO CUYA MEDIA DE SALARIOS ES MAYOR QUE
+
+--  LA MEDIA DE TODOS LOS SALARIOS DE TODA LA EMPRESA
+
+
+
+SELECT DEPT_NO,ROUND(AVG(SALARIO))
+  FROM EMPLE
+  GROUP BY DEPT_NO
+  HAVING AVG(SALARIO) > (SELECT AVG(SALARIO) FROM EMPLE);
+
+
+
+-- NOMBRE DEPARTAMENTOS CON SALARIO MEDIO SUPEROR A LA MEDIA DE TODA
+-- LA EMPRESA
+
+
+
+SELECT DNOMBRE
+  FROM EMPLE E,DEPART D
+  WHERE E.DEPT_NO = D.DEPT_NO
+  GROUP BY E.DEPT_NO,DNOMBRE
+  HAVING AVG(SALARIO) > (SELECT AVG(SALARIO) FROM EMPLE);
+
+
+
+ -- O TAMBIÉN
+
+
+
+SELECT DNOMBRE,DEPT_NO
+  FROM DEPART 
+  WHERE DEPT_NO IN(SELECT DEPT_NO FROM EMPLE
+                    GROUP BY DEPT_NO
+                    HAVING AVG(SALARIO) > (SELECT AVG(SALARIO) FROM EMPLE)
+                   );
+
+
+
+----MEDIAS SALARIALES POR  OFICIO;
+
+
+
+ SELECT OFICIO,ROUND(AVG(SALARIO),2) "MEDIA"
+
+  FROM EMPLE 
+
+  GROUP BY  OFICIO
+
+  ORDER BY "MEDIA" DESC;
+
+  
+
+
+
+  
+
+-- empleados que ganan lo mismo que la media de su oficio respectivo
+
+
+
+select apellido,salario,OFICIO
+ from emple
+ where (oficio,salario) in (select oficio,avg(salario)
+                           from emple
+                           group by oficio);
+
+                           
+
+ -- empleados que ganan menos que la media de su oficio respectivo;                          
+
+select apellido,salario
+ from emple e
+ where salario <  (select avg(salario)
+                  from emple
+                  where e.oficio=oficio
+                   group by oficio
+                   );                             
+
+                           
+
+                           
+
+ -- empleados que ganan MAS que la media de su oficio respectivo;
+
+ select apellido,salario
+
+ from emple e
+
+ where salario > (select avg(salario)
+
+                  from emple
+
+                  where e.oficio=oficio
+
+                   group by oficio
+
+                   );        
+
+                                     
+
+  
+
+  
+
+  -- empleados que ganan mas de la media en el departamento
+
+ -- en el que trabajan
+
+  
+
+  select apellido,salario
+
+  from emple e
+
+  where salario > (select avg(salario)
+
+                   from emple
+
+                   where e.dept_no=dept_no
+
+                   group by dept_no);        
+
+                         
+
+                                           
+
+  
+
+-- CIUDAD CON MAS EMPLEADOS;
+
+
+
+  SELECT LOC FROM DEPART
+
+        WHERE DEPT_NO IN (SELECT DEPT_NO FROM EMPLE
+
+                          GROUP BY DEPT_NO
+
+                          HAVING COUNT(*) = (SELECT MAX(COUNT(*)) FROM EMPLE
+
+                                             GROUP BY DEPT_NO)
+
+                          );
+
+                          
+
+  --CIUDAD CON MAS TRABAJADORES DE OFICIO EMPLEADO
+
+  SELECT LOC FROM DEPART
+       WHERE DEPT_NO IN ( SELECT DEPT_NO
+                          FROM EMPLE
+                          WHERE OFICIO='EMPLEADO'
+                          GROUP BY DEPT_NO
+                          HAVING COUNT(*) =  ( SELECT MAX(COUNT(*))
+                                              FROM EMPLE
+                                              WHERE OFICIO='EMPLEADO'
+                                              GROUP BY DEPT_NO
+                                              )
+                         );
+
+                         
+
+   
+
+
+
+
+
+ 2---------------- UNIONES EXTERNAS-------------------------------------------------
+
+
+
+ 
+
+ DESC PARALEER;
+
+DESC LEIDOS;
+
+SELECT * FROM PARALEER;
+
+SELECT * FROM LEIDOS;
+DELETE FROM LEIDOS WHERE COD_LIBRO=400;
+INSERT INTO LEIDOS VALUES(400,'12/12/2020');
+
+
+-- SACAR CODIGO, NOMBRE LIBRO Y SU FECHA DE LECTURA
+
+SELECT P.COD_LIBRO,NOMBRE_LIBRO,FECHA
+
+   FROM PARALEER P,LEIDOS L
+
+   WHERE P.COD_LIBRO=L.COD_LIBRO;
+
+
+
+SELECT P.COD_LIBRO,NOMBRE_LIBRO,FECHA
+
+   FROM PARALEER P,LEIDOS L
+
+   WHERE L.COD_LIBRO(+)=P.COD_LIBRO;
+
+
+SELECT * FROM EMPLE;
+
+
+SELECT D.DEPT_NO,APELLIDO
+
+   FROM EMPLE E,DEPART D
+
+   WHERE D.DEPT_NO=E.DEPT_NO(+);
+
+
+
+SELECT * FROM EMPLE;
+
+SELECT * FROM DEPART;
+
+
+
+SELECT APELLIDO,DEPART.DEPT_NO, LOC
+
+ FROM EMPLE, DEPART
+
+ WHERE EMPLE.DEPT_NO(+) = DEPART.DEPT_NO;
+
+
+
+---------------- RECUPERACION JER\C1RQUICA-------------------------------------------------
+
+--NOMBRE EMPLEADOS CON EL MISMO JEFE QUE TOVAR;
+
+
+
+SELECT APELLIDO,dir
+       FROM EMPLE
+       WHERE DIR = (SELECT DIR FROM EMPLE
+                     WHERE APELLIDO='TOVAR');

@@ -1,0 +1,56 @@
+#!/bin/bash
+opcion=0
+while [ $opcion -ne 5 ]
+do
+	echo \t\t "SCRIPT MENU"
+	echo "\t\t ==============="
+	echo "\t\t Opcion 1 Copiar ficheros a un directorio"
+	echo "\t\t Opcion 2 Borrar ficheros"
+	echo "\t\t Opcion 3 Renombrar ficheros"
+	echo "\t\t Opcion 4 Mover ficheros a un directorio"
+	echo "\t\t Opcion 5 salir"
+	read -p "Que opcion quieres ejecutar??" opcion
+	
+	case $opcion in
+		1)
+		read -p "cual es la direccion del fichero a copiar??" direccion
+		
+		cd $direccion
+		ls
+		read -p "cual es el fichero que quieres copiar??" fichero
+		read -p "cual es la direccion del fichero donde lo quieres pegar??" ruta_pega
+		cp $fichero $ruta_pega
+		
+			;;
+		2)
+		read -p "cual es la direccion del fichero a borrar??" direccion
+		
+		cd $direccion
+		ls
+		read -p "cual es el fichero que quieres borrar??" fichero
+		rm $fichero
+			;;
+		3)
+		read -p "cual es la direccion del fichero a renombrar??" direccion
+		cd $direccion
+		ls
+		read -p "cual es el fichero que quieres renombrar??" fichero
+		read -p "cual es el nuevo nombre del fichero??" newname
+		mv $fichero $newname
+			;;
+		4)
+		read -p "donde esta el fichero que quieres mover??" direccion
+		read -p "cual es el fichero que quieres mover?" fichero
+		faltan cosassssssss
+			;;
+		5)
+		echo "saliendo del script"
+			exit 0
+			;;
+		*) 
+		echo "opcion invalida"
+			;;
+		esac
+done
+sleep 10s
+

@@ -1,0 +1,9 @@
+#!/bin/bash
+clear
+#pedir nombre de app que quieres cambiar de prioridad
+read -p "que app quieres cambiar de pri" app
+#mostrar prioridad actual
+ps -C -c $app
+#cambiar prioridad pidiendo nuevo valor de bondad(nice,renice)
+#mostrar prioridad actual cambiada del proceso
+

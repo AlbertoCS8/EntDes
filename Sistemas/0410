@@ -1,0 +1,74 @@
+alumnot@a37pc04:~$ cat /etc/anacrontab
+# /etc/anacrontab: configuration file for anacron
+
+# See anacron(8) and anacrontab(5) for details.
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+HOME=/root
+LOGNAME=root
+
+# These replace cron's entries
+1	5	cron.daily	run-parts --report /etc/cron.daily
+7	10	cron.weekly	run-parts --report /etc/cron.weekly
+@monthly	15	cron.monthly	run-parts --report /etc/cron.monthly
+alumnot@a37pc04:~$ systemctl status anacron
+● anacron.service - Run anacron jobs
+     Loaded: loaded (/lib/systemd/system/anacron.service; enabled; vendor prese>
+     Active: inactive (dead) since Wed 2023-10-04 16:01:55 CEST; 7min ago
+TriggeredBy: ● anacron.timer
+       Docs: man:anacron
+             man:anacrontab
+   Main PID: 839 (code=exited, status=0/SUCCESS)
+
+Warning: some journal files were not opened due to insufficient permissions.
+------------------------------------------------------------------------------
+period  delay  job-identifier  command
+--------------------------------------------------------
+man anacron
+------------------------------------------------------------------------------
+VER EEL TIMER
+
+alumnot@a37pc04:~$ systemctl cat anacron.timer
+# /lib/systemd/system/anacron.timer
+[Unit]
+Description=Trigger anacron every hour
+
+[Timer]
+OnCalendar=*-*-* 07..23:30
+RandomizedDelaySec=5m
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+---------------------------------------------------------------
+Usage:  anacron [-s] [-f] [-n] [-d] [-q] [-t anacrontab] [-S spooldir] [job] ...
+        anacron [-S spooldir] -u [job] ...
+        anacron [-V|-h]
+        anacron -T [-t anacrontab]
+
+ -s  Serialize execution of jobs
+ -f  Force execution of jobs, even before their time
+ -n  Run jobs with no delay, implies -s
+ -d  Don't fork to the background
+ -q  Suppress stderr messages, only applicable with -d
+ -u  Update the timestamps without actually running anything
+ -t  Use this anacrontab
+ -V  Print version information
+ -h  Print this message
+ -T  Test an anacrontab
+ -S  Select a different spool directory
+-------------------------------------------------------------------
+alumnot@a37pc04:~/Escritorio$ rm borrar1.txt
+alumnot@a37pc04:~/Escritorio$ rm borrar1.txt && borrar2.txt
+borrar2.txt: orden no encontrada
+alumnot@a37pc04:~/Escritorio$ rm borrar1.txt && rm borrar2.txt
+alumnot@a37pc04:~/Escritorio$ for valor in 1 2 3 4 5 
+> do echo "$valor"
+> done
+1
+2
+3
+4
+5
+--------------------------------------------------------------
